@@ -1,30 +1,11 @@
-# Project checkpoint — 2026-09-27
+# Project status — v0.4
 
-## Current version
-HAWK Radar Watch 0.3.0 (Android versionCode 3), package `com.jb.radar`.
-This repository is the project backup and source of truth for continuing development.
-The initial sketch has an altitude-vs-speed display at left and a circular search radar at right.
-The detailed requirements are in `Mission-Guide.txt` supplied by the project owner.
+Owner: PRIME. Repository: uran39281-bit/Hank-radar-watch. Android package com.jb.radar, versionCode 4, title AIR DEFAME 101.
 
-## Files
-- `src/com/jb/radar/Game.java`: standalone game model, aircraft, radar measurements, identification, terrain, missiles, channels and reloads.
-- `src/com/jb/radar/MainActivity.java`: Android Activity, custom Canvas interface, controls and lifecycle.
-- `tests/GameTest.java`: deterministic rule and simulation tests.
-- `tests/MissionSmoke.java`: ten seeded whole-mission runs with inventory/channel invariants.
-- `build.sh`: build without Gradle, using Android SDK tools and Java.
-- `artifacts/`: signed APK and SHA-256 checksum.
+Read README.md, Mission-Guide.txt and Update-Guide-v0.4.txt before changing behavior. The original sketch, terminal-green palette and launcher image are retained. Latest APK is artifacts/Air-Defame-101-v0.4.apk, signed with the existing private development certificate. Never publish the keystore or its password.
 
-## Completed
-Native offline landscape game, five aircraft reference profiles, uncertain identification, terrain/clutter detection, coasting, up to two illuminated targets, three triple launchers, 9 ready + 9 reserve missiles, 90-second empty-launcher reloads, simplified missile motion and interception, scoring, mission ending, pause, optional sound and time acceleration.
+Completed: simple PLAY menu; original menu song with lifecycle control; bottom five controls; passive priority tracking separate from two-channel locking; uncertain identification and heading glyphs; enemy guided missiles, radar damage and dynamic range presets. Source, tests, guides, media and APK are backed up here.
 
-## Verification and remaining work
-Compilation, signing verification, model tests and ten seeded mission simulations passed. Desktop drawing-harness layout inspection passed. No actual phone/emulator install or touchscreen testing has been completed. Human gameplay balance remains untested. Missiles use arcade pursuit and a generous game collision tolerance; these are not validated real-world models. Resume by testing installation, touch sizing and gameplay on the user's phone, then implement requested changes.
+Verified: compilation, APK signature, assets and manifest, deterministic model tests, ten seeded mission smoke runs, desktop drawing and music lifecycle logic. No Android device/emulator was available: real playback, installation, touch usability and balancing require owner testing.
 
-## Signing and privacy
-The repository is public. Do not commit signing keys, passwords, tokens or private source archives containing them. The original development key is preserved separately in the owner's saved source ZIP, not here. Preserve the application ID and use that same key for in-place updates. Increment versionCode for the next release.
-
-## Suggested checks
-Compile the standalone Game.java and tests with javac, then run `com.jb.radar.GameTest` and `com.jb.radar.MissionSmoke`. See README for Android build prerequisites.
-
-## Latest change
-Terminal-green UI and owner-supplied launcher icon added to all three launcher cards. APK and layout preview updated. Compile, signature, embedded asset check and desktop layout inspection passed; phone testing remains pending.
+Future work: additional missions, balance based on playtests, accessibility/settings. Current missions do not survive process termination. Aircraft loadout selection is a simplified subset of guide examples.

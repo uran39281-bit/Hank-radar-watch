@@ -1,0 +1,1502 @@
+AIR DEFAME 101
+
+Game Design Update — UI, Radar Controls, Aircraft Identification & Enemy Radar Attacks
+
+This update expands the existing HAWK air-defense simulation with:
+
+- Main menu
+- In-game radar controls
+- Target cycling
+- Target tracking
+- Target locking
+- Missile firing
+- Radar range presets
+- Improved target identification uncertainty
+- Aircraft and missile radar icons
+- Enemy air-to-ground missile attacks
+- Anti-radiation missile attacks against the radar
+- Radar damage and degraded radar range
+
+The existing MIM-23A HAWK missile mechanics, ammunition system, launcher reload system, aircraft flight behavior, radar horizon, terrain masking, and two-target engagement limit should remain active.
+
+---
+
+1. GAME NAME
+
+Change the game title to:
+
+AIR DEFAME 101
+
+Display this title prominently on the main menu.
+
+---
+
+2. MAIN MENU
+
+For this version, keep the main menu extremely simple.
+
+The menu should contain:
+
+AIR DEFAME 101
+
+and one large button:
+
+PLAY
+
+Example:
+
+================================
+         AIR DEFAME 101
+================================
+
+
+             [ PLAY ]
+
+
+================================
+
+Pressing PLAY immediately starts Mission 1.
+
+Do not add:
+
+Settings
+
+Multiplayer
+
+Campaign
+
+Load Game
+
+Credits
+
+or other menu options yet.
+
+Those can be added later.
+
+---
+
+3. IN-GAME BOTTOM CONTROL BAR
+
+The main gameplay screen should have a permanent control bar along the bottom of the screen.
+
+Buttons:
+
+NEXT TARGET
+
+TRACK
+
+LOCK
+
+FIRE
+
+RANGE LIMIT
+
+Example:
+
+------------------------------------------------------------
+ NEXT TARGET | TRACK | LOCK | FIRE | RANGE LIMIT: 40 KM
+------------------------------------------------------------
+
+These buttons must be large enough to work well on a touchscreen.
+
+Each button should provide clear visual feedback when pressed.
+
+---
+
+4. NEXT TARGET
+
+Button:
+
+NEXT TARGET
+
+Purpose:
+
+Select the next closest detected radar contact.
+
+Targets should normally be sorted by distance.
+
+Example:
+
+Current target:
+
+TRACK 017
+RANGE: 31.4 KM
+
+Player presses:
+
+NEXT TARGET
+
+Radar selects:
+
+TRACK 004
+RANGE: 24.8 KM
+
+Press again:
+
+TRACK 022
+RANGE: 18.1 KM
+
+Continue cycling through detected contacts.
+
+After reaching the final contact, return to the first target.
+
+Only detected aircraft should be included.
+
+Missiles may have separate icons but should not normally be selected using NEXT TARGET unless missile interception is added later.
+
+---
+
+5. TRACK
+
+Button:
+
+TRACK
+
+TRACK tells the radar system to concentrate tracking calculations on the selected aircraft.
+
+Tracking does NOT mean the aircraft has been selected for missile firing.
+
+Tracking should:
+
+- Add the aircraft to the priority target list.
+- Increase measurement frequency.
+- Improve speed estimation.
+- Improve altitude estimation.
+- Improve heading estimation.
+- Improve size estimation.
+- Improve identification confidence over time.
+- Keep the aircraft highlighted.
+
+TRACK should not produce a radar-lock warning for the enemy aircraft.
+
+However, an aircraft with an RWR may still know that search radar energy exists in the area.
+
+The important distinction is:
+
+TRACK = surveillance / priority tracking
+
+LOCK = fire-control radar lock
+
+Example:
+
+TRACK 014
+STATUS: TRACKING
+RANGE: 26.8 KM
+ALT: 4,820 M
+SPD: 890 KM/H
+ID: UNKNOWN
+
+After observing longer:
+
+TRACK 014
+STATUS: TRACKING
+RANGE: 23.1 KM
+ALT: 4,760 M
+SPD: 905 KM/H
+ID: POSSIBLE SU-25
+CONFIDENCE: 47%
+
+---
+
+6. PRIORITY TARGET LIST
+
+Tracked aircraft should be added to a priority list.
+
+Example:
+
+PRIORITY TARGETS
+
+01  TRACK 014   POSSIBLE SU-25   23.1 KM
+02  TRACK 021   UNKNOWN          28.7 KM
+03  TRACK 009   LIKELY MIG-23    32.2 KM
+
+Tracking multiple aircraft does NOT mean all of them are locked.
+
+The HAWK system may continue observing several contacts while only engaging the limited number allowed by the fire-control system.
+
+---
+
+7. LOCK
+
+Button:
+
+LOCK
+
+LOCK prepares the selected aircraft for missile engagement.
+
+The target must normally be TRACKED before a lock can be established.
+
+When LOCK is pressed:
+
+1. Fire-control radar attempts to lock the aircraft.
+2. The aircraft becomes an active engagement target.
+3. The radar begins the illumination/fire-control process.
+4. The target aircraft receives a radar-lock warning if its warning equipment supports it.
+5. Enemy AI may begin defensive action.
+
+Example:
+
+TRACK 014
+
+STATUS:
+LOCKED
+
+RANGE:
+17.8 KM
+
+TARGET:
+PROBABLE SU-25
+
+MISSILE:
+READY
+
+The selected target should receive a clear lock indicator.
+
+For example:
+
+[ LOCK ]
+
+or:
+
+LOCKED TARGET
+
+The radar target icon could also become brighter or change shape.
+
+---
+
+8. TARGET LOCK WARNING
+
+When an enemy aircraft becomes LOCKED, its AI should know that a fire-control radar is tracking it.
+
+Depending on:
+
+- Aircraft type
+- Pilot skill
+- Range
+- Mission behavior
+- Current attack objective
+
+the aircraft may react.
+
+Possible reactions:
+
+Turn away
+
+Dive
+
+Accelerate
+
+Begin terrain masking
+
+Perform defensive maneuvers
+
+Continue attacking despite the warning
+
+Prepare countermeasures
+
+The aircraft should not always react identically.
+
+---
+
+9. FIRE
+
+Button:
+
+FIRE
+
+FIRE launches a MIM-23A HAWK missile at the currently locked target.
+
+Requirements:
+
+Target must be locked.
+
+A launcher must have a missile available.
+
+The target must be within the permitted missile engagement envelope.
+
+One of the two engagement channels must be available.
+
+Example:
+
+TARGET LOCKED
+RANGE 16.4 KM
+
+M192-1
+3 MISSILES READY
+
+[FIRE]
+
+After pressing FIRE:
+
+M192-1
+2 MISSILES READY
+
+MISSILE AWAY
+
+Show the launched missile on radar.
+
+---
+
+10. RANGE LIMIT
+
+Button:
+
+RANGE LIMIT
+
+RANGE LIMIT changes the displayed radar range.
+
+For now use:
+
+10 KM
+
+20 KM
+
+30 KM
+
+40 KM
+
+Pressing RANGE LIMIT cycles between them:
+
+10 KM
+↓
+20 KM
+↓
+30 KM
+↓
+40 KM
+↓
+10 KM
+
+Example:
+
+RANGE LIMIT: 20 KM
+
+The radar display scale changes accordingly.
+
+---
+
+11. SHORTER RANGE = HIGHER PRECISION
+
+For gameplay, shorter radar range settings should provide more accurate information.
+
+This represents the radar system concentrating its display and processing on a smaller area.
+
+Suggested values:
+
+10 KM
+
+Highest precision.
+
+Very accurate:
+
+Range
+
+Speed
+
+Altitude
+
+Heading
+
+Target size
+
+Aircraft identification
+
+---
+
+20 KM
+
+High precision.
+
+Small measurement errors.
+
+---
+
+30 KM
+
+Medium precision.
+
+Aircraft identification becomes less reliable.
+
+---
+
+40 KM
+
+Lowest precision.
+
+More uncertainty in:
+
+Speed
+
+Altitude
+
+Size
+
+Target identification
+
+This setting is excellent for detecting approaching threats but not as good for identifying them.
+
+---
+
+12. RADAR RANGE ACCURACY MULTIPLIER
+
+Suggested starting values:
+
+10 KM = 100% measurement quality
+20 KM = 92%
+30 KM = 82%
+40 KM = 70%
+
+These values can be adjusted after gameplay testing.
+
+Distance to the actual target should still matter.
+
+A target at 38 km should be harder to identify than a target at 8 km.
+
+---
+
+13. AIRCRAFT RADAR ICONS
+
+Add simple top-down aircraft icons.
+
+The icon should show:
+
+- Aircraft position
+- Direction of travel
+- Track number
+- Selected state
+- Tracked state
+- Locked state
+
+Example:
+
+      ▲
+    T-014
+
+Aircraft heading should rotate the aircraft icon.
+
+A northbound aircraft points upward.
+
+A westbound aircraft points left.
+
+Etc.
+
+---
+
+14. UNKNOWN AIRCRAFT ICON
+
+If the radar does not have enough information to identify the aircraft, use a generic aircraft/contact symbol.
+
+Example:
+
+      ◇
+      ?
+    T-014
+
+or:
+
+UNKNOWN
+
+Do NOT immediately show the actual aircraft icon.
+
+The correct aircraft silhouette should become available only when identification confidence becomes sufficiently high.
+
+---
+
+15. IDENTIFIED AIRCRAFT ICONS
+
+Create different top-down icons for:
+
+Su-25
+
+MiG-21
+
+MiG-23
+
+Su-22
+
+Su-17
+
+The icons should be simplified radar-style silhouettes rather than detailed aircraft images.
+
+The player should eventually be able to recognize different aircraft by icon shape.
+
+However, the icon should only change from UNKNOWN to a specific aircraft after the radar identification system becomes sufficiently confident.
+
+---
+
+16. UNKNOWN FACTOR
+
+Add an explicit UNKNOWN FACTOR to target identification.
+
+Radar identification should NEVER be guaranteed merely because the game internally knows what aircraft was spawned.
+
+Each target maintains several identification probabilities.
+
+Example:
+
+TRACK 014
+
+SU-25       52%
+SU-17       18%
+SU-22       16%
+MIG-21       5%
+MIG-23       2%
+UNKNOWN       7%
+
+The UNKNOWN percentage represents information that the radar cannot confidently explain.
+
+At long range:
+
+MIG-23      32%
+SU-17       20%
+SU-22       18%
+UNKNOWN     30%
+
+At close range:
+
+MIG-23      94%
+UNKNOWN      3%
+OTHER        3%
+
+---
+
+17. WHAT INCREASES THE UNKNOWN FACTOR?
+
+Increase UNKNOWN when:
+
+Target is far away.
+
+Target is flying extremely low.
+
+Target is partially hidden by terrain.
+
+Ground clutter is strong.
+
+The target is maneuvering heavily.
+
+The radar has only observed it briefly.
+
+Target size measurement is unreliable.
+
+Multiple aircraft have similar characteristics.
+
+The player is using a long radar range setting.
+
+---
+
+18. WHAT DECREASES THE UNKNOWN FACTOR?
+
+Decrease UNKNOWN when:
+
+Target gets closer.
+
+Target remains tracked longer.
+
+Target climbs higher.
+
+Radar line-of-sight improves.
+
+Player changes to a shorter range setting.
+
+Speed becomes stable.
+
+Altitude becomes stable.
+
+Aircraft dimensions become easier to estimate.
+
+More movement history becomes available.
+
+---
+
+19. IDENTIFICATION STATES
+
+Suggested states:
+
+0–30%
+UNKNOWN
+
+30–50%
+POSSIBLE
+
+50–75%
+LIKELY
+
+75–90%
+PROBABLE
+
+90%+
+HIGH CONFIDENCE
+
+Example:
+
+POSSIBLE MIG-23
+42%
+
+later:
+
+LIKELY MIG-23
+63%
+
+later:
+
+HIGH CONFIDENCE MIG-23
+94%
+
+The identification can also become WORSE.
+
+Example:
+
+PROBABLE MIG-21
+81%
+
+Aircraft starts behaving differently:
+
+POSSIBLE SU-17
+54%
+
+This is intentional.
+
+---
+
+20. MISSILE RADAR ICONS
+
+Air-to-air, surface-to-air, and air-to-ground missiles should have their own radar icon.
+
+Use a smaller and faster-moving symbol than aircraft.
+
+Example:
+
+  ▷
+ MSL
+
+Differentiate:
+
+Friendly HAWK missile
+
+MIM-23
+
+Incoming enemy missile
+
+MSL
+
+If identified:
+
+KH-29
+
+or:
+
+ARM
+
+If not identified:
+
+UNKNOWN MSL
+
+---
+
+21. ENEMY AIR-TO-GROUND ATTACKS
+
+Some enemy aircraft should be capable of attacking the HAWK battery.
+
+Not every aircraft can do this equally well.
+
+Aircraft capabilities should follow the War Thunder versions being used for the game.
+
+---
+
+22. MIG-21BIS
+
+The MiG-21bis should NOT carry guided air-to-ground missiles in this mission.
+
+It may:
+
+Escort strike aircraft.
+
+Attack HAWK aircraft interceptors if those are added later.
+
+Distract the radar operator.
+
+Force the player to decide which target is most dangerous.
+
+The MiG-21 can therefore appear dangerous because of its speed even though another slower strike aircraft may represent the larger threat to the radar site.
+
+---
+
+23. MIG-23M
+
+The MiG-23M may carry:
+
+Kh-23M
+
+Use it as a limited air-to-ground attacker.
+
+Kh-23M Reference
+
+Mass:
+
+289 kg
+
+Guidance:
+
+Manual / MCLOS
+
+Maximum speed:
+
+Mach 2
+
+Nominal firing range:
+
+10 km
+
+Guidance time:
+
+25 seconds
+
+Explosive equivalent:
+
+approximately 96 kg TNT
+
+The MiG-23 should need to approach relatively close compared with dedicated anti-radiation attacks.
+
+It should also have difficulty performing extreme defensive maneuvers while manually guiding the missile.
+
+---
+
+24. SU-25
+
+The Su-25 may attack the battery using guided air-to-ground weapons.
+
+Available examples:
+
+Kh-25ML
+
+Kh-29L
+
+Kh-25ML
+
+Mass:
+
+297 kg
+
+Guidance:
+
+Laser
+
+Maximum speed:
+
+Mach 2
+
+Firing range:
+
+10 km
+
+Guidance time:
+
+45 seconds
+
+Explosive equivalent:
+
+approximately 119 kg TNT
+
+---
+
+Kh-29L
+
+Mass:
+
+657 kg
+
+Guidance:
+
+Laser
+
+Maximum speed:
+
+Mach 1.8
+
+Firing range:
+
+approximately 13 km
+
+Guidance time:
+
+40 seconds
+
+Explosive equivalent:
+
+approximately 186 kg TNT
+
+The Su-25 should normally need to approach the HAWK battery much closer than a dedicated anti-radiation strike aircraft.
+
+---
+
+25. SU-22M3
+
+The Su-22M3 may carry guided air-to-ground weapons including:
+
+Kh-23M
+
+Kh-25ML
+
+Kh-29L
+
+and an anti-radiation weapon:
+
+Kh-27PS
+
+The Kh-27PS should make the Su-22 one of the more dangerous aircraft to the radar site.
+
+The missile specifically searches for radar emissions instead of requiring the aircraft to attack the radar like a normal visual ground target.
+
+---
+
+26. SU-17M4
+
+The Su-17M4 should be one of the main SEAD aircraft in Mission 1.
+
+SEAD:
+
+Suppression of Enemy Air Defenses
+
+It can carry weapons including:
+
+Kh-25ML
+
+Kh-29L
+
+Kh-29T
+
+Kh-27PS
+
+Kh-58U
+
+The Kh-27PS and Kh-58U are especially important because they are anti-radiation missiles.
+
+The War Thunder Su-17M4 supports:
+
+Kh-27PS — approximately 311 kg
+
+Kh-58U — approximately 640 kg
+
+These should represent some of the greatest threats to the HAWK radar.
+
+---
+
+27. ANTI-RADIATION MISSILE LOGIC
+
+Anti-radiation missiles are different from ordinary air-to-ground missiles.
+
+They search for radar emissions.
+
+The gameplay concept should be:
+
+HAWK RADAR TRANSMITS
+        ↓
+ENEMY SEAD AIRCRAFT DETECTS RADAR
+        ↓
+RADAR LOCATION ESTIMATED
+        ↓
+ANTI-RADIATION MISSILE LAUNCHED
+        ↓
+MISSILE HOMES TOWARD RADAR
+
+This means operating the radar should have a consequence.
+
+For the first version, do not make this system excessively complicated.
+
+The enemy AI can simply calculate whether:
+
+- The radar is active.
+- Aircraft has an anti-radiation weapon.
+- Aircraft is within its launch conditions.
+- Radar signal is detectable.
+
+Then decide whether to fire.
+
+---
+
+28. INCOMING MISSILE DETECTION
+
+An incoming enemy missile should appear as a radar contact if the radar detects it.
+
+Example:
+
+WARNING
+
+HIGH SPEED CONTACT
+
+RANGE: 14.2 KM
+SPD: 2,130 KM/H
+
+CLASS:
+MISSILE
+
+If identification is available:
+
+INCOMING
+
+KH-27PS
+ANTI-RADIATION MISSILE
+
+If not:
+
+INCOMING
+
+UNKNOWN MISSILE
+
+---
+
+29. MISSILE ICON
+
+Enemy missiles should use a smaller icon than aircraft.
+
+Example:
+
+        >
+       MSL
+
+The icon should move significantly faster than aircraft icons.
+
+If the missile is heading toward the radar station, display:
+
+INCOMING
+
+Example:
+
+⚠ INCOMING MISSILE
+
+---
+
+30. AIRCRAFT ATTACK BEHAVIOR
+
+Enemy strike aircraft should not launch immediately after spawning.
+
+They should:
+
+1. Enter radar coverage.
+2. Navigate toward the target area.
+3. Search for the HAWK site.
+4. Reach acceptable missile-launch conditions.
+5. Launch.
+6. Turn away or begin defensive maneuvering.
+
+Different aircraft should behave differently.
+
+---
+
+31. SU-25 ATTACK BEHAVIOR
+
+The Su-25 should normally:
+
+Fly relatively low.
+
+Use terrain.
+
+Approach closer.
+
+Launch Kh-25ML or Kh-29L.
+
+Turn away after launch.
+
+It may need to continue laser designation depending on the missile.
+
+This makes the Su-25 vulnerable to the HAWK during the attack.
+
+---
+
+32. MIG-23M ATTACK BEHAVIOR
+
+A MiG-23 carrying a Kh-23M should:
+
+Approach quickly.
+
+Launch from relatively short range.
+
+Maintain attention on the target while guiding.
+
+Have reduced ability to perform aggressive defensive maneuvers during missile guidance.
+
+After the missile hits or misses, it may immediately accelerate away.
+
+---
+
+33. SU-17 / SU-22 ATTACK BEHAVIOR
+
+Su-17 and Su-22 aircraft should be more likely to perform SEAD missions.
+
+Typical behavior:
+
+Fly low.
+
+Approach using terrain.
+
+Detect radar emission.
+
+Climb briefly if required.
+
+Launch anti-radiation missile.
+
+Turn away.
+
+Descend.
+
+Exit the HAWK engagement zone.
+
+This creates an important priority decision for the player.
+
+A MiG-21 may be closer.
+
+But the Su-17 farther away may actually be the aircraft preparing to destroy the radar.
+
+---
+
+34. RADAR BASE DAMAGE
+
+Enemy missiles can damage the HAWK battery.
+
+For this version, use a simplified damage system.
+
+Every successful missile hit reduces the radar's maximum effective detection range.
+
+Use a randomized damage value.
+
+Suggested starting value:
+
+2–8 km radar range lost per missile hit.
+
+Example:
+
+Starting radar:
+
+MAX RADAR RANGE
+40 KM
+
+Missile hits:
+
+RADAR HIT
+
+DAMAGE:
+-6 KM
+
+New maximum:
+
+MAX RADAR RANGE
+34 KM
+
+Second missile:
+
+RADAR HIT
+
+DAMAGE:
+-4 KM
+
+New range:
+
+30 KM
+
+The exact damage amount should be randomized for now.
+
+---
+
+35. DAMAGED RANGE PRESETS
+
+Radar presets should respect the remaining radar capability.
+
+Example:
+
+Normal radar:
+
+10 KM
+20 KM
+30 KM
+40 KM
+
+Radar damaged to maximum 27 km:
+
+10 KM
+20 KM
+27 KM MAX
+
+The 30 km and 40 km options are unavailable.
+
+If the radar has only 13 km remaining:
+
+10 KM
+13 KM MAX
+
+---
+
+36. RADAR DAMAGE WARNING
+
+When a missile hits the radar site:
+
+Flash a warning.
+
+Example:
+
+============================
+
+      RADAR IMPACT
+
+ SYSTEM DAMAGE DETECTED
+
+ RADAR RANGE REDUCED
+
+       -5.3 KM
+
+============================
+
+Then return to gameplay.
+
+---
+
+37. MULTIPLE RADAR HITS
+
+Damage should accumulate.
+
+Example:
+
+START
+40 KM
+
+HIT #1
+-5 KM
+35 KM
+
+HIT #2
+-7 KM
+28 KM
+
+HIT #3
+-3 KM
+25 KM
+
+This progressively makes the mission harder.
+
+The player loses early warning distance.
+
+Aircraft appear later.
+
+Identification becomes harder.
+
+The player has less time to react.
+
+---
+
+38. RADAR DESTROYED STATE
+
+If radar range reaches:
+
+0 KM
+
+the radar becomes unavailable.
+
+Display:
+
+RADAR SYSTEM DESTROYED
+
+For Mission 1 this may trigger:
+
+MISSION FAILED
+
+---
+
+39. PRIORITY THREAT LOGIC
+
+The radar should NOT automatically tell the player exactly which enemy must be destroyed first.
+
+However, the system can calculate a general threat level.
+
+Possible factors:
+
+Aircraft range.
+
+Aircraft heading.
+
+Aircraft speed.
+
+Aircraft identification.
+
+Whether aircraft is approaching the base.
+
+Whether aircraft is carrying air-to-ground missiles.
+
+Whether aircraft has launched a weapon.
+
+Example:
+
+TRACK 017
+MIG-21
+THREAT: MEDIUM
+
+TRACK 022
+SU-17
+THREAT: HIGH
+
+TRACK 031
+SU-25
+THREAT: HIGH
+
+Do not reveal an aircraft's weapons before the radar has enough information.
+
+---
+
+40. UNKNOWN PAYLOAD
+
+Aircraft payload should also contain uncertainty.
+
+At long range:
+
+PAYLOAD:
+UNKNOWN
+
+After better identification:
+
+PAYLOAD:
+POSSIBLE A/G WEAPONS
+
+If missile launch is observed:
+
+WEAPON LAUNCH DETECTED
+
+After missile identification:
+
+KH-27PS
+ANTI-RADIATION MISSILE
+
+---
+
+41. TARGET DATA PANEL
+
+When an aircraft is selected, show something similar to:
+
+TRACK 014
+
+ID:
+POSSIBLE SU-22
+
+CONFIDENCE:
+58%
+
+UNKNOWN:
+22%
+
+RANGE:
+24.7 KM
+
+ALT:
+1,870 M
+
+SPD:
+1,040 KM/H
+
+HDG:
+247°
+
+STATUS:
+TRACKING
+
+THREAT:
+HIGH
+
+PAYLOAD:
+UNKNOWN
+
+When locked:
+
+STATUS:
+LOCKED
+
+ENGAGEMENT:
+CHANNEL 1
+
+MIM-23A:
+READY
+
+---
+
+42. MISSILE DATA PANEL
+
+When an incoming missile is detected:
+
+MISSILE TRACK M-004
+
+TYPE:
+UNKNOWN ARM
+
+RANGE:
+11.8 KM
+
+SPEED:
+1,730 KM/H
+
+HEADING:
+HAWK SITE
+
+STATUS:
+INCOMING
+
+If confidently identified:
+
+TYPE:
+KH-27PS
+
+CLASS:
+ANTI-RADIATION MISSILE
+
+---
+
+43. UI COLORS
+
+Maintain the radar-terminal visual style.
+
+Use primarily:
+
+Terminal green
+
+and
+
+White
+
+Green:
+
+Normal radar information
+
+Aircraft tracks
+
+Buttons
+
+Radar lines
+
+Text
+
+White:
+
+Selected information
+
+Important values
+
+Locked target information
+
+Warnings may flash between bright terminal green and white rather than introducing many additional colors.
+
+---
+
+44. BOTTOM BAR EXAMPLE
+
+Normal:
+
+┌───────────────────────────────────────────────────────────────┐
+│ NEXT TARGET │ TRACK │ LOCK │ FIRE │ RANGE LIMIT: 40 KM     │
+└───────────────────────────────────────────────────────────────┘
+
+Tracking:
+
+┌───────────────────────────────────────────────────────────────┐
+│ NEXT TARGET │ TRACKING │ LOCK │ FIRE │ RANGE: 20 KM         │
+└───────────────────────────────────────────────────────────────┘
+
+Locked:
+
+┌───────────────────────────────────────────────────────────────┐
+│ NEXT TARGET │ TRACK │ LOCKED │ FIRE │ RANGE: 20 KM          │
+└───────────────────────────────────────────────────────────────┘
+
+---
+
+45. PLAYER GAMEPLAY LOOP
+
+The intended gameplay loop is now:
+
+Detect
+
+↓
+
+Select target
+
+↓
+
+Track
+
+↓
+
+Observe
+
+↓
+
+Attempt identification
+
+↓
+
+Determine threat
+
+↓
+
+Lock
+
+↓
+
+Enemy receives warning
+
+↓
+
+Fire
+
+↓
+
+Maintain engagement
+
+↓
+
+Enemy maneuvers
+
+↓
+
+Missile intercepts or misses
+
+↓
+
+Move to next threat
+
+Meanwhile enemy strike aircraft may be preparing their own attacks against the HAWK radar.
+
+---
+
+46. CORE DESIGN PRINCIPLE
+
+The player should constantly make decisions with incomplete information.
+
+Example:
+
+The radar shows three contacts:
+
+TRACK 014
+POSSIBLE MIG-21
+15 KM
+
+TRACK 021
+UNKNOWN
+24 KM
+
+TRACK 033
+POSSIBLE SU-17
+31 KM
+
+The MiG-21 is closest.
+
+However:
+
+TRACK 033 may be an Su-17 carrying an anti-radiation missile.
+
+The player must decide:
+
+Do I engage the closest aircraft?
+
+Do I wait for better identification?
+
+Do I track the distant aircraft?
+
+Do I use one of my two engagement channels?
+
+Do I risk allowing the strike aircraft to launch?
+
+This uncertainty should be one of the main features of Air Defame 101.
