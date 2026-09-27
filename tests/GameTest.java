@@ -1,7 +1,7 @@
 package com.jb.radar;
 public class GameTest {
  static void check(boolean b,String s){if(!b)throw new AssertionError(s);}
- static Game.Contact target(Game g,int n){Game.Contact t=new Game.Contact();t.id=100+n;t.type=0;t.x=9+n;t.y=0;t.alt=3000;t.speed=500;t.heading=-Math.PI/2;t.px=t.x;t.palt=t.alt;t.pspeed=t.speed;t.samples=4;t.seen=g.elapsed;t.quality=1;t.priority=true;t.alive=true;t.desiredAlt=2900;g.contacts.add(t);return t;}
+ static Game.Contact target(Game g,int n){Game.Contact t=new Game.Contact();t.id=100+n;t.type=0;t.x=9+n;t.y=0;t.alt=3000;t.speed=500;t.heading=-Math.PI/2;t.px=t.x;t.palt=t.alt;t.pspeed=t.speed;t.samples=4;t.seen=g.elapsed;t.quality=1;t.priority=true;t.radarTracked=true;t.alive=true;t.desiredAlt=2900;g.contacts.add(t);return t;}
  public static void main(String[] a){
   Game g=new Game(8);g.start();check(g.ready()==9&&g.reserve==9,"inventory");g.contacts.clear();
   Game.Contact t=target(g,0),t2=target(g,1),t3=target(g,2);

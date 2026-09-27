@@ -1,17 +1,13 @@
-# Project status — v0.7
+# Project status — v0.8
 
-Repository: uran39281-bit/Hank-radar-watch. Android package com.jb.radar, versionCode 7, title AIR DEFAME 101.
+Repository: uran39281-bit/Hank-radar-watch. Android package com.jb.radar, versionCode 8, versionName 0.8.0, title AIR DEFAME 101. Latest APK: artifacts/Air-Defame-101-v0.8.apk.
 
-Read README.md, Mission-Guide.txt and Update-Guide-v0.7.txt before changing behavior. The original sketch, terminal-green palette and launcher image are retained. Latest APK is artifacts/Air-Defame-101-v0.7.apk, signed with the existing private development certificate. Never publish the keystore or its password.
+Read README.md, EQUIPMENT.md, Mission-Guide.txt and Update-Guide-v0.8.txt before changing behavior. Preserve the terminal green palette, supplied launcher illustration, original menu audio, economy_* preferences and existing signing certificate. Never publish signing keys or passwords.
 
-Completed: simple PLAY menu; original menu song with lifecycle control; bottom five controls; passive priority tracking separate from two-channel locking; uncertain identification and heading glyphs; enemy guided missiles, radar damage and dynamic range presets. Source, tests, guides, media and APK are backed up here.
+Completed: native landscape radar game; twelve-aircraft mission; uncertain identities and heading glyphs; terrain masking; separate TRACK and LOCK; selectable/interceptable incoming missiles; four-hit base and range damage; three radar launchers; separate IR seeker, ammo and flares; persistent Dollars and BP; receipts, retryable saving and interrupted-mission recovery.
 
-Verified: compilation, APK signature, assets and manifest, deterministic model tests, ten seeded mission smoke runs, desktop drawing and music lifecycle logic. No Android device/emulator was available: real playback, installation, touch usability and balancing require owner testing.
+Latest update: validated editable radar/missile profiles in assets/equipment.properties. Detection/tracking/lock range separation, finite track slots, per-target datalink channels, scan timing, IR support/lock range, guidance types/modes and finite guidance time. Equipment.java loads profiles, MissileMotion.java supplies shared arcade acceleration/turn/energy behavior, and the menu EQUIPMENT page shows battery and all seven weapon profiles. Only the existing loadout ships; active/command/passive primary profiles are supported for future equipment. No tech tree or purchases yet.
 
-Future work: additional missions, balance based on playtests, accessibility/settings. Current missions do not survive process termination. Aircraft loadout selection is a simplified subset of guide examples.
+Verified: six pure Java model suites, ten seeded full missions, desktop rendering and menu/music/economy adapter checks. APK compiled; v2/v3 signature and previous signing identity verified; assets and manifest inspected. Real Android installation, audio playback, touch usability and human balance testing remain unverified. The current mission does not survive process termination; earned currency does.
 
-Latest additions: selectable/interceptable enemy missiles; contact ID colors and labels; right-side controls; left priority list; four-hit base limit; dim animated menu radar. tests/InterceptionTest.java covers the new mechanics.
-
-Latest: separate IR-6 heat-seeking launcher with independent ammo/reload, warmup/acquisition, passive lock, post-launch self-guidance, heat/aspect/terrain gates and moving flares. See Infrared.java, tests/InfraredTest.java and Update-Guide-v0.7.txt. Radar MIM-23 behavior remains separate.
-
-Latest: persistent Dollars and BP balances, combat/victory/base rewards, detailed debrief and economy page, duplicate-payout checks, save retry and interrupted-mission handling. Tests: EconomyTest.java. New classes: Economy.java / EconomyStore.java. Tech tree and spending are explicitly future work. Preserve economy_* preferences and lifetime totals in future migrations.
+Build: see build.sh and README; use original private key for in-place updates. Run test.sh with javac or RADAR_ECJ. Tests intentionally use fictional values; do not represent them as real operational missile performance. Future work: owner playtests, equipment selection/research, additional missions and accessibility.

@@ -1,0 +1,27 @@
+Additional Radar and Missile Mechanics
+
+Add configurable characteristics for each radar system and missile. These values should determine their detection, tracking, guidance, and engagement capabilities.
+
+Radar System Characteristics
+- System name
+- Maximum detection range: Farthest distance at which the radar can detect a contact.
+- Maximum tracking range: Farthest distance at which the radar can maintain a target track.
+- Maximum radar lock range: Farthest distance at which the radar can lock a target for engagement.
+- Maximum simultaneous tracks: Number of targets the radar can track at once.
+- Datalink channels: Number of available channels for exchanging target or guidance data.
+- Radar scan speed: How quickly the radar scans and updates contact information.
+- Infrared guidance support: Whether the system supports compatible IR-guided missiles.
+- Maximum IR lock range: Farthest distance at which a compatible infrared seeker can acquire a target.
+
+Missile Characteristics
+- Missile name
+- Guidance type: Radar, infrared, command guidance, or another method.
+- Radar guidance mode: Active, semi-active, or passive, where applicable.
+- Maximum guidance time: How long the missile can remain guided.
+- Maximum speed
+- Maximum G load: Maximum maneuvering acceleration.
+- Mass
+- Maximum angle of attack: Maximum AOA during flight.
+- Maximum thrust: Maximum force produced by the missile's motor.
+
+Use these characteristics to determine missile acceleration, turning ability, energy loss, and interception performance.

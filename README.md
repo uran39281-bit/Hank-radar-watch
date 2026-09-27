@@ -1,13 +1,13 @@
-# Air Defame 101 0.7 — Mission 1
+# Air Defame 101 0.8 — Mission 1
 
-Android game based on the creator's radar sketch and supplied "HAWK Air Defense Radar Game — Mission 1" guide (included as Mission-Guide.txt). Offline, landscape, Android 8+. No network or account permissions. Package com.jb.radar; version code 7; signed with the same development key as 0.1 for an in-place update.
+Android game based on the creator's radar sketch and supplied "HAWK Air Defense Radar Game — Mission 1" guide (included as Mission-Guide.txt). Offline, landscape, Android 8+. No network or account permissions. Package com.jb.radar; version code 8; signed with the same development key as 0.1 for an in-place update.
 
 ## Play
 Defend the command site from twelve incoming aircraft during a mission of up to ten simulation minutes. Tap a blip or NEXT TARGET. Two observations establish a track. Read its estimated identity and telemetry, press TRACK, LOCK, and FIRE when within the measured engagement envelope. Maintain illumination until interception. RELEASE LOCK frees a channel but risks missiles already in flight. Protect the site; intercepts award 250 points, aircraft reaching the site cost 100; enemy missile impacts reduce radar range.
 
-The radar starts at 40 km coverage, independent of the 25 km missile envelope. RANGE LIMIT cycles 10/20/30/40 km, with shorter presets improving measurements and identification. Each enemy missile impact removes 2–8 km cumulatively; damaged presets include the remaining maximum (for example 10/20/27). The fourth confirmed missile impact loses the mission. Remaining hits are displayed explicitly. The pale ring marks 25 km. Shaded patches are fictional hills. Unknown aircraft use heading-oriented diamonds; sufficiently confident estimated identities use aircraft silhouettes. Small arrows distinguish friendly and incoming missiles. Enemy missiles can be selected and engaged with TRACK / LOCK / FIRE, sharing the two channels with aircraft. Position and telemetry are radar observations, not perfect live data.
+The radar starts at 40 km detection, 32 km tracking and 25 km locking, with twelve track slots. RANGE LIMIT cycles 10/20/30/40 km, with shorter presets improving measurements and identification. Each enemy missile impact removes 2–8 km cumulatively; damaged presets include the remaining maximum (for example 10/20/27). The fourth confirmed missile impact loses the mission. Remaining hits are displayed explicitly. The pale ring marks 25 km. Shaded patches are fictional hills. Unknown aircraft use heading-oriented diamonds; sufficiently confident estimated identities use aircraft silhouettes. Small arrows distinguish friendly and incoming missiles. Enemy missiles can be selected and engaged with TRACK / LOCK / FIRE, sharing the two channels with aircraft. Position and telemetry are radar observations, not perfect live data.
 
-Select launcher L1, L2 or L3 along the bottom. Each starts with three missiles; nine more are in reserve. Only completely empty launchers reload. A reload takes 90 simulation seconds. Three reserve rounds are allocated when reloading starts and transferred when it finishes; the reserve display includes allocated rounds until completion. A full three-round reserve allocation is required. A maximum of two aircraft may be illuminated; multiple missiles may target one illuminated aircraft.
+Select launcher L1, L2 or L3 along the bottom. Each starts with three missiles; nine more are in reserve. Only completely empty launchers reload. A reload takes 90 simulation seconds. Three reserve rounds are allocated when reloading starts and transferred when it finishes; the reserve display includes allocated rounds until completion. A full three-round reserve allocation is required. A maximum of two targets may be locked; multiple missiles may share the channel for one target.
 
 1x / 2x / 4x changes all simulation timing, including reloads and missile flight. Pause, guide, or backgrounding freezes the mission. Gameplay beeps are optional. The supplied menu theme loops only on the title screen, and pauses for gameplay, backgrounding and audio-focus loss. Best completed mission score persists. Current missions do not survive Android process termination.
 
@@ -17,7 +17,7 @@ Select launcher L1, L2 or L3 along the bottom. Each starts with three missiles; 
 - Unknown contacts, noisy range/speed/altitude/size/heading measurements, weighted aircraft-profile estimates, track history and confidence that can rise or fall. Su-17 and Su-22 have deliberately similar profiles. True types are revealed only in the debrief.
 - Simplified radar horizon, sampled line-of-sight terrain obstruction, altitude-dependent clutter, coasting and reacquisition.
 - Two illumination channels, 25 km measured slant-range launch gate, and a 13,700 m launch ceiling.
-- Accelerating missiles, altitude-adjusted approximate speed cap, later energy loss, finite steering, terrain collision and guidance loss after four seconds without illumination.
+- Profile-driven missile acceleration and speed caps, turn and coast energy loss, finite G/AOA steering, terrain collision and finite guidance time.
 - Hits use swept proximity geometry, not a random hit roll. A 120 m game collision tolerance is used for accessibility; it is not a claim about real missile lethality.
 
 This is a fictional game simulation, not a validated representation of HAWK or aircraft performance. Missile motion is simplified arcade pursuit. Terrain consists of two generated ridge features. Size is an identification proxy, not radar cross section. Reference values are taken from the supplied guide, not independently verified War Thunder data.
@@ -33,7 +33,7 @@ Requires Java 17 JDK, Android platform 35, build-tools 35.0.0 and zip. Set RADAR
 - No actual Android device/emulator installation or touch test was available. Initial gameplay balance is unvalidated by a human player.
 
 ## Download
-The compiled version is in [artifacts/Air-Defame-101-v0.7.apk](artifacts/Air-Defame-101-v0.7.apk).
+The compiled version is in [artifacts/Air-Defame-101-v0.8.apk](artifacts/Air-Defame-101-v0.8.apk).
 
 ## Continue development
 Read [PROJECT_STATUS.md](PROJECT_STATUS.md), then the mission guide and source before making changes.
@@ -81,3 +81,13 @@ Combat rewards save immediately and remain after defeat, restarting a mission or
 Economy.java owns reward rules, receipts and duplicate checks. EconomyStore.java saves a single SharedPreferences transaction for balances and payout markers. Save failures show a retry action, and a new mission cannot discard pending rewards. On relaunch, unfinished missions are marked interrupted while already saved earnings remain. Local progress is removed by app-data clearing or uninstalling; no cloud sync is provided. Full scope is in Update-Guide-v0.7.txt.
 
 Validation: EconomyTest exercises rewards, duplicate prevention, persistence/recovery, failed-write retries and real radar/IR payout hooks. Existing simulation regressions pass. A desktop Android-stub check verifies UI rendering, the preference adapter, preservation of best scores and save retry behavior. The signed APK was built and verified; no real Android device/emulator test was available.
+
+## Version 0.8 — Configurable radar and missile mechanics
+
+Implements [the supplied guide](Update-Guide-v0.8.txt). All requested radar and missile characteristics are loaded from [assets/equipment.properties](assets/equipment.properties) and displayed on the new EQUIPMENT / STATS menu page. Edit the asset and rebuild to tune the values; this is not an in-game stat editor. Defaults retain the HAWK / MIM-23, IR-6 and five enemy missile loadouts.
+
+Detection, tracking and locking have separate ranges. Aircraft and incoming missiles share finite track slots and per-target datalink channels. Scan speed affects observation timing; battery IR support and IR lock range gate the seeker. Missile mass, thrust, speed, G load, AOA, motor duration and guidance time affect flight through one shared arcade motion step. Active, semi-active, passive, command, IR and source-guided laser paths are supported. See [EQUIPMENT.md](EQUIPMENT.md) for units, limits and exact simplifications.
+
+All six model test suites and ten seeded missions pass. Desktop renders and menu/economy lifecycle checks passed; APK signature and in-place signing identity verified. No Android device/emulator was available for installation or playtesting. Dollars and BP preferences are unchanged. Run `./test.sh` for the pure Java tests.
+
+![Equipment stats](docs/equipment-radar-v08.png)
