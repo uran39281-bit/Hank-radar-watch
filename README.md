@@ -1,11 +1,11 @@
-# Air Defame 101 0.4 — Mission 1
+# Air Defame 101 0.5 — Mission 1
 
-Android game based on the creator's radar sketch and supplied "HAWK Air Defense Radar Game — Mission 1" guide (included as Mission-Guide.txt). Offline, landscape, Android 8+. No network or account permissions. Package com.jb.radar; version code 4; signed with the same development key as 0.1 for an in-place update.
+Android game based on the creator's radar sketch and supplied "HAWK Air Defense Radar Game — Mission 1" guide (included as Mission-Guide.txt). Offline, landscape, Android 8+. No network or account permissions. Package com.jb.radar; version code 5; signed with the same development key as 0.1 for an in-place update.
 
 ## Play
 Defend the command site from twelve incoming aircraft during a mission of up to ten simulation minutes. Tap a blip or NEXT TARGET. Two observations establish a track. Read its estimated identity and telemetry, press TRACK, LOCK, and FIRE when within the measured engagement envelope. Maintain illumination until interception. RELEASE LOCK frees a channel but risks missiles already in flight. Protect the site; intercepts award 250 points, aircraft reaching the site cost 100; enemy missile impacts reduce radar range.
 
-The radar starts at 40 km coverage, independent of the 25 km missile envelope. RANGE LIMIT cycles 10/20/30/40 km, with shorter presets improving measurements and identification. Each enemy missile impact removes 2–8 km cumulatively; damaged presets include the remaining maximum (for example 10/20/27). Zero remaining coverage loses the mission. The pale ring marks 25 km. Shaded patches are fictional hills. Unknown aircraft use heading-oriented diamonds; sufficiently confident estimated identities use aircraft silhouettes. Small arrows distinguish friendly and incoming missiles. Position and telemetry are radar observations, not perfect live data.
+The radar starts at 40 km coverage, independent of the 25 km missile envelope. RANGE LIMIT cycles 10/20/30/40 km, with shorter presets improving measurements and identification. Each enemy missile impact removes 2–8 km cumulatively; damaged presets include the remaining maximum (for example 10/20/27). The fourth confirmed missile impact loses the mission. Remaining hits are displayed explicitly. The pale ring marks 25 km. Shaded patches are fictional hills. Unknown aircraft use heading-oriented diamonds; sufficiently confident estimated identities use aircraft silhouettes. Small arrows distinguish friendly and incoming missiles. Enemy missiles can be selected and engaged with TRACK / LOCK / FIRE, sharing the two channels with aircraft. Position and telemetry are radar observations, not perfect live data.
 
 Select launcher L1, L2 or L3 along the bottom. Each starts with three missiles; nine more are in reserve. Only completely empty launchers reload. A reload takes 90 simulation seconds. Three reserve rounds are allocated when reloading starts and transferred when it finishes; the reserve display includes allocated rounds until completion. A full three-round reserve allocation is required. A maximum of two aircraft may be illuminated; multiple missiles may target one illuminated aircraft.
 
@@ -33,7 +33,7 @@ Requires Java 17 JDK, Android platform 35, build-tools 35.0.0 and zip. Set RADAR
 - No actual Android device/emulator installation or touch test was available. Initial gameplay balance is unvalidated by a human player.
 
 ## Download
-The compiled version is in [artifacts/Air-Defame-101-v0.4.apk](artifacts/Air-Defame-101-v0.4.apk).
+The compiled version is in [artifacts/Air-Defame-101-v0.5.apk](artifacts/Air-Defame-101-v0.5.apk).
 
 ## Continue development
 Read [PROJECT_STATUS.md](PROJECT_STATUS.md), then the mission guide and source before making changes.
@@ -49,3 +49,10 @@ Enemy aircraft can launch simplified air-to-ground missiles after approach: Su-2
 Weapon/profile reference pages: https://wiki.warthunder.com/unit/su_17m4 , https://wiki.warthunder.com/unit/su_22m3 , https://wiki.warthunder.com/unit/mig_23m , https://wiki.warthunder.com/unit/su_25 . No claim of exact real-world performance is made.
 
 The original user-supplied menu audio is bundled unchanged as assets/menu_theme.mp3. New deterministic tests cover track/lock separation, target cycling, damaged presets, launch delay, guidance loss and radar destruction. Desktop media stubs verify lifecycle decisions, not actual sound playback. The APK still needs a real Android device installation/playtest.
+
+## Version 0.5
+Implemented Update-Guide-v0.5.txt. The right panel holds NEXT TARGET, TRACK, LOCK, FIRE, RANGE LIMIT and RELEASE LOCK; priority targets are directly below target analysis on the left. The gameplay title, top range and mission timer are removed. The title menu retains the supplied song and gains a dim, soft radar sweep background.
+
+Contacts use gray for unknown affiliation/type, orange for known enemy with uncertain type, and red for known enemy/type. Green is reserved for future positively identified friendly targets; no friendly target spawning is added. The selected contact shows a full text identity label. Classification reflects observation history and confidence rather than revealing hidden aircraft identity. Incoming missiles can transition from gray to orange to red as observations accumulate.
+
+The base survives three impacts and is defeated on the fourth. Range damage still accumulates. Deterministic tests intercept all five moving enemy missile profiles, verify mixed aircraft/missile channel limits, sorted target selection, ID transitions and exact fourth-hit defeat. Model regression tests and ten mission smoke runs passed. Desktop renders were inspected; actual Android playback, installation and touch testing remain unverified.

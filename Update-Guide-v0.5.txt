@@ -1,0 +1,54 @@
+Air Defame 101 — Gameplay and UI Update
+
+1. Intercept Incoming Missiles
+
+Add the ability to shoot down enemy air-to-ground missiles, including anti-radiation missiles attacking the radar.
+
+Detected incoming missiles must be selectable. The player should be able to use TRACK → LOCK → FIRE to engage them. Update NEXT TARGET to cycle through both aircraft and incoming missiles.
+
+2. Target Identification Colors
+
+Apply these colors to aircraft and missile contacts:
+
+Identification state| Color| Meaning
+UNKNOWN TARGET| Gray| The radar does not know whether the contact is friendly or enemy, and its type is unknown.
+POSITIVE ID — ENEMY| Red| The radar has identified the contact as an enemy and knows its aircraft or missile type.
+POSITIVE ID — FRIENDLY| Green| The radar has identified the contact as friendly and knows its aircraft or missile type. Reserve this state for future use.
+UNSURE ID| Orange| The radar has identified the contact as an enemy, but its aircraft or missile type remains uncertain.
+
+Update contact colors as identification changes. Show a text label alongside the color so the identification state is always clear.
+
+Keep the surrounding interface primarily terminal green and white.
+
+3. Move the Control Buttons
+
+Move the gameplay controls from the bottom of the screen to a vertical panel on the right side:
+
+- NEXT TARGET
+- TRACK
+- LOCK
+- FIRE
+- RANGE LIMIT
+
+Keep the buttons large enough for comfortable touchscreen use.
+
+4. Move the Priority Target List
+
+Place PRIORITY TARGETS on the left side, directly below TARGET ANALYSIS.
+
+5. Simplify the Top Bar
+
+- Make the TIME, GUIDE, and PAUSE controls smaller.
+- Remove the game title from the gameplay screen to free up space.
+- Remove the radar-range readout from the top bar. Display it with the RANGE LIMIT control instead.
+- Remove the visible mission timer.
+
+6. Limit Base Survival
+
+For now, give the player’s base a four-missile-hit limit. Display the remaining hits clearly and update the indicator after each confirmed impact.
+
+7. Main Menu Background
+
+Add an animated radar scan as the main menu background.
+
+Blur and dim the background so the game title and PLAY button remain sharp, readable, and easy to see.

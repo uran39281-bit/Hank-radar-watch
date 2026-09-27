@@ -12,7 +12,7 @@ public class Game {
   public double range(){return Math.hypot(x,y);}public double measuredRange(){return Math.hypot(px,py);}
  }
  public static class Missile {public Contact target;public double x,y,z,speed=.08,age,lost,path;public boolean alive=true;}
- public static class EnemyMissile {public int id,weapon,samples;public Contact source;public double x,y,z,speed=.18,age,lost,seen=-999,px,py,pz;public boolean alive=true;}
+ public static class EnemyMissile extends Contact {public Contact source;public double z,age,lost,pz;public EnemyMissile(){speed=.18;}}
  public static final String[] WEAPONS={"Kh-25ML","Kh-29L","Kh-23M","Kh-27PS","Kh-58U"};
  // ARM envelopes below are fictional mission-balancing values, not operational data.
  public static final double[] WEAPON_RANGE={10,13,10,26,32}, WEAPON_TIME={45,40,25,70,80}, WEAPON_SPEED={.68,.61,.68,.72,.85};
@@ -30,9 +30,9 @@ public class Game {
  public boolean liveTrack(Contact t){return t!=null&&t.alive&&t.samples>=2&&elapsed-t.seen<=7&&t.measuredRange()<=maxRange;}
  public boolean visible(Contact t){return t!=null&&t.alive&&t.samples>0&&elapsed-t.seen<22&&t.measuredRange()<=Math.min(range,maxRange);}
  public String trackState(Contact t){if(t==null)return "NO TRACK";if(!t.alive)return t.outcome;if(elapsed-t.seen>22)return "TRACK LOST";if(elapsed-t.seen>7)return "COASTING";return t.illuminated?"LOCKED":t.priority?"TRACKING":t.samples<2?"TENTATIVE":"DETECTED";}
- public int channels(){int n=0;for(Contact t:contacts)if(t.alive&&t.illuminated)n++;return n;}
+ public int channels(){int n=0;for(Contact t:targets())if(t.alive&&t.illuminated)n++;return n;}
  public int inbound(Contact t){int n=0;for(Missile m:missiles)if(m.alive&&m.target==t)n++;return n;}
- public String illuminate(Contact t){if(t==null||!t.priority)return "TRACK THE TARGET BEFORE LOCKING";if(!liveTrack(t))return "ESTABLISH TRACK / WAIT FOR TWO SWEEPS";if(t.illuminated)return "TARGET ALREADY ILLUMINATED";if(channels()>=2)return "BOTH ENGAGEMENT CHANNELS ARE OCCUPIED";t.illuminated=true;if(random.nextDouble()<.75)t.evasion=5+random.nextDouble()*7;event("LOCK ESTABLISHED / TRACK "+t.id);return message;}
+ public String illuminate(Contact t){if(t==null||!t.priority)return "TRACK THE TARGET BEFORE LOCKING";if(!liveTrack(t))return "ESTABLISH TRACK / WAIT FOR TWO SWEEPS";if(t.illuminated)return "TARGET ALREADY ILLUMINATED";if(channels()>=2)return "BOTH ENGAGEMENT CHANNELS ARE OCCUPIED";t.illuminated=true;if(!(t instanceof EnemyMissile)&&random.nextDouble()<.75)t.evasion=5+random.nextDouble()*7;event("LOCK ESTABLISHED / TRACK "+t.id);return message;}
  public String release(Contact t){if(t==null||!t.illuminated)return "NO CHANNEL TO RELEASE";t.illuminated=false;event("CHANNEL RELEASED / TRACK "+t.id);return message;}
  public String launchBlock(Contact t){if(!running)return "MISSION NOT ACTIVE";if(!liveTrack(t))return "NO VALID TARGET TRACK";if(!t.illuminated)return "LOCK THE TARGET FIRST";double slant=Math.hypot(t.measuredRange(),t.palt/1000);if(slant>25)return "OUTSIDE 25 KM ENGAGEMENT RANGE";if(t.palt>13700)return "ABOVE 13,700 M CEILING";Launcher l=launchers[chosenLauncher];if(l.reload>0)return "SELECTED LAUNCHER IS RELOADING";if(l.ammo==0)return "SELECTED LAUNCHER IS EMPTY";return null;}
  public String launch(Contact t){String block=launchBlock(t);if(block!=null)return block;Launcher l=launchers[chosenLauncher];l.ammo--;shots++;Missile m=new Missile();m.target=t;m.z=(terrain(0,0)+5)/1000;missiles.add(m);t.evasion=12+random.nextDouble()*7;if(l.ammo==0&&reserve-reserved>=3){l.reload=90;reserved+=3;}event("MISSILE AWAY / TRACK "+t.id);return message;}
@@ -42,7 +42,7 @@ public class Game {
  public void identify(Contact t){double r=t.measuredRange(),noise=1+r/28,history=Math.min(1,t.samples/12.0);double[] weights=new double[5];double sum=0;for(int i=0;i<5;i++){double speedFit=Math.exp(-Math.pow((t.pspeed-CRUISE[i])/(250*noise),2));if(t.pspeed>MAX_SPEED[i]*1.12)speedFit*=.01;double span=SPAN[i];if(i==2)span=14-6.2*clamp((t.pspeed-650)/650,0,1);else if(i>=3)span=13.7-3.7*clamp((t.pspeed-600)/700,0,1);double sizeFit=Math.exp(-Math.pow((t.psize-span*.9)/(2.2*noise),2)-Math.pow((t.plen-LENGTH[i])/(2*noise),2));double altFit=Math.exp(-Math.abs(t.palt-BASE_ALT[i])/(3500*noise));if(t.palt>CEILING[i])altFit*=.1;double behavior=Math.exp(-Math.abs(t.pclimb)/(i==0?22:60))*Math.exp(-Math.max(0,t.pturn-TURN[i])/(.04*noise));double match=.30*speedFit+.25*sizeFit+.20*altFit+.15*behavior+.10*history;weights[i]=Math.exp(match*12);sum+=weights[i];}
   double quality=(.4+.6*(1-clamp(r/90,0,1)))*(.55+.45*t.quality)*(.65+.35*history);quality*=rangeQuality()*(1-Math.min(.25,t.pturn*1.5));int top=0;for(int i=0;i<5;i++){t.probabilities[i]=weights[i]/sum*quality;if(t.probabilities[i]>t.probabilities[top])top=i;}t.probabilities[5]=1-quality;t.guess=top;t.confidence=t.probabilities[top];
  }
- public String identification(Contact t){if(t==null||t.samples<2)return "UNKNOWN AIR CONTACT";double conf=t.confidence*Math.max(.3,1-Math.max(0,elapsed-t.seen-5)/30);int pc=(int)(conf*100);if(pc<30)return "UNKNOWN / "+pc+"%";String label=pc<50?"POSSIBLE":pc<75?"LIKELY":pc<90?"PROBABLE":"HIGH CONF.";return label+" "+NAMES[t.guess]+" "+pc+"%";}
+ public String identification(Contact t){if(t instanceof EnemyMissile)return missileName((EnemyMissile)t);if(t==null||t.samples<2)return "UNKNOWN AIR CONTACT";double conf=t.confidence*Math.max(.3,1-Math.max(0,elapsed-t.seen-5)/30);int pc=(int)(conf*100);if(pc<30)return "UNKNOWN / "+pc+"%";String label=pc<50?"POSSIBLE":pc<75?"LIKELY":pc<90?"PROBABLE":"HIGH CONF.";return label+" "+NAMES[t.guess]+" "+pc+"%";}
  public void tick(double dt){if(!running||finished)return;dt=clamp(dt,0,.1);if(dt==0)return;elapsed+=dt;double adv=dt*TAU/5;sweep=(sweep+adv)%TAU;
   for(Launcher l:launchers)if(l.reload>0){l.reload=Math.max(0,l.reload-dt);if(l.reload==0){reserve-=3;reserved-=3;l.ammo=3;event("LAUNCHER RELOAD COMPLETE");}}
   if(spawned<12&&elapsed>=nextSpawn){int count=spawned<5?1:2;for(int i=0;i<count&&spawned<12;i++)spawn((spawned+1)%5,40+random.nextDouble()*18);nextSpawn=elapsed+48;event("NEW CONTACTS APPROACHING THE SECTOR");}
@@ -55,7 +55,7 @@ public class Game {
    if(t.range()<2&&!t.attacked){t.attacked=true;leaks++;score-=100;t.alive=false;t.illuminated=false;t.outcome="REACHED SITE";event("AIRCRAFT PASSED THE SITE / TRACK "+t.id);}
   }
   for(Missile m:missiles)if(m.alive)fly(m,dt);for(EnemyMissile m:enemyMissiles)if(m.alive)flyEnemy(m,dt);
-  if(maxRange<=0)finish(false);else if(spawned==12&&aliveCount()==0&&incomingCount()==0)finish(true);else if(elapsed>=600&&incomingCount()==0)finish(maxRange>0);
+  if(radarHits>=4||maxRange<=0)finish(false);else if(spawned==12&&aliveCount()==0&&incomingCount()==0)finish(true);else if(elapsed>=600&&incomingCount()==0)finish(maxRange>0);
  }
  void finish(boolean victory){finished=true;running=false;won=victory;event(victory?"MISSION COMPLETE / SITE SURVIVED":"MISSION FAILED / RADAR SYSTEM DESTROYED");}
  public int aliveCount(){int n=0;for(Contact t:contacts)if(t.alive)n++;return n;}
@@ -72,21 +72,27 @@ public class Game {
   else if(m.lost>4||m.age>65||m.path>32||(m.age>1&&m.z*1000<terrain(m.x,m.y))||!t.alive){m.alive=false;misses++;event("MISSILE LOST / TRACK "+t.id);}
   if(!m.alive)vectors.remove(m);
  }
- public String track(Contact t){if(!visible(t))return "SELECT A DETECTED AIRCRAFT";t.priority=true;t.nextPriority=elapsed;event("PRIORITY TRACK / "+t.id);return message;}
+ public String track(Contact t){if(!visible(t))return "SELECT A DETECTED CONTACT";t.priority=true;t.nextPriority=elapsed;event("PRIORITY TRACK / "+t.id);return message;}
  public double rangeQuality(){return range<=10?1:range<=20?.92:range<=30?.82:.70;}
  public int[] presets(){ArrayList<Integer> a=new ArrayList<>();for(int n:new int[]{10,20,30,40})if(n<=maxRange)a.add(n);if(maxRange>0&&!a.contains(maxRange))a.add(maxRange);int[] r=new int[a.size()];for(int i=0;i<r.length;i++)r[i]=a.get(i);return r;}
  public void cycleRange(){int[] a=presets();if(a.length==0){range=1;return;}int next=0;for(int i=0;i<a.length;i++)if(a[i]==range)next=(i+1)%a.length;range=a[next];}
- public Contact nextTarget(Contact current){ArrayList<Contact> a=new ArrayList<>();for(Contact t:contacts)if(visible(t))a.add(t);a.sort((x,y)->Double.compare(x.measuredRange(),y.measuredRange()));return a.isEmpty()?null:a.get((a.indexOf(current)+1)%a.size());}
+ public ArrayList<Contact> targets(){ArrayList<Contact> a=new ArrayList<>(contacts);a.addAll(enemyMissiles);return a;}
+ public int hitsRemaining(){return Math.max(0,4-radarHits);}
+ public int identity(Contact t){if(t==null||elapsed-t.seen>7)return 0;if(t instanceof EnemyMissile)return t.samples<2?0:t.samples>=3&&t.measuredRange()<12?2:1;boolean enemy=t.launchObserved||(t.samples>=4&&t.confidence>=.3);return !enemy?0:t.confidence>=.75?2:1;}
+ public String identityLabel(Contact t){return new String[]{"UNKNOWN TARGET","UNSURE ID / ENEMY","POSITIVE ID / ENEMY","POSITIVE ID / FRIENDLY"}[identity(t)];}
+ public String contactName(Contact t){return t instanceof EnemyMissile?missileName((EnemyMissile)t):t.confidence>=.3?NAMES[t.guess]:"UNKNOWN";}
+ public String tag(Contact t){return (t instanceof EnemyMissile?"M-":"T-")+t.id;}
+ public Contact nextTarget(Contact current){ArrayList<Contact> a=new ArrayList<>();for(Contact t:targets())if(visible(t))a.add(t);a.sort((x,y)->Double.compare(x.measuredRange(),y.measuredRange()));return a.isEmpty()?null:a.get((a.indexOf(current)+1)%a.size());}
  public String payload(Contact t){return t.launchObserved?"WEAPON LAUNCH OBSERVED":t.confidence>.65&&t.guess!=1?"POSSIBLE A/G WEAPONS":"UNKNOWN PAYLOAD";}
  public String threat(Contact t){double approach=Math.cos(delta(t.pheading,angle(-t.px,-t.py)));return t.launchObserved||t.confidence>.6&&t.guess>=3?"HIGH":approach>.5&&t.measuredRange()<20?"ELEVATED":"UNCERTAIN";}
  boolean guiding(Contact t){for(EnemyMissile m:enemyMissiles)if(m.alive&&m.source==t&&m.weapon<3)return true;return false;}
- void tryEnemyLaunch(Contact t){if(t.weapon<0||t.weaponFired||elapsed-t.born<30||maxRange<=0)return;double r=t.range();if(r>WEAPON_RANGE[t.weapon]||r<3||signal(t)==0||Math.abs(delta(t.heading,angle(-t.x,-t.y)))>.65)return;EnemyMissile m=new EnemyMissile();m.id=++enemySerial;m.source=t;m.weapon=t.weapon;m.x=t.x;m.y=t.y;m.z=t.alt/1000;enemyMissiles.add(m);t.weaponFired=true;if(liveTrack(t)){t.launchObserved=true;event("WEAPON LAUNCH DETECTED / TRACK "+t.id);}}
+ void tryEnemyLaunch(Contact t){if(t.weapon<0||t.weaponFired||elapsed-t.born<30||maxRange<=0)return;double r=t.range();if(r>WEAPON_RANGE[t.weapon]||r<3||signal(t)==0||Math.abs(delta(t.heading,angle(-t.x,-t.y)))>.65)return;EnemyMissile m=new EnemyMissile();m.id=100+(++enemySerial);m.source=t;m.weapon=t.weapon;m.x=t.x;m.y=t.y;m.z=t.alt/1000;m.alt=t.alt;enemyMissiles.add(m);t.weaponFired=true;if(liveTrack(t)){t.launchObserved=true;event("WEAPON LAUNCH DETECTED / TRACK "+t.id);}}
  public int incomingCount(){int n=0;for(EnemyMissile m:enemyMissiles)if(m.alive)n++;return n;}
- public boolean visible(EnemyMissile m){return m.alive&&elapsed-m.seen<8&&Math.hypot(m.px,m.py)<=Math.min(range,maxRange);}
+ public boolean visible(EnemyMissile m){return m.samples>0&&m.alive&&elapsed-m.seen<8&&Math.hypot(m.px,m.py)<=Math.min(range,maxRange);}
  public String missileName(EnemyMissile m){return m.samples>=3&&Math.hypot(m.px,m.py)<12?WEAPONS[m.weapon]:"UNKNOWN MSL";}
- public void damageRadar(){int damage=2+random.nextInt(7);lastDamage=Math.min(maxRange,damage);maxRange=Math.max(0,maxRange-damage);range=Math.max(1,Math.min(range,maxRange));health=(int)Math.round(maxRange*2.5);radarHits++;impactUntil=elapsed+3;score-=100;event("RADAR IMPACT / RANGE -"+(int)lastDamage+" km");if(maxRange==0)finish(false);}
- public void flyEnemy(EnemyMissile m,double dt){m.age+=dt;double dx=-m.x,dy=-m.y,dz=terrain(0,0)/1000-m.z,d=Math.sqrt(dx*dx+dy*dy+dz*dz);boolean guided=m.weapon>=3?maxRange>0:m.source.alive&&signal(m.source)>0&&Math.abs(delta(m.source.heading,angle(-m.source.x,-m.source.y)))<.8;if(!guided)m.lost+=dt;else m.lost=0;if(m.lost>3||m.age>WEAPON_TIME[m.weapon]){m.alive=false;return;}m.speed=Math.min(WEAPON_SPEED[m.weapon],m.speed+.12*dt);double step=m.speed*dt;if(d<=step+.08){m.alive=false;damageRadar();return;}m.x+=dx/d*step;m.y+=dy/d*step;m.z+=dz/d*step;if(m.z*1000<terrain(m.x,m.y)){m.alive=false;return;}
-  Contact proxy=new Contact();proxy.x=m.x;proxy.y=m.y;proxy.alt=m.z*1000;double q=signal(proxy);if(elapsed-m.seen>=1&&Math.hypot(m.x,m.y)<=range&&q>0){m.seen=elapsed;m.px=m.x;m.py=m.y;m.pz=m.z;m.samples++;}
+ public void damageRadar(){if(finished)return;int damage=2+random.nextInt(7);lastDamage=Math.min(maxRange,damage);maxRange=Math.max(0,maxRange-damage);range=Math.max(1,Math.min(range,maxRange));radarHits++;health=hitsRemaining()*25;impactUntil=elapsed+3;score-=100;event("RADAR IMPACT / RANGE -"+(int)lastDamage+" km");if(radarHits>=4||maxRange==0)finish(false);}
+ public void flyEnemy(EnemyMissile m,double dt){m.age+=dt;double dx=-m.x,dy=-m.y,dz=terrain(0,0)/1000-m.z,d=Math.sqrt(dx*dx+dy*dy+dz*dz);boolean guided=m.weapon>=3?maxRange>0:m.source.alive&&signal(m.source)>0&&Math.abs(delta(m.source.heading,angle(-m.source.x,-m.source.y)))<.8;if(!guided)m.lost+=dt;else m.lost=0;if(m.lost>3||m.age>WEAPON_TIME[m.weapon]){m.alive=false;return;}m.speed=Math.min(WEAPON_SPEED[m.weapon],m.speed+.12*dt);double step=m.speed*dt;if(d<=step+.08){m.alive=false;damageRadar();return;}m.x+=dx/d*step;m.y+=dy/d*step;m.z+=dz/d*step;m.alt=m.z*1000;if(m.z*1000<terrain(m.x,m.y)){m.alive=false;return;}
+  Contact proxy=new Contact();proxy.x=m.x;proxy.y=m.y;proxy.alt=m.z*1000;double q=signal(proxy);if(elapsed-m.seen>=1&&Math.hypot(m.x,m.y)<=range&&q>0){m.seen=elapsed;m.px=m.x;m.py=m.y;m.pz=m.z;m.palt=m.alt;m.pspeed=m.speed*3600;m.pheading=angle(-m.x,-m.y);m.samples++;}
  }
  private HashMap<Missile,double[]> vectors=new HashMap<>();
 }
