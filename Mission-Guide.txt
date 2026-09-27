@@ -1,0 +1,808 @@
+HAWK Air Defense Radar Game — Mission 1
+
+For this version of the game, the player will operate a HAWK air-defense battery equipped with MIM-23A HAWK missiles.
+
+The goal is to make the radar, target identification, missile guidance, aircraft behavior, and engagement system feel believable while still being fun to play.
+
+---
+
+1. MIM-23A HAWK SYSTEM
+
+Use the MIM-23A HAWK as the primary surface-to-air missile.
+
+MIM-23A Reference Performance
+
+Characteristic| Value
+Maximum engagement range| 25 km
+Flight ceiling| ~13,700 m
+Maximum speed| ~Mach 2.5
+Launch weight| ~584 kg / 1,290 lb
+Warhead| ~54 kg / 119 lb
+Warhead type| HE blast-fragmentation
+Guidance| Semi-active radar homing
+Launcher| M192 triple missile launcher
+
+The MIM-23A uses semi-active radar guidance, meaning the HAWK battery must continue illuminating the target for the missile to remain properly guided.
+
+For gameplay, the fire-control system may engage a maximum of two targets simultaneously.
+
+The player may track more aircraft on the radar, but only two aircraft may be actively illuminated/engaged at the same time.
+
+---
+
+2. MISSILE INVENTORY
+
+At the beginning of Mission 1, the battery has:
+
+9 missiles ready to fire
+
+and
+
+9 additional missiles in reserve.
+
+Use three M192 triple launchers.
+
+Each launcher begins with:
+
+3 × MIM-23A missiles
+
+Therefore:
+
+3 launchers × 3 missiles = 9 ready missiles
+
+Reserve ammunition:
+
+9 missiles
+
+Total battery ammunition:
+
+18 missiles
+
+---
+
+3. RELOADING SYSTEM
+
+An M192 launcher contains three missiles.
+
+A launcher cannot be reloaded until all three missiles on that launcher have been fired.
+
+Example:
+
+Launcher #1:
+
+MISSILE 1 — FIRED
+MISSILE 2 — READY
+MISSILE 3 — READY
+
+The launcher CANNOT reload.
+
+After:
+
+MISSILE 1 — FIRED
+MISSILE 2 — FIRED
+MISSILE 3 — FIRED
+
+the launcher becomes:
+
+EMPTY — RELOADING
+
+Reload time:
+
+90 seconds
+
+During those 90 seconds, that launcher cannot fire.
+
+After the reload completes, three missiles are removed from the reserve ammunition supply and placed on the launcher.
+
+If fewer than three reserve missiles remain, follow whatever ammunition rule is appropriate for the mission design.
+
+---
+
+4. ENEMY AIRCRAFT
+
+Mission 1 should contain the following possible radar contacts:
+
+- Su-25
+- MiG-21
+- MiG-23
+- Su-22
+- Su-17
+
+For simulation purposes, use the following specific War Thunder aircraft as the reference versions.
+
+Aircraft| Max Speed| Length| Wingspan| WT Turn Time| Max Altitude
+Su-25| ~979 km/h at 1,000 m| 14.2 m| 14.4 m| ~27 s| 11,000 m
+MiG-21bis| ~2,240 km/h at 13,000 m| 14.1 m| 7.2 m| ~37 s| 16,000 m
+MiG-23M| ~2,358 km/h at 13,000 m| 16.7 m| 7.8–14 m| ~35 s| 16,000 m
+Su-22M3| ~2,232 km/h at 11,000 m| 18.9 m| 10–13.7 m| ~27 s| 19,500 m
+Su-17M4| ~2,052 km/h at 11,000 m| 18.9 m| 10–13.7 m| ~27 s| 19,500 m
+
+These values should be treated as performance limits/reference characteristics, not the speed the aircraft constantly flies at.
+
+Actual mission speed depends on altitude, maneuvering, weapons load, AI behavior, and current mission state.
+
+War Thunder reference data: Su-25 , MiG-21bis , MiG-23M , Su-22M3 , and Su-17M4.
+
+---
+
+5. AIRCRAFT MANEUVERABILITY
+
+Do NOT make every aircraft fly the same way.
+
+Each aircraft should have different acceleration, turning, altitude, and energy characteristics.
+
+Su-25
+
+Role: Ground attack aircraft
+
+The Su-25 should normally be one of the slowest aircraft.
+
+It should commonly operate at low or medium altitude.
+
+It has a relatively large physical profile because of its broad wings.
+
+Its combat maneuverability should be lower than dedicated fighters.
+
+It can perform defensive turns, dives, and terrain-hugging maneuvers, but it should not suddenly behave like a MiG-21.
+
+---
+
+MiG-21bis
+
+Role: Fighter
+
+The MiG-21 should be:
+
+Fast
+Small
+Highly responsive
+Capable of aggressive defensive maneuvers
+
+Its narrow 7.2 m wingspan makes its physical size profile noticeably different from the Su-25 or Su-17/Su-22.
+
+The MiG-21 should be capable of aggressive instantaneous turns but should lose energy during sustained hard maneuvering.
+
+---
+
+MiG-23M
+
+Role: Fighter / interceptor
+
+The MiG-23 should normally be extremely fast.
+
+Its variable-geometry wings mean that its apparent size and maneuvering characteristics can change depending on wing sweep.
+
+At high speed the wings should normally be swept backward.
+
+At lower speeds the aircraft can increase wing area for maneuvering.
+
+The MiG-23 should generally behave like a high-speed interceptor rather than a slow attack aircraft.
+
+---
+
+Su-17M4 / Su-22M3
+
+Role: Strike aircraft
+
+These aircraft should be deliberately difficult for the radar identification system to distinguish.
+
+Both aircraft have very similar dimensions:
+
+Length: approximately 18.9 m
+Wingspan: approximately 10–13.7 m
+
+Their performance is also similar.
+
+Therefore, when their speed, altitude, and range are similar, the radar identification computer should frequently confuse:
+
+Su-17 ↔ Su-22
+
+This is intentional.
+
+---
+
+6. RADAR TARGET DETECTION
+
+The radar must NOT automatically know what every aircraft is.
+
+A newly detected contact should initially appear as something such as:
+
+UNKNOWN
+
+UNKNOWN AIR CONTACT
+
+TRACK 014
+
+TRACK 021
+
+etc.
+
+The radar measures or estimates:
+
+Range
+Altitude
+Speed
+Estimated aircraft size
+Heading
+Vertical speed
+Movement behavior
+
+These measurements are then used to estimate what aircraft the contact might be.
+
+---
+
+7. TARGET IDENTIFICATION SYSTEM
+
+Target identification should depend primarily on:
+
+ALTITUDE + SPEED + SIZE + RANGE
+
+Additional behavior information can improve identification after the aircraft has been observed for longer.
+
+The computer compares the radar measurements against known aircraft performance profiles.
+
+Example:
+
+A radar contact is:
+
+Altitude: 4,800 m
+Speed: 870 km/h
+Estimated size: Medium/Large
+Range: 11 km
+
+The computer might determine:
+
+SU-25 — 72%
+SU-17 — 14%
+SU-22 — 10%
+UNKNOWN — 4%
+
+Instead of immediately displaying:
+
+SU-25
+
+display:
+
+PROBABLE SU-25 — 72%
+
+---
+
+8. RADAR IDENTIFICATION ERRORS
+
+The identification system MUST sometimes be wrong.
+
+Aircraft with similar characteristics should create uncertainty.
+
+For example:
+
+A Su-17 and MiG-21 might temporarily produce similar speed and altitude measurements.
+
+At long range, inaccurate size measurements could make the radar computer incorrectly classify the Su-17 as a MiG-21.
+
+As the aircraft approaches, the estimated dimensions become more accurate and the identification may change:
+
+UNKNOWN
+
+↓
+
+POSSIBLE MIG-21
+
+↓
+
+POSSIBLE SU-17
+
+↓
+
+PROBABLE SU-17
+
+↓
+
+SU-17 — HIGH CONFIDENCE
+
+Do not make identification completely deterministic.
+
+Add small measurement errors to:
+
+Speed
+Altitude
+Range
+Estimated target size
+
+The amount of measurement error should increase with distance.
+
+---
+
+9. RANGE VS IDENTIFICATION ACCURACY
+
+The closer an aircraft is to the radar, the easier it should be to identify.
+
+The farther away it is, the less reliable the identification becomes.
+
+For example:
+
+Very Close Range
+
+Radar measurements are highly accurate.
+
+Size estimation becomes much better.
+
+Identification confidence rises quickly.
+
+Medium Range
+
+Speed and altitude remain useful.
+
+Size estimation becomes less accurate.
+
+Two similar aircraft may be confused.
+
+Long Range
+
+Identification should become much less reliable.
+
+The radar may only display something like:
+
+FAST AIRCRAFT
+
+FIGHTER-SIZED CONTACT
+
+LARGE STRIKE AIRCRAFT
+
+UNKNOWN
+
+The missile engagement range and the radar detection range should NOT automatically be the same value.
+
+The radar may detect aircraft beyond the missile's effective engagement range.
+
+---
+
+10. SIZE-BASED IDENTIFICATION
+
+Physical aircraft dimensions should act as a gameplay approximation for target size.
+
+Do NOT treat physical dimensions as an exact radar cross section.
+
+For identification purposes:
+
+Small Profile
+
+MiG-21
+
+Length: 14.1 m
+Wingspan: 7.2 m
+
+Medium Profile
+
+MiG-23
+
+Length: 16.7 m
+Variable wingspan: 7.8–14 m
+
+Large Profile
+
+Su-25
+
+Length: 14.2 m
+Wingspan: 14.4 m
+
+Large Profile
+
+Su-17 / Su-22
+
+Length: 18.9 m
+Variable wingspan: 10–13.7 m
+
+Aircraft orientation should also influence the estimated size.
+
+A target flying directly toward the radar should not appear identical to the same aircraft flying broadside.
+
+---
+
+11. LOW-ALTITUDE RADAR DETECTION
+
+Aircraft flying near the ground should be significantly harder to detect and track.
+
+Model three major effects:
+
+Earth curvature
+Terrain obstruction
+Ground clutter
+
+The radar should require line-of-sight to the aircraft.
+
+Mountains, hills, or terrain between the radar and target should block or degrade detection.
+
+An aircraft flying extremely low may disappear behind terrain and reappear later.
+
+---
+
+12. RADAR HORIZON
+
+Use a simplified radar-horizon calculation.
+
+A useful approximation is:
+
+Radar Horizon ≈ 4.12 × (√Radar Height + √Target Height)
+
+where:
+
+Heights are measured in meters.
+
+Result is approximately kilometers.
+
+This prevents extremely low aircraft from being detected unrealistically far away.
+
+Example concept:
+
+A fighter at 8,000 m altitude can be detected much farther away than the same fighter flying at 50 m above the ground.
+
+---
+
+13. GROUND CLUTTER
+
+Even when an aircraft is theoretically above the radar horizon, very low targets should still be more difficult to track.
+
+Radar quality should decrease when an aircraft flies close to terrain.
+
+Suggested gameplay behavior:
+
+Above 1,500 m AGL:
+
+Little or no ground-clutter penalty.
+
+500–1,500 m AGL:
+
+Small tracking penalty.
+
+150–500 m AGL:
+
+Moderate tracking and identification penalty.
+
+Below 150 m AGL:
+
+Major detection and identification penalty.
+
+Aircraft flying through valleys should sometimes temporarily disappear from radar.
+
+When this happens, retain the track's last known position briefly rather than instantly deleting it.
+
+Display something such as:
+
+TRACK LOST
+
+or
+
+COASTING
+
+The radar may attempt to reacquire the target.
+
+---
+
+14. RADAR IDENTIFICATION CONFIDENCE
+
+Create an internal confidence system.
+
+A possible starting formula is:
+
+Identification Confidence =
+
+30% Speed Match
+
++ 25% Size Match
++ 20% Altitude/Profile Match
++ 15% Aircraft Behavior Match
++ 10% Track History
+
+Then multiply the result by:
+
+Range Quality
+
+and
+
+Radar Signal Quality
+
+Add a small randomized measurement error.
+
+The exact numbers can be adjusted during gameplay testing.
+
+The important requirement is:
+
+Distance and low altitude must make identification less reliable.
+
+---
+
+15. CONFIDENCE DISPLAY
+
+Use several identification states.
+
+0–30%:
+
+UNKNOWN
+
+30–50%:
+
+POSSIBLE [AIRCRAFT]
+
+50–75%:
+
+LIKELY [AIRCRAFT]
+
+75–90%:
+
+PROBABLE [AIRCRAFT]
+
+90%+:
+
+HIGH CONFIDENCE [AIRCRAFT]
+
+Confidence should be capable of going DOWN as well as up.
+
+Example:
+
+PROBABLE MIG-21 — 82%
+
+The aircraft slows down and begins behaving unlike a MiG-21.
+
+The computer changes to:
+
+POSSIBLE SU-17 — 58%
+
+After additional radar observations:
+
+PROBABLE SU-17 — 91%
+
+This will make the radar system feel like it is actually analyzing the aircraft.
+
+---
+
+16. AIRCRAFT EVASIVE MANEUVERS
+
+Enemy aircraft must be able to react to missile engagements.
+
+Aircraft should NOT simply fly straight toward the target after a missile has been launched.
+
+Depending on aircraft type, altitude, speed, AI skill, and situation, the aircraft may:
+
+Break left or right
+Perform a hard turn
+Dive toward terrain
+Climb aggressively
+Change heading
+Accelerate
+Reduce altitude
+Use terrain masking
+Perform repeated defensive maneuvers
+
+The maneuver must remain inside the aircraft's performance capabilities.
+
+Do NOT allow instantaneous direction changes.
+
+Do NOT allow unrealistic unlimited G.
+
+Do NOT allow aircraft to maintain full speed while performing extreme turns.
+
+Energy should matter.
+
+---
+
+17. AIRCRAFT-SPECIFIC DEFENSIVE AI
+
+MiG-21
+
+Aggressive turns.
+
+High instantaneous maneuverability.
+
+Rapid energy loss during sustained hard turning.
+
+Likely to make sharp defensive direction changes.
+
+MiG-23
+
+Uses speed aggressively.
+
+May accelerate away from the engagement.
+
+Can perform high-speed defensive turns.
+
+Wing geometry should change depending on flight condition if the simulation supports it.
+
+Su-25
+
+Less likely to escape through raw speed.
+
+More likely to dive low, turn toward terrain, or attempt terrain masking.
+
+Su-17 / Su-22
+
+Prefer high-speed evasive maneuvers.
+
+May dive toward low altitude and attempt to leave the HAWK engagement zone.
+
+---
+
+18. MISSILE GUIDANCE
+
+The MIM-23A uses semi-active radar homing.
+
+The missile should therefore depend on radar illumination from the HAWK fire-control system.
+
+Basic engagement sequence:
+
+Radar detects target
+
+↓
+
+Target track established
+
+↓
+
+Player selects target
+
+↓
+
+Target illumination begins
+
+↓
+
+MISSILE READY
+
+↓
+
+MISSILE LAUNCH
+
+↓
+
+Missile accelerates toward target
+
+↓
+
+Target may maneuver
+
+↓
+
+Radar continues target illumination
+
+↓
+
+Either:
+
+INTERCEPT
+
+or
+
+MISS
+
+If illumination is lost for too long, missile guidance quality should degrade significantly.
+
+---
+
+19. MISSILE INTERCEPT LOGIC
+
+Do not determine missile hits using a simple random percentage.
+
+Missile success should depend on:
+
+Target range
+Target speed
+Target heading
+Target altitude
+Target maneuvering
+Missile remaining energy
+Line of sight
+Radar illumination
+Terrain
+Launch geometry
+
+A missile launched against a slow aircraft flying directly toward the battery should generally have a better intercept opportunity than a missile launched against a fast aircraft crossing near the edge of the engagement envelope.
+
+---
+
+20. MISSILE FLIGHT PERFORMANCE
+
+The missile should NOT instantly travel at Mach 2.5.
+
+Model an acceleration phase.
+
+The missile accelerates after launch, reaches high speed, and eventually begins losing energy.
+
+Missile maneuverability should therefore change during flight.
+
+At long range, the missile should have less energy available for large last-second turns.
+
+This makes aircraft evasive maneuvers and launch range meaningful.
+
+---
+
+21. TWO-TARGET ENGAGEMENT LIMIT
+
+The HAWK battery may actively engage no more than:
+
+2 aircraft simultaneously.
+
+Example:
+
+TRACK 014 — ENGAGED
+TRACK 021 — ENGAGED
+TRACK 027 — TRACKING
+TRACK 031 — TRACKING
+TRACK 044 — TRACKING
+
+The player can still see TRACK 027, TRACK 031, and TRACK 044.
+
+However, another missile engagement cannot begin until one of the two active engagement channels becomes available.
+
+---
+
+22. IMPORTANT GAMEPLAY PRINCIPLE
+
+The player should never feel like the radar has perfect knowledge.
+
+The gameplay loop should be:
+
+Detect
+
+→ Track
+
+→ Estimate
+
+→ Identify
+
+→ Prioritize
+
+→ Illuminate
+
+→ Launch
+
+→ Maintain track
+
+→ Observe target reaction
+
+→ Confirm kill or miss
+
+This should create uncertainty.
+
+A target may appear to be a MiG-21 but later turn out to be a Su-17.
+
+A low-altitude Su-25 may disappear behind terrain.
+
+A distant MiG-23 may initially appear only as:
+
+FAST UNKNOWN CONTACT
+
+A Su-17 and Su-22 should sometimes remain difficult to distinguish for most of their approach.
+
+The radar operator should have to make decisions using incomplete information instead of simply clicking aircraft names.
+
+---
+
+23. MISSION 1 DESIGN GOAL
+
+Mission 1 should introduce the player to:
+
+Radar scanning
+Target tracking
+Identification uncertainty
+Low-altitude detection
+Radar horizon
+Terrain masking
+Target prioritization
+Two-target engagement limits
+MIM-23A missile launches
+Semi-active radar guidance
+Missile ammunition management
+90-second launcher reloads
+Aircraft evasive behavior
+
+Start the mission slowly with only a few contacts.
+
+As the mission progresses, introduce aircraft at different:
+
+Altitudes
+Speeds
+Ranges
+Headings
+
+Eventually create situations where several aircraft appear simultaneously and the player must decide which two targets are dangerous enough to engage first.
+
+The radar and identification systems should provide information, but the final engagement decision belongs to the player.

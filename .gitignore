@@ -1,0 +1,7 @@
+build/
+*.jks
+*.keystore
+.env
+local.properties
+*.class
+*.log
