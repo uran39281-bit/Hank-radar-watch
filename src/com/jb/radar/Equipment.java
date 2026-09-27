@@ -7,10 +7,10 @@ public final class Equipment {
  public enum RadarMode { NONE, ACTIVE, SEMI_ACTIVE, PASSIVE }
  public static final class Radar {
   public final String name;
-  public final int detectionKm,tracks,channels,scanSpeed;
-  public final double trackingKm,lockKm,irLockKm;
+  public final int detectionKm,tracks,channels;
+  public final double trackingKm,lockKm,irLockKm,scanSpeed;
   public final boolean infrared;
-  Radar(Properties p){name=name(p,"radar.name","HAWK BATTERY");detectionKm=integer(p,"radar.detectionKm",40,1,100);trackingKm=number(p,"radar.trackingKm",32,1,detectionKm);lockKm=number(p,"radar.lockKm",25,1,trackingKm);tracks=integer(p,"radar.tracks",12,1,72);channels=integer(p,"radar.channels",2,0,tracks);scanSpeed=integer(p,"radar.scanSpeed",6,1,10);infrared=bool(p,"radar.infrared",true);irLockKm=number(p,"radar.irLockKm",9,0,100);}
+  Radar(Properties p){name=name(p,"radar.name","ADS-201 Watchpost");detectionKm=integer(p,"radar.detectionKm",30,1,100);trackingKm=number(p,"radar.trackingKm",24,1,detectionKm);lockKm=number(p,"radar.lockKm",16,1,trackingKm);tracks=integer(p,"radar.tracks",5,1,72);channels=integer(p,"radar.channels",2,0,tracks);scanSpeed=number(p,"radar.scanSpeed",1.00,1,10);infrared=bool(p,"radar.infrared",false);irLockKm=number(p,"radar.irLockKm",0,0,100);}
   public double sweepSeconds(){return 11-scanSpeed;}
  }
  public static final class Weapon {
@@ -26,25 +26,27 @@ public final class Equipment {
   public String guidanceLabel(){return guidance==Guidance.RADAR?"RADAR / "+radarMode.toString().replace('_',' '):guidance.toString();}
  }
  public final Radar radar;
- public final Weapon primary,infrared;
+ public final Weapon primary,stonebolt,infrared;
  public final Weapon[] enemy,all;
  public Equipment(Properties p){
   radar=new Radar(p);
-  primary=new Weapon(p,"hawk","MIM-23",Guidance.RADAR,RadarMode.SEMI_ACTIVE,65,3000,18,580,28,84000,5,32,0,13700);
-  infrared=new Weapon(p,"ir6","IR-6",Guidance.INFRARED,RadarMode.NONE,28,2592,22,90,35,14400,4,12,.6,6000);
+  primary=new Weapon(p,"rampart","MIM-301 Rampart",Guidance.RADAR,RadarMode.SEMI_ACTIVE,35,2400,14,140,12,18000,5,24,0,13700);
+  stonebolt=new Weapon(p,"stonebolt","FIM-352 Stonebolt",Guidance.RADAR,RadarMode.SEMI_ACTIVE,40,2700,12,180,10,22000,6,28,0,13700);
+  infrared=radar.infrared?new Weapon(p,"ir6","IR-6",Guidance.INFRARED,RadarMode.NONE,28,2592,22,90,35,14400,4,12,.6,6000):null;
   if(primary.guidance==Guidance.INFRARED||primary.guidance==Guidance.LASER)throw new IllegalArgumentException("Primary slot supports RADAR or COMMAND");
-  if(infrared.guidance!=Guidance.INFRARED)throw new IllegalArgumentException("IR slot requires INFRARED");
+  if(infrared!=null&&infrared.guidance!=Guidance.INFRARED)throw new IllegalArgumentException("IR slot requires INFRARED");
   enemy=new Weapon[]{
    new Weapon(p,"kh25","Kh-25ML",Guidance.LASER,RadarMode.NONE,45,2448,8,300,20,36000,6,10,3,20000),
    new Weapon(p,"kh29","Kh-29L",Guidance.LASER,RadarMode.NONE,40,2196,7,650,18,78000,5,13,3,20000),
    new Weapon(p,"kh23","Kh-23M",Guidance.COMMAND,RadarMode.NONE,25,2448,9,280,22,33600,6,10,3,20000),
    new Weapon(p,"kh27","Kh-27PS",Guidance.RADAR,RadarMode.PASSIVE,70,2592,8,320,20,38400,6,26,3,20000),
    new Weapon(p,"kh58","Kh-58U",Guidance.RADAR,RadarMode.PASSIVE,80,3060,9,640,22,76800,7,32,3,20000)};
-  all=new Weapon[]{primary,infrared,enemy[0],enemy[1],enemy[2],enemy[3],enemy[4]};
+  all=infrared==null?new Weapon[]{primary,stonebolt,enemy[0],enemy[1],enemy[2],enemy[3],enemy[4]}:new Weapon[]{primary,stonebolt,enemy[0],enemy[1],enemy[2],enemy[3],enemy[4],infrared};
   HashSet<String> allowed=new HashSet<>();for(String k:new String[]{"name","detectionKm","trackingKm","lockKm","tracks","channels","scanSpeed","infrared","irLockKm"})allowed.add("radar."+k);
   for(Weapon w:all)for(String k:new String[]{"name","guidance","radarMode","guidanceSeconds","maxSpeedKmh","maxG","massKg","maxAoADeg","thrustN","burnSeconds","rangeKm","minRangeKm","ceilingM","seekerKm"})allowed.add("missile."+w.id+"."+k);
   for(String k:p.stringPropertyNames())if(!allowed.contains(k))throw new IllegalArgumentException("Unknown equipment property: "+k);
  }
+ public Weapon playerWeapon(String id){return "stonebolt".equals(id)?stonebolt:primary;}
  public static Equipment defaults(){return new Equipment(new Properties());}
  public static Equipment load(InputStream in)throws IOException{Properties p=new Properties();p.load(in);return new Equipment(p);}
  static String name(Properties p,String key,String def){String s=p.getProperty(key,def).trim();if(s.length()==0||s.length()>28)throw new IllegalArgumentException(key+" needs 1-28 characters");return s;}

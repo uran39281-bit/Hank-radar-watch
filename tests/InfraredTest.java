@@ -1,7 +1,7 @@
 package com.jb.radar;
 public class InfraredTest {
  static void check(boolean b,String s){if(!b)throw new AssertionError(s);}
- static Game make(){Game g=new Game(37);g.start();g.contacts.clear();return g;}
+ static Game make(){java.util.Properties p=new java.util.Properties();p.setProperty("radar.infrared","true");p.setProperty("radar.irLockKm","9");Game g=new Game(37,new Economy(new Economy.MemoryStore()),new Equipment(p));g.start();g.contacts.clear();return g;}
  static Game.Contact target(Game g){Game.Contact t=GameTest.target(g,0);t.x=t.px=4;t.y=t.py=0;t.alt=t.palt=1800;t.heading=Math.PI/2;t.flareBursts=0;t.nextFlare=9999;return t;}
  static void warm(Game g){for(int i=0;i<70;i++){g.elapsed+=.05;g.ir.tick(.05);}}
  public static void main(String[] args){Game g=make();Game.Contact t=target(g);g.toggleWeapon();g.weaponLock(t);check(!g.ir.locked&&g.weaponBlock(t)!=null,"no instant lock or launch");double evasion=t.evasion;warm(g);check(g.ir.locked&&g.channels()==0&&t.evasion==evasion,"passive acquisition uses no channel or warning");check(g.weaponBlock(t)==null,"fire enabled after acquisition");g.fireWeapon(t);Game.Missile m=g.missiles.get(0);check(m.infrared&&g.ir.ammo==5&&g.ready()==9&&g.reserve==9,"separate IR inventory");g.weaponRelease(t);g.toggleWeapon();g.maxRange=1;t.seen=-100;for(int i=0;i<1500&&m.alive;i++){g.elapsed+=.02;g.fly(m,.02);}check(g.kills==1&&!t.alive,"self guidance after release, mode switch and radar track loss");

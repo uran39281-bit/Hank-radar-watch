@@ -1,0 +1,53 @@
+AIR DEFAME 101 — v0.9 USA tech tree
+
+Requested: a War Thunder-style tech tree with USA as the only nation, replacing
+the default player battery and missiles with the following fictional equipment.
+
+ADS-201 Watchpost
+Detection: 30 km
+Tracking: 24 km
+Radar lock: 16 km
+Simultaneous tracks: 5
+Datalink channels: 2
+Radar scan speed: 1.00 (on the existing 1.00–10.00 scale)
+IR guidance and IR lock range: N/A
+
+MIM-301 Rampart
+Radar / semi-active homing
+Maximum guidance: 35 seconds
+Maximum speed: 2,400 km/h
+Maximum G: 14
+Mass: 140 kg
+Maximum AOA: 12 degrees
+Maximum thrust: 18 kN (18,000 N)
+
+FIM-352 Stonebolt
+Radar / semi-active homing
+Maximum guidance: 40 seconds
+Maximum speed: 2,700 km/h
+Maximum G: 12
+Mass: 180 kg
+Maximum AOA: 10 degrees
+Maximum thrust: 22 kN (22,000 N)
+
+Implementation choices where values were not supplied:
+- Watchpost and Rampart are free Rank I starters.
+- Stonebolt follows Rampart: 600 BP research and $1,500 purchase.
+- Research consumes only available banked BP up to the remaining requirement;
+  partial progress persists. Purchase and equip are separate steps.
+- One equipped missile type supplies all L1–L3 launchers for the next mission.
+- Existing ammunition, free reloads, rewards, and enemy loadouts remain.
+- Scan speed uses the existing 11 minus rating formula: 1.00 = ten-second sweep.
+- Supporting arcade defaults: Rampart motor 5s / path 24km, Stonebolt motor 6s /
+  path 28km; launch ceiling 13,700m. Watchpost still limits locks to 16km.
+- Former HAWK/MIM-23/IR-6 player defaults are removed from the shipped loadout.
+  The reusable IR engine remains for future compatible systems; this battery
+  has no IR inventory, weapon toggle, or enabled heat seeker.
+
+Progress compatibility:
+Existing Dollars, BP, best score, lifetime earnings and mission receipts survive
+in-place updates. Starter ownership is granted without charging old balances.
+Research, ownership, selected missile, and currency save together. Failed
+research/purchase/equip writes leave the previous in-memory transaction state;
+retry is required. Duplicate research/purchases do not charge twice. Loadout
+changes and spending are blocked during a mission.

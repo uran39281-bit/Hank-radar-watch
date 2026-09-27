@@ -1,54 +1,43 @@
-# Equipment profiles — v0.8
+# USA equipment — v0.9
 
-Edit `assets/equipment.properties` and rebuild to change balance. The APK loads these profiles at startup. The menu's **EQUIPMENT / STATS** page displays the loaded battery and all seven missile profiles; browsing does not change the loadout. These are fictional arcade values. No purchases or tech-tree research are added in this update.
+`assets/equipment.properties` supplies runtime radar and missile values. `TechTree.java` supplies the USA research catalog, prerequisites and initial prices. The menu offers USA TECH TREE, ECONOMY / REWARDS and EQUIPMENT / STATS.
 
-## Radar
+## Starter battery
 
-| Property | Meaning / accepted values |
-| --- | --- |
-| `radar.name` | Display name, 1–28 characters |
-| `radar.detectionKm` | Maximum detection radius, whole kilometres, 1–100 |
-| `radar.trackingKm` | Maximum track radius; cannot exceed detection |
-| `radar.lockKm` | Maximum measured slant lock range; cannot exceed tracking |
-| `radar.tracks` | Shared aircraft and incoming-missile track slots, 1–72 |
-| `radar.channels` | Shared target datalink / fire-control channels, 0 through track capacity |
-| `radar.scanSpeed` | 1–10 rating; full sweep takes `11 - scanSpeed` seconds |
-| `radar.infrared` | Whether the battery supports IR missiles (`true` / `false`) |
-| `radar.irLockKm` | Maximum platform IR acquisition range |
+| ADS-201 Watchpost | Value |
+| --- | ---: |
+| Detection range | 30 km |
+| Tracking range | 24 km |
+| Radar lock range | 16 km |
+| Simultaneous tracks | 5 |
+| Datalink channels | 2 |
+| Scan speed | 1.00 / 10.00 |
+| IR guidance / IR lock | N/A |
 
-Two observations can create a track inside the tracking envelope if a slot is free. Contacts outside that envelope can still appear as detections. A coasting track holds its slot for up to 22 seconds; death, track expiry or leaving the tracking envelope frees it. TRACK selects priority updates; it never bypasses the capacity limit. Priority updates run at 30% of the sweep period. Incoming missile measurements update at 20% of that period. Fresh-track time is at least seven seconds and scales for slow radars. Terrain, altitude clutter, radar damage and the selected display range still affect observations.
+Scan rating accepts decimals from 1.00 to 10.00. A full sweep takes `11 - scanSpeed` seconds (Watchpost: ten seconds). Aircraft and incoming missiles share track slots. Two observations establish a track if there is capacity and it is within the tracking envelope. Coasting, terrain/clutter, priority refreshes, radar damage, selected display range and uncertain identification still apply. Channels are allocated per locked target; multiple shots can share the target's channel. Both equipped missiles need a maintained target lock. No IR missile is included in the Watchpost loadout.
 
-The current battery detects to 40 km, tracks to 32 km, locks to 25 km, supports 12 tracks and two channels, and scans in five seconds. Damage caps detection, tracking and lock ranges. A lost or out-of-range track releases its channel. Channels are reserved per locked target, shared by multiple shots at that target, matching the existing game's engagement controls. IR locks use no datalink channels; heat, aspect, ceiling and terrain can limit acquisition before the platform maximum is reached.
+## USA missiles
 
-## Missiles
+| Characteristic | MIM-301 Rampart | FIM-352 Stonebolt |
+| --- | ---: | ---: |
+| Guidance | Radar / semi-active | Radar / semi-active |
+| Guidance time | 35 s | 40 s |
+| Maximum speed | 2,400 km/h | 2,700 km/h |
+| Maximum G | 14 | 12 |
+| Mass | 140 kg | 180 kg |
+| Maximum AOA | 12 degrees | 10 degrees |
+| Maximum thrust | 18 kN | 22 kN |
+| Research cost | Free starter | 600 BP |
+| Purchase cost | Free starter | $1,500 |
 
-Each profile uses `missile.<id>.<property>`. IDs: `hawk`, `ir6`, `kh25`, `kh29`, `kh23`, `kh27`, `kh58`.
+The supplied speeds are interpreted as km/h and the thrust figures as kN, converted to N internally. Supporting values absent from the request are initial arcade balance: 5s/6s motor burns, 24km/28km flight-path caps, and the existing 13,700m ceiling. Watchpost's 16km radar lock remains the tighter launch limit. Stonebolt is faster and guides longer but has lower G/AOA and more mass; it is not better in every maneuver.
 
-| Property | Gameplay effect |
-| --- | --- |
-| `name` | Display name |
-| `guidance` | `RADAR`, `INFRARED`, `COMMAND` or `LASER` |
-| `radarMode` | `ACTIVE`, `SEMI_ACTIVE`, `PASSIVE` for radar; `NONE` otherwise |
-| `guidanceSeconds` | Maximum time homing can operate |
-| `maxSpeedKmh` | Speed cap |
-| `maxG` | Maximum turn acceleration in the arcade flight step |
-| `massKg` | More mass means less acceleration at the same thrust |
-| `maxAoADeg` | Angle-of-attack allowance limits turn rate and turn-related speed loss |
-| `thrustN` | Maximum motor force; acceleration scales with thrust divided by mass |
-| `burnSeconds` | Motor duration, no longer than guidance time |
-| `rangeKm` | Maximum flight path and launch range |
-| `minRangeKm` | Minimum launch range |
-| `ceilingM` | Launch altitude gate |
-| `seekerKm` | Active radar acquisition / IR heat-signature range scale where applicable |
+Each weapon property is prefixed `missile.rampart.` or `missile.stonebolt.`; the existing five hostile profiles remain under `kh25`, `kh29`, `kh23`, `kh27`, `kh58`. `Game.weapon` snapshots the owned/equipped missile at mission start and each projectile retains its own profile. MissileMotion applies common thrust/mass acceleration, speed caps, finite turns, coast drag and turn energy loss. This is fictional arcade pursuit, not an operational weapon model.
 
-MissileMotion.java applies the same finite acceleration, speed cap, G/AOA-limited steering, coast drag and turn energy loss to player radar, IR and enemy missiles. It is an approximate pursuit game mechanic, not an aerodynamic or operational guidance model. Homing stops at the guidance deadline; an unguided missile coasts briefly before expiry. Collision checks use swept proximity and terrain.
+## Research and ownership
 
-Semi-active and command player missiles need the ground target link. Active radar needs it until the missile's seeker acquires the target within its configured range; takeover releases the channel when no other dependent shot needs that target. Passive radar follows an emitting target without a ground channel. Aircraft emission is a fictional per-type game flag; active enemy missile seekers emit after acquisition. IR continues independent flight after launch and can be diverted by flares. Laser and command enemy missiles need a living, suitably oriented source aircraft with site visibility; passive enemy missiles need the surviving radar's emission. The radar always emits while alive; an emission-off control is not added.
+Watchpost and Rampart are free and owned for every new or migrated save. Stonebolt follows Rampart. Select its tree card, apply banked BP (partial progress allowed), buy it with Dollars after research completes, then EQUIP. Research deducts at most the remaining requirement. Purchase alone does not switch the loadout. EQUIP is free and reversible between missions; all three launchers use the chosen missile next mission. Ammunition and repairs remain free.
 
-The shipped loadout is still semi-active MIM-23 and IR-6, plus the existing five enemy weapons. Active and command player guidance can be selected in the primary profile for future equipment; passive needs an emitting target. The primary slot accepts RADAR or COMMAND; the IR slot must remain INFRARED. The enemy slots accept all defined guidance types. Values are configurable in the source asset, not through an in-game editor.
+Research, ownership, loadout and currency are saved in the same preference transaction. Lifetime/mission earnings remain gross earnings, while wallet balances show spendable funds. Old `economy_*` keys and `hawk_best` remain compatible. Schema 2 adds `economy_tech_research`, `economy_tech_owned` and `economy_equipped_missile`. No historical currency is reset. A failed transaction does not change the in-memory wallet/ownership/loadout; the UI reports failure and offers retry. The existing rewards save/retry behavior is retained.
 
-## Validation and progress
-
-Numeric values must be finite and in their declared bounds. Whole-number fields, booleans, enum combinations, unknown property names and inconsistent ranges are rejected. Missing properties use defaults. An invalid or unreadable asset triggers the complete default loadout and a visible menu notice, avoiding a partially applied profile.
-
-Run `./test.sh` using a Java JDK, or set `RADAR_ECJ` to an ECJ jar. EquipmentTest changes profiles and verifies effects on detection, tracking, capacity, channels, scanning, IR compatibility, acceleration, speed, turn limits, energy and guidance. Existing tests cover economy, IR, all five moving incoming weapons, ammunition and mission completion. Android preference names and signing identity are unchanged; saved Dollars and BP remain compatible with an in-place update. Device installation and playtesting remain unverified.
+`./test.sh` runs the pure Java suites. TechTreeTest verifies exact requested stats, starter migration, partial research, insufficient funds, duplicate prevention, save failures/retries, persistent equip state, and actual Rampart/Stonebolt interceptions. Desktop Android stubs check the tree UI and preference adapter; real-device installation/playtesting remains unverified.
