@@ -47,7 +47,7 @@ public class Infrared {
   if(m.age<4)m.speed=Math.min(.72,m.speed+.16*dt);else if(m.age>12)m.speed=Math.max(.2,m.speed-.018*dt);
   double ox=m.x,oy=m.y,oz=m.z;m.x+=m.vx*m.speed*dt;m.y+=m.vy*m.speed*dt;m.z+=m.vz*m.speed*dt;m.path+=m.speed*dt;
   double sx=m.x-ox,sy=m.y-oy,sz=m.z-oz,len=sx*sx+sy*sy+sz*sz,f=len==0?0:Game.clamp(((tx-ox)*sx+(ty-oy)*sy+(tz-oz)*sz)/len,0,1);double near=Math.sqrt(Math.pow(tx-ox-f*sx,2)+Math.pow(ty-oy-f*sy,2)+Math.pow(tz-oz-f*sz,2));
-  if(guided&&near<.10&&m.age>.5){m.alive=false;if(m.decoy==null&&t.alive){t.alive=false;t.illuminated=false;t.outcome="IR INTERCEPT";game.kills++;game.score+=250;game.event("IR INTERCEPT / "+game.tag(t));}else{game.misses++;game.event("IR-6 LOST TO FLARE");}}
+  if(guided&&near<.10&&m.age>.5){m.alive=false;if(m.decoy==null&&t.alive){game.confirmIntercept(t,true);}else{game.misses++;game.event("IR-6 LOST TO FLARE");}}
   else if(m.lost>2||m.age>28||m.path>12||(m.age>.5&&m.z*1000<Game.terrain(m.x,m.y))||(m.decoy==null&&!t.alive)){m.alive=false;game.misses++;game.event("IR-6 LOST / "+game.tag(t));}
  }
 }

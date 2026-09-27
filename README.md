@@ -1,6 +1,6 @@
-# Air Defame 101 0.6 — Mission 1
+# Air Defame 101 0.7 — Mission 1
 
-Android game based on the creator's radar sketch and supplied "HAWK Air Defense Radar Game — Mission 1" guide (included as Mission-Guide.txt). Offline, landscape, Android 8+. No network or account permissions. Package com.jb.radar; version code 6; signed with the same development key as 0.1 for an in-place update.
+Android game based on the creator's radar sketch and supplied "HAWK Air Defense Radar Game — Mission 1" guide (included as Mission-Guide.txt). Offline, landscape, Android 8+. No network or account permissions. Package com.jb.radar; version code 7; signed with the same development key as 0.1 for an in-place update.
 
 ## Play
 Defend the command site from twelve incoming aircraft during a mission of up to ten simulation minutes. Tap a blip or NEXT TARGET. Two observations establish a track. Read its estimated identity and telemetry, press TRACK, LOCK, and FIRE when within the measured engagement envelope. Maintain illumination until interception. RELEASE LOCK frees a channel but risks missiles already in flight. Protect the site; intercepts award 250 points, aircraft reaching the site cost 100; enemy missile impacts reduce radar range.
@@ -33,7 +33,7 @@ Requires Java 17 JDK, Android platform 35, build-tools 35.0.0 and zip. Set RADAR
 - No actual Android device/emulator installation or touch test was available. Initial gameplay balance is unvalidated by a human player.
 
 ## Download
-The compiled version is in [artifacts/Air-Defame-101-v0.6.apk](artifacts/Air-Defame-101-v0.6.apk).
+The compiled version is in [artifacts/Air-Defame-101-v0.7.apk](artifacts/Air-Defame-101-v0.7.apk).
 
 ## Continue development
 Read [PROJECT_STATUS.md](PROJECT_STATUS.md), then the mission guide and source before making changes.
@@ -65,3 +65,19 @@ IR-6 has six ready rounds and six reserve, with a 60-second reload when empty. R
 The seeker shows cooling, acquisition, lock and heat strength. Enable SOUND in the pause menu for search and lock pulses. Seeker activity times out after 30 simulation seconds. Aircraft can deploy limited flare bursts; flares can interrupt acquisition or divert a missile. Terrain and seeker view limit guidance. Full behavior and simplifications are in [Update-Guide-v0.6.txt](Update-Guide-v0.6.txt).
 
 Verification: InfraredTest covers acquisition timing, passive locks, heat aspect, terrain, ceiling, independent flight, flare diversion, seeker cone loss, hot incoming missile interception, reload timing, inventory, pause, timeout and reset. Existing game and interception regressions and ten mission smoke runs pass. UI and music logic were exercised with desktop stubs; no Android device/emulator playtest was available.
+
+## Version 0.7 — Dollars and Battle Points
+Dollars and BP (Battle Points = XP) now persist across app restarts and in-place updates. New balances start at zero. Dollars are reserved for future equipment purchases and BP for future tech-tree research; spending and research are not implemented yet. Existing best scores are preserved.
+
+| Action | Dollars | BP |
+| --- | ---: | ---: |
+| Aircraft destroyed | 250 | 100 |
+| Incoming missile intercepted | 150 | 75 |
+| Victory | 500 | 250 |
+| Each base hit remaining after victory | 100 | 50 |
+
+Combat rewards save immediately and remain after defeat, restarting a mission or withdrawing. Victory bonuses pay once at mission completion. Radar and IR use the same rates; misses and decoys pay nothing. The menu and gameplay display balances; ECONOMY / REWARDS shows the table, last receipt and lifetime totals. The debrief itemizes each reward.
+
+Economy.java owns reward rules, receipts and duplicate checks. EconomyStore.java saves a single SharedPreferences transaction for balances and payout markers. Save failures show a retry action, and a new mission cannot discard pending rewards. On relaunch, unfinished missions are marked interrupted while already saved earnings remain. Local progress is removed by app-data clearing or uninstalling; no cloud sync is provided. Full scope is in Update-Guide-v0.7.txt.
+
+Validation: EconomyTest exercises rewards, duplicate prevention, persistence/recovery, failed-write retries and real radar/IR payout hooks. Existing simulation regressions pass. A desktop Android-stub check verifies UI rendering, the preference adapter, preservation of best scores and save retry behavior. The signed APK was built and verified; no real Android device/emulator test was available.

@@ -26,8 +26,10 @@ public class Game {
  public String weaponRelease(Contact t){if(irMode){ir.cancel();return "IR SEEKER OFF / FIRED MISSILES SELF GUIDE";}return release(t);}
  public String weaponBlock(Contact t){return irMode?ir.launchBlock(t):launchBlock(t);}
  public String fireWeapon(Contact t){return irMode?ir.launch(t):launch(t);}
- public Game(long seed){random=new Random(seed);for(int i=0;i<3;i++)launchers[i]=new Launcher();}
- public void start(){ir.reset();irMode=false;contacts.clear();missiles.clear();enemyMissiles.clear();maxRange=40;radarHits=enemySerial=0;impactUntil=lastDamage=0;vectors.clear();log.clear();elapsed=sweep=0;nextSpawn=48;reserve=9;reserved=spawned=kills=misses=leaks=score=shots=0;health=100;range=40;chosenLauncher=0;running=true;finished=won=false;for(int i=0;i<3;i++)launchers[i]=new Launcher();spawn(0,34);spawn(1,46);event("MISSION 1 / DEFEND THE COMMAND SITE");}
+ public final Economy economy;
+ public Game(long seed){this(seed,new Economy(new Economy.MemoryStore()));}
+ public Game(long seed,Economy economy){this.economy=economy;random=new Random(seed);for(int i=0;i<3;i++)launchers[i]=new Launcher();}
+ public boolean start(){if(!economy.beginMission())return false;ir.reset();irMode=false;contacts.clear();missiles.clear();enemyMissiles.clear();maxRange=40;radarHits=enemySerial=0;impactUntil=lastDamage=0;vectors.clear();log.clear();elapsed=sweep=0;nextSpawn=48;reserve=9;reserved=spawned=kills=misses=leaks=score=shots=0;health=100;range=40;chosenLauncher=0;running=true;finished=won=false;for(int i=0;i<3;i++)launchers[i]=new Launcher();spawn(0,34);spawn(1,46);event("MISSION 1 / DEFEND THE COMMAND SITE");return true;}
  public void event(String s){message=s;log.add(String.format(Locale.US,"%02d:%02d %s",(int)elapsed/60,(int)elapsed%60,s));if(log.size()>40)log.remove(0);}
  void spawn(int type,double distance){Contact t=new Contact();t.id=++spawned;t.type=type;t.born=elapsed;t.weapon=type==1?-1:type==0?random.nextInt(2):type==2?2:type==3?3:4;double a=random.nextDouble()*TAU;t.x=Math.sin(a)*distance;t.y=-Math.cos(a)*distance;t.heading=angle(-t.x,-t.y);t.speed=CRUISE[type]*(.85+random.nextDouble()*.2);t.desiredAlt=BASE_ALT[type]*(.5+random.nextDouble());if(type>=3&&random.nextBoolean())t.desiredAlt=130+random.nextDouble()*300;t.alt=terrain(t.x,t.y)+t.desiredAlt;t.side=random.nextBoolean()?1:-1;contacts.add(t);}
  static double clamp(double x,double a,double b){return Math.max(a,Math.min(b,x));}static double angle(double x,double y){return Math.atan2(x,-y);}static double delta(double a,double b){return Math.atan2(Math.sin(a-b),Math.cos(a-b));}
@@ -63,7 +65,7 @@ public class Game {
   ir.tick(dt);for(Missile m:missiles)if(m.alive)fly(m,dt);for(EnemyMissile m:enemyMissiles)if(m.alive)flyEnemy(m,dt);
   if(radarHits>=4||maxRange<=0)finish(false);else if(spawned==12&&aliveCount()==0&&incomingCount()==0)finish(true);else if(elapsed>=600&&incomingCount()==0)finish(maxRange>0);
  }
- void finish(boolean victory){finished=true;running=false;won=victory;event(victory?"MISSION COMPLETE / SITE SURVIVED":"MISSION FAILED / RADAR SYSTEM DESTROYED");}
+ void finish(boolean victory){if(finished)return;economy.finish(victory,hitsRemaining());finished=true;running=false;won=victory;event(victory?"MISSION COMPLETE / SITE SURVIVED":"MISSION FAILED / RADAR SYSTEM DESTROYED");}
  public int aliveCount(){int n=0;for(Contact t:contacts)if(t.alive)n++;return n;}
  public int ready(){int n=0;for(Launcher l:launchers)n+=l.ammo;return n;}
  public void fly(Missile m,double dt){if(m.infrared){ir.fly(m,dt);return;}Contact t=m.target;m.age+=dt;boolean guided=t.alive&&t.illuminated&&signal(t)>.15;if(guided)m.lost=Math.max(0,m.lost-dt*2);else m.lost+=dt;
@@ -74,10 +76,11 @@ public class Game {
   if(!vectors.containsKey(m))vectors.put(m,new double[]{0,0,1});double[] v=vectors.get(m);if(guided&&d>0){double blend=Math.min(1,dt*(m.age<18?2.8:1.0));v[0]+=(dx/d-v[0])*blend;v[1]+=(dy/d-v[1])*blend;v[2]+=(dz/d-v[2])*blend;}
   double norm=Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);double ox=m.x,oy=m.y,oz=m.z;m.x+=v[0]/norm*m.speed*dt;m.y+=v[1]/norm*m.speed*dt;m.z+=v[2]/norm*m.speed*dt;m.path+=m.speed*dt;
   double sx=m.x-ox,sy=m.y-oy,sz=m.z-oz,len=sx*sx+sy*sy+sz*sz;double f=len==0?0:clamp(((tx-ox)*sx+(ty-oy)*sy+(tz-oz)*sz)/len,0,1);double nearest=Math.sqrt(Math.pow(tx-ox-f*sx,2)+Math.pow(ty-oy-f*sy,2)+Math.pow(tz-oz-f*sz,2));
-  if(t.alive&&guided&&nearest<.12&&m.age>1){m.alive=false;t.alive=false;t.illuminated=false;t.outcome="INTERCEPTED";kills++;score+=250;event("INTERCEPT CONFIRMED / TRACK "+t.id);}
+  if(t.alive&&guided&&nearest<.12&&m.age>1){m.alive=false;confirmIntercept(t,false);}
   else if(m.lost>4||m.age>65||m.path>32||(m.age>1&&m.z*1000<terrain(m.x,m.y))||!t.alive){m.alive=false;misses++;event("MISSILE LOST / TRACK "+t.id);}
   if(!m.alive)vectors.remove(m);
  }
+ public void confirmIntercept(Contact t,boolean infrared){if(!t.alive||finished)return;economy.intercept(tag(t),t instanceof EnemyMissile);t.alive=false;t.illuminated=false;t.outcome=infrared?"IR INTERCEPT":"INTERCEPTED";kills++;score+=250;event((infrared?"IR INTERCEPT / ":"INTERCEPT / ")+tag(t));}
  public String track(Contact t){if(!visible(t))return "SELECT A DETECTED CONTACT";t.priority=true;t.nextPriority=elapsed;event("PRIORITY TRACK / "+t.id);return message;}
  public double rangeQuality(){return range<=10?1:range<=20?.92:range<=30?.82:.70;}
  public int[] presets(){ArrayList<Integer> a=new ArrayList<>();for(int n:new int[]{10,20,30,40})if(n<=maxRange)a.add(n);if(maxRange>0&&!a.contains(maxRange))a.add(maxRange);int[] r=new int[a.size()];for(int i=0;i<r.length;i++)r[i]=a.get(i);return r;}

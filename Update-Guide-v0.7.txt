@@ -1,0 +1,51 @@
+AIR DEFAME 101 — v0.7 Dollars and Battle Points
+
+Request: add an economy first, using Dollars and BP (Battle Points = XP),
+with a tech tree to follow in a future update.
+
+Both balances start at zero and accumulate separately. Dollars will fund
+future equipment purchases. BP is earned experience for future research.
+No purchases, research nodes, ammunition charges or repair charges exist yet.
+
+Initial reward table:
+Aircraft destroyed:                $250 + 100 BP
+Incoming missile intercepted:      $150 +  75 BP
+Mission victory:                   $500 + 250 BP
+Each base hit remaining on victory: $100 +  50 BP
+
+Radar and IR interceptions receive the same rewards. The actual target class
+sets the reward; uncertain radar identification does not alter it. A confirmed
+interception pays once. Flares, misses, aircraft escapes, and enemy missiles
+hitting terrain or the base do not award interception rewards.
+
+Combat rewards save when earned. A defeat, voluntary restart, or return to
+the menu keeps those rewards. Victory bonuses are awarded once, at successful
+mission completion. Reopening/redrawing the results screen does not pay again.
+After app termination the incomplete mission is marked INTERRUPTED, and already
+saved combat rewards remain. The mission itself does not resume.
+
+UI:
+- Menu cards and the gameplay top bar show Dollars and BP.
+- ECONOMY / REWARDS opens the reward table, last-mission receipt, lifetime
+  earnings, wins, and completed missions.
+- Mission results show separate aircraft, missile, victory, and base bonuses.
+- A failed save displays SAVE PENDING with RETRY SAVE in the economy screen.
+  A new mission cannot overwrite unsaved earnings. Backgrounding also retries.
+
+Persistence:
+The Android preference transaction saves both balances, mission receipt, and
+credited target IDs together. Duplicate checks exist at target, mission-event,
+and mission-settlement levels. The existing best score remains separate.
+The existing Android package/signing identity is retained for in-place updates.
+Progress is local to the device and survives normal app restarts and updates.
+Uninstalling or clearing app data removes it. No historical score conversion
+is performed: scores before v0.7 did not contain the required reward history.
+
+Engineering checks:
+EconomyTest covers rates, victory/defeat/withdrawal, recovery, duplicate payouts,
+failed-write retries, actual radar and IR interception credit, and integer
+bounds. Existing model, IR, missile-interception and update tests pass. Desktop
+Android stubs exercise preference persistence, preservation of the old best
+score, receipt redraws, save failure/retry, and the actual drawing code.
+The APK compiles and its signing verifies. Device installation/playtesting is
+still required; desktop stubs do not verify Android filesystem durability.
