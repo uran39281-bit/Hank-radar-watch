@@ -1,0 +1,50 @@
+AIR DEFAME 101 — v0.6 infrared launcher
+
+User request: add an IR system for IR-guided missiles, inspired by War Thunder.
+
+IR-6 is a fictional separate short-range battery. MIM-23 remains radar guided.
+Use WEAPON on the right to select IR-6. Select a detected contact, TRACK it,
+then IR LOCK / ACTIVATE. The seeker cools for 2 simulation seconds and needs
+1.2 seconds of continuous usable heat to lock. FIRE IR-6 then releases the
+launcher seeker; the missile guides itself. Selecting another contact or
+switching weapon does not affect IR missiles already in flight. IR locks use
+no radar illumination channels and do not trigger a radar-lock reaction.
+
+Gameplay limits: 6–9 km acquisition for aircraft depending on aspect, 9 km
+maximum slant launch range, 600 m minimum launch range, 6,000 m ceiling.
+Rear exhaust is stronger; terrain blocks heat. Incoming enemy missiles have
+stronger heat while boosting and weaker heat afterwards, so IR interception
+is possible at shorter distances. Heat locks do not reveal identity.
+
+Stock: 6 ready + 6 reserve IR missiles, separate from the existing 18 radar
+missiles. Only an empty IR launcher reloads, in 60 simulation seconds. Selecting
+L1/L2/L3 switches back to the corresponding radar launcher. Fired radar missiles
+still need their existing radar lock even while the UI is in IR mode.
+
+The UI shows cooling/acquisition/lock status, a seeker reticle, heat strength,
+IR ammo and reload time. SOUND in the pause menu enables short search pulses
+and a faster lock tone. The launcher seeker times out after 30 seconds.
+Pause and app background freeze simulation timers and stop seeker tones.
+
+Aircraft have limited fictional flare bursts and may react to nearby visible
+IR missile approaches. Flares are temporary moving heat sources; they can
+interrupt acquisition or distract an in-flight seeker if inside its view and
+stronger than the aircraft. A missile drawn to a flare can miss. Missiles also
+lose guidance through terrain or when a target moves outside the seeker cone.
+
+This is an arcade game interpretation, not an exact War Thunder recreation or
+validated real-weapon model. Values, loadouts, reaction probabilities, movement
+and collision tolerances are gameplay choices. Search radar still provides
+initial contact selection; this update does not add a standalone IRST search
+screen, sun/cloud modeling, manual optical aiming, or advanced IRCCM.
+
+Mechanics references:
+https://wiki.warthunder.com/129-infrared-missiles-in-war-thunder
+https://wiki.warthunder.com/mechanics/5026-aerial-infrared-countermeasures-flares
+
+Verification: deterministic acquisition, no radar warning/channel use, aspect,
+terrain/ceiling, post-launch independence, flare diversion, cone loss, hot
+missile interception, separate ammunition, reload/pause, timeout and reset.
+Existing game and missile-interception tests plus seeded mission simulations
+pass. Actual drawing code was checked with desktop Android stubs. Android
+hardware playback, installation, touch controls and player balance need testing.

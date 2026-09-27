@@ -7,11 +7,11 @@ public class Game {
  public static final double[] MAX_SPEED={979,2240,2358,2232,2052}, LENGTH={14.2,14.1,16.7,18.9,18.9}, SPAN={14.4,7.2,14,13.7,13.7}, CEILING={11000,16000,16000,19500,19500};
  public static final double[] CRUISE={680,1080,1280,960,940}, TURN={.12,.28,.19,.17,.17}, ACCEL={13,28,35,24,24}, BASE_ALT={850,4800,6500,2300,2200};
  public static class Contact {
-  public int id,type,samples,weapon=-1; public boolean priority,launchObserved,weaponFired; public double born,nextPriority; public double x,y,alt,speed,heading,climb,desiredAlt,evasion,side=1,seen=-999,px,py,palt,pspeed,psize,plen,pheading,pclimb,pturn,quality,confidence,previousHeading;
+  public int id,type,samples,weapon=-1,flareBursts=3; public double nextFlare; public boolean priority,launchObserved,weaponFired; public double born,nextPriority; public double x,y,alt,speed,heading,climb,desiredAlt,evasion,side=1,seen=-999,px,py,palt,pspeed,psize,plen,pheading,pclimb,pturn,quality,confidence,previousHeading;
   public double[] probabilities=new double[6]; public int guess;public boolean alive=true,illuminated,attacked,escaped; public String outcome="";
   public double range(){return Math.hypot(x,y);}public double measuredRange(){return Math.hypot(px,py);}
  }
- public static class Missile {public Contact target;public double x,y,z,speed=.08,age,lost,path;public boolean alive=true;}
+ public static class Missile {public boolean infrared;public double vx,vy,vz;public Infrared.Flare decoy;public Contact target;public double x,y,z,speed=.08,age,lost,path;public boolean alive=true;}
  public static class EnemyMissile extends Contact {public Contact source;public double z,age,lost,pz;public EnemyMissile(){speed=.18;}}
  public static final String[] WEAPONS={"Kh-25ML","Kh-29L","Kh-23M","Kh-27PS","Kh-58U"};
  // ARM envelopes below are fictional mission-balancing values, not operational data.
@@ -20,8 +20,14 @@ public class Game {
  public static class Launcher {public int ammo=3;public double reload;}
  public Random random;public ArrayList<Contact> contacts=new ArrayList<>();public ArrayList<Missile> missiles=new ArrayList<>();public ArrayList<String> log=new ArrayList<>();public Launcher[] launchers=new Launcher[3];
  public double elapsed,sweep,nextSpawn;public int reserve=9,reserved=0,spawned,kills,misses,leaks,health=100,score,shots,range=40,chosenLauncher=0;public boolean running,finished,won;public String message="";
+ public final Infrared ir=new Infrared(this);public boolean irMode;
+ public void toggleWeapon(){irMode=!irMode;ir.cancel();}
+ public String weaponLock(Contact t){return irMode?ir.begin(t):illuminate(t);}
+ public String weaponRelease(Contact t){if(irMode){ir.cancel();return "IR SEEKER OFF / FIRED MISSILES SELF GUIDE";}return release(t);}
+ public String weaponBlock(Contact t){return irMode?ir.launchBlock(t):launchBlock(t);}
+ public String fireWeapon(Contact t){return irMode?ir.launch(t):launch(t);}
  public Game(long seed){random=new Random(seed);for(int i=0;i<3;i++)launchers[i]=new Launcher();}
- public void start(){contacts.clear();missiles.clear();enemyMissiles.clear();maxRange=40;radarHits=enemySerial=0;impactUntil=lastDamage=0;vectors.clear();log.clear();elapsed=sweep=0;nextSpawn=48;reserve=9;reserved=spawned=kills=misses=leaks=score=shots=0;health=100;range=40;chosenLauncher=0;running=true;finished=won=false;for(int i=0;i<3;i++)launchers[i]=new Launcher();spawn(0,34);spawn(1,46);event("MISSION 1 / DEFEND THE COMMAND SITE");}
+ public void start(){ir.reset();irMode=false;contacts.clear();missiles.clear();enemyMissiles.clear();maxRange=40;radarHits=enemySerial=0;impactUntil=lastDamage=0;vectors.clear();log.clear();elapsed=sweep=0;nextSpawn=48;reserve=9;reserved=spawned=kills=misses=leaks=score=shots=0;health=100;range=40;chosenLauncher=0;running=true;finished=won=false;for(int i=0;i<3;i++)launchers[i]=new Launcher();spawn(0,34);spawn(1,46);event("MISSION 1 / DEFEND THE COMMAND SITE");}
  public void event(String s){message=s;log.add(String.format(Locale.US,"%02d:%02d %s",(int)elapsed/60,(int)elapsed%60,s));if(log.size()>40)log.remove(0);}
  void spawn(int type,double distance){Contact t=new Contact();t.id=++spawned;t.type=type;t.born=elapsed;t.weapon=type==1?-1:type==0?random.nextInt(2):type==2?2:type==3?3:4;double a=random.nextDouble()*TAU;t.x=Math.sin(a)*distance;t.y=-Math.cos(a)*distance;t.heading=angle(-t.x,-t.y);t.speed=CRUISE[type]*(.85+random.nextDouble()*.2);t.desiredAlt=BASE_ALT[type]*(.5+random.nextDouble());if(type>=3&&random.nextBoolean())t.desiredAlt=130+random.nextDouble()*300;t.alt=terrain(t.x,t.y)+t.desiredAlt;t.side=random.nextBoolean()?1:-1;contacts.add(t);}
  static double clamp(double x,double a,double b){return Math.max(a,Math.min(b,x));}static double angle(double x,double y){return Math.atan2(x,-y);}static double delta(double a,double b){return Math.atan2(Math.sin(a-b),Math.cos(a-b));}
@@ -29,7 +35,7 @@ public class Game {
  public double signal(Contact t){double r=t.range(),radarHeight=35,targetASL=t.alt;double horizon=4.12*(Math.sqrt(radarHeight)+Math.sqrt(Math.max(0,targetASL)));if(r>maxRange||r>horizon||maxRange<=0)return 0;double origin=terrain(0,0)+radarHeight;for(int i=1;i<24;i++){double f=i/24.0;if(terrain(t.x*f,t.y*f)>origin+(targetASL-origin)*f)return 0;}double agl=t.alt-terrain(t.x,t.y);return agl<150?.32:agl<500?.58:agl<1500?.82:1;}
  public boolean liveTrack(Contact t){return t!=null&&t.alive&&t.samples>=2&&elapsed-t.seen<=7&&t.measuredRange()<=maxRange;}
  public boolean visible(Contact t){return t!=null&&t.alive&&t.samples>0&&elapsed-t.seen<22&&t.measuredRange()<=Math.min(range,maxRange);}
- public String trackState(Contact t){if(t==null)return "NO TRACK";if(!t.alive)return t.outcome;if(elapsed-t.seen>22)return "TRACK LOST";if(elapsed-t.seen>7)return "COASTING";return t.illuminated?"LOCKED":t.priority?"TRACKING":t.samples<2?"TENTATIVE":"DETECTED";}
+ public String trackState(Contact t){if(t!=null&&ir.target==t&&ir.locked)return "IR LOCK";if(t==null)return "NO TRACK";if(!t.alive)return t.outcome;if(elapsed-t.seen>22)return "TRACK LOST";if(elapsed-t.seen>7)return "COASTING";return t.illuminated?"LOCKED":t.priority?"TRACKING":t.samples<2?"TENTATIVE":"DETECTED";}
  public int channels(){int n=0;for(Contact t:targets())if(t.alive&&t.illuminated)n++;return n;}
  public int inbound(Contact t){int n=0;for(Missile m:missiles)if(m.alive&&m.target==t)n++;return n;}
  public String illuminate(Contact t){if(t==null||!t.priority)return "TRACK THE TARGET BEFORE LOCKING";if(!liveTrack(t))return "ESTABLISH TRACK / WAIT FOR TWO SWEEPS";if(t.illuminated)return "TARGET ALREADY ILLUMINATED";if(channels()>=2)return "BOTH ENGAGEMENT CHANNELS ARE OCCUPIED";t.illuminated=true;if(!(t instanceof EnemyMissile)&&random.nextDouble()<.75)t.evasion=5+random.nextDouble()*7;event("LOCK ESTABLISHED / TRACK "+t.id);return message;}
@@ -54,13 +60,13 @@ public class Game {
    if(t.weaponFired&&t.range()>60){t.alive=false;t.illuminated=false;t.escaped=true;t.outcome="WITHDREW";}
    if(t.range()<2&&!t.attacked){t.attacked=true;leaks++;score-=100;t.alive=false;t.illuminated=false;t.outcome="REACHED SITE";event("AIRCRAFT PASSED THE SITE / TRACK "+t.id);}
   }
-  for(Missile m:missiles)if(m.alive)fly(m,dt);for(EnemyMissile m:enemyMissiles)if(m.alive)flyEnemy(m,dt);
+  ir.tick(dt);for(Missile m:missiles)if(m.alive)fly(m,dt);for(EnemyMissile m:enemyMissiles)if(m.alive)flyEnemy(m,dt);
   if(radarHits>=4||maxRange<=0)finish(false);else if(spawned==12&&aliveCount()==0&&incomingCount()==0)finish(true);else if(elapsed>=600&&incomingCount()==0)finish(maxRange>0);
  }
  void finish(boolean victory){finished=true;running=false;won=victory;event(victory?"MISSION COMPLETE / SITE SURVIVED":"MISSION FAILED / RADAR SYSTEM DESTROYED");}
  public int aliveCount(){int n=0;for(Contact t:contacts)if(t.alive)n++;return n;}
  public int ready(){int n=0;for(Launcher l:launchers)n+=l.ammo;return n;}
- public void fly(Missile m,double dt){Contact t=m.target;m.age+=dt;boolean guided=t.alive&&t.illuminated&&signal(t)>.15;if(guided)m.lost=Math.max(0,m.lost-dt*2);else m.lost+=dt;
+ public void fly(Missile m,double dt){if(m.infrared){ir.fly(m,dt);return;}Contact t=m.target;m.age+=dt;boolean guided=t.alive&&t.illuminated&&signal(t)>.15;if(guided)m.lost=Math.max(0,m.lost-dt*2);else m.lost+=dt;
   double speedCap=2.5*(340-.004*Math.min(11000,m.z*1000))/1000;
   if(m.age<5)m.speed=Math.min(speedCap,m.speed+.145*dt);else if(m.age>18)m.speed=Math.max(.16,m.speed-.009*dt);
   double tx=t.x,ty=t.y,tz=t.alt/1000,dx=tx-m.x,dy=ty-m.y,dz=tz-m.z,d=Math.sqrt(dx*dx+dy*dy+dz*dz);

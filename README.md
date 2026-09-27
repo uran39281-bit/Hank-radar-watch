@@ -1,6 +1,6 @@
-# Air Defame 101 0.5 — Mission 1
+# Air Defame 101 0.6 — Mission 1
 
-Android game based on the creator's radar sketch and supplied "HAWK Air Defense Radar Game — Mission 1" guide (included as Mission-Guide.txt). Offline, landscape, Android 8+. No network or account permissions. Package com.jb.radar; version code 5; signed with the same development key as 0.1 for an in-place update.
+Android game based on the creator's radar sketch and supplied "HAWK Air Defense Radar Game — Mission 1" guide (included as Mission-Guide.txt). Offline, landscape, Android 8+. No network or account permissions. Package com.jb.radar; version code 6; signed with the same development key as 0.1 for an in-place update.
 
 ## Play
 Defend the command site from twelve incoming aircraft during a mission of up to ten simulation minutes. Tap a blip or NEXT TARGET. Two observations establish a track. Read its estimated identity and telemetry, press TRACK, LOCK, and FIRE when within the measured engagement envelope. Maintain illumination until interception. RELEASE LOCK frees a channel but risks missiles already in flight. Protect the site; intercepts award 250 points, aircraft reaching the site cost 100; enemy missile impacts reduce radar range.
@@ -33,7 +33,7 @@ Requires Java 17 JDK, Android platform 35, build-tools 35.0.0 and zip. Set RADAR
 - No actual Android device/emulator installation or touch test was available. Initial gameplay balance is unvalidated by a human player.
 
 ## Download
-The compiled version is in [artifacts/Air-Defame-101-v0.5.apk](artifacts/Air-Defame-101-v0.5.apk).
+The compiled version is in [artifacts/Air-Defame-101-v0.6.apk](artifacts/Air-Defame-101-v0.6.apk).
 
 ## Continue development
 Read [PROJECT_STATUS.md](PROJECT_STATUS.md), then the mission guide and source before making changes.
@@ -56,3 +56,12 @@ Implemented Update-Guide-v0.5.txt. The right panel holds NEXT TARGET, TRACK, LOC
 Contacts use gray for unknown affiliation/type, orange for known enemy with uncertain type, and red for known enemy/type. Green is reserved for future positively identified friendly targets; no friendly target spawning is added. The selected contact shows a full text identity label. Classification reflects observation history and confidence rather than revealing hidden aircraft identity. Incoming missiles can transition from gray to orange to red as observations accumulate.
 
 The base survives three impacts and is defeated on the fourth. Range damage still accumulates. Deterministic tests intercept all five moving enemy missile profiles, verify mixed aircraft/missile channel limits, sorted target selection, ID transitions and exact fourth-hit defeat. Model regression tests and ten mission smoke runs passed. Desktop renders were inspected; actual Android playback, installation and touch testing remain unverified.
+
+## Version 0.6 — IR-6 launcher
+A separate fictional IR-6 battery adds heat-seeking missiles. Switch WEAPON on the right, select a contact, TRACK, then IR LOCK / ACTIVATE. Wait for cooling and a steady heat lock, then FIRE IR-6. The missile self-guides after launch; you can change targets or weapon mode without breaking its guidance. IR locks use no radar channels and do not trigger a radar-lock reaction. Initial selection is radar-cued, not a separate IRST search display. Selecting L1/L2/L3 switches back to radar.
+
+IR-6 has six ready rounds and six reserve, with a 60-second reload when empty. Range depends on aspect and heat: approximately 6–9 km for aircraft, with a 9 km maximum slant launch gate and 6,000 m ceiling. Incoming missiles are also heat targets, with stronger signatures during boost. These are fictional gameplay values. Heat locks do not identify the target.
+
+The seeker shows cooling, acquisition, lock and heat strength. Enable SOUND in the pause menu for search and lock pulses. Seeker activity times out after 30 simulation seconds. Aircraft can deploy limited flare bursts; flares can interrupt acquisition or divert a missile. Terrain and seeker view limit guidance. Full behavior and simplifications are in [Update-Guide-v0.6.txt](Update-Guide-v0.6.txt).
+
+Verification: InfraredTest covers acquisition timing, passive locks, heat aspect, terrain, ceiling, independent flight, flare diversion, seeker cone loss, hot incoming missile interception, reload timing, inventory, pause, timeout and reset. Existing game and interception regressions and ten mission smoke runs pass. UI and music logic were exercised with desktop stubs; no Android device/emulator playtest was available.

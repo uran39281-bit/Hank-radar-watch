@@ -12,7 +12,7 @@ public class MainActivity extends Activity {
  @Override public void onBackPressed(){view.paused=true;view.help=false;view.invalidate();}
  class Radar extends View {
   final int green=0xff00ff00,muted=0xff70b870,amber=0xffeeeeee,red=0xffffffff,bg=0xff000000,border=0xff164516,panel=0xff020a02;
-  Paint p=new Paint(3);Game game=new Game(System.nanoTime());Game.Contact selected;ArrayList<Btn> buttons=new ArrayList<>();long last;float scale,ox,oy;boolean paused=false,started=false,sound=false,ended=false,help=false;int speed=1,best=getPreferences(0).getInt("hawk_best",0);String notice="MISSION 1 / HAWK BATTERY";ToneGenerator tone;Bitmap launcherIcon;
+  Paint p=new Paint(3);Game game=new Game(System.nanoTime());Game.Contact selected;ArrayList<Btn> buttons=new ArrayList<>();long last,lastSeekerTone;float scale,ox,oy;boolean paused=false,started=false,sound=false,ended=false,help=false;int speed=1,best=getPreferences(0).getInt("hawk_best",0);String notice="MISSION 1 / HAWK BATTERY";ToneGenerator tone;Bitmap launcherIcon;
   class Btn{RectF r;String id;boolean enabled;Btn(float x,float y,float w,float h,String i,boolean e){r=new RectF(x,y,x+w,y+h);id=i;enabled=e;}}
   Radar(){super(MainActivity.this);setFocusable(true);try(java.io.InputStream stream=getAssets().open("hawk_launcher.png")){BitmapFactory.Options opts=new BitmapFactory.Options();opts.inSampleSize=4;launcherIcon=BitmapFactory.decodeStream(stream,null,opts);}catch(java.io.IOException e){launcherIcon=null;}try{tone=new ToneGenerator(AudioManager.STREAM_MUSIC,30);}catch(Exception e){}}
   void text(Canvas c,String s,float x,float y,float size,int color){p.setColor(color);p.setStyle(Paint.Style.FILL);p.setTypeface(Typeface.MONOSPACE);p.setTextSize(size);c.drawText(s,x,y,p);}
@@ -26,7 +26,7 @@ public class MainActivity extends Activity {
    float aw=getWidth()-getPaddingLeft()-getPaddingRight(),ah=getHeight()-getPaddingTop()-getPaddingBottom();scale=Math.min(aw/1280f,ah/720f);ox=getPaddingLeft()+(aw-1280*scale)/2;oy=getPaddingTop()+(ah-720*scale)/2;c.drawColor(bg);c.save();c.translate(ox,oy);c.scale(scale,scale);buttons.clear();if(!started){mainMenu(c);c.restore();if(isShown())postInvalidateDelayed(33);return;}
    text(c,"BASE HITS LEFT: "+game.hitsRemaining()+" / 4",20,33,20,game.hitsRemaining()>1?green:amber);
    button(c,"speed",speed+"x TIME",855,8,120,true);button(c,"help","GUIDE",985,8,120,true);button(c,"pause","PAUSE",1115,8,145,!game.finished);
-   telemetry(c);scope(c);engagement(c);launchers(c);controlBar(c);if(game.elapsed<game.impactUntil){rect(c,405,180,390,130,bg,true);rect(c,405,180,390,130,green,false);int flash=((int)(game.elapsed*5)%2==0)?green:amber;text(c,"RADAR IMPACT",430,220,27,flash);text(c,"SYSTEM DAMAGE DETECTED",430,254,18,flash);text(c,fmt("RANGE REDUCED -%.0f km",game.lastDamage),430,284,16,flash);}
+   telemetry(c);scope(c);engagement(c);launchers(c);controlBar(c);seekerPanel(c);if(game.elapsed<game.impactUntil){rect(c,405,180,390,130,bg,true);rect(c,405,180,390,130,green,false);int flash=((int)(game.elapsed*5)%2==0)?green:amber;text(c,"RADAR IMPACT",430,220,27,flash);text(c,"SYSTEM DAMAGE DETECTED",430,254,18,flash);text(c,fmt("RANGE REDUCED -%.0f km",game.lastDamage),430,284,16,flash);}
    text(c,notice,20,717,11,amber);
    if(!started||paused||game.finished)overlay(c);c.restore();if(isShown())postInvalidateDelayed(33);
   }
@@ -36,7 +36,19 @@ public class MainActivity extends Activity {
    for(int j=0;j<7;j++){double a=j*2.39;float x=cx+(float)Math.cos(a)*(100+j*37),y=cy+(float)Math.sin(a)*(100+j*37);for(int k=14;k>0;k--)circle(c,x,y,k,Color.argb(3,0,255,0),true);}
    rect(c,365,235,550,240,0xb9000000,true);text(c,"AIR DEFAME 101",410,285,44,green);rect(c,440,366,400,84,border,true);rect(c,440,366,400,84,green,false);text(c,"PLAY",595,420,30,green);buttons.add(new Btn(440,366,400,84,"start",true));}
   int contactColor(Game.Contact t){return new int[]{0xff999999,0xffffa040,0xffff4545,green}[game.identity(t)];}
-  void controlBar(Canvas c){boolean active=!paused&&!game.finished;button(c,"next","NEXT TARGET",874,89,367,active);button(c,"track",selected!=null&&selected.priority?"TRACKING":"TRACK",874,149,367,active&&game.visible(selected));button(c,"illuminate",selected!=null&&selected.illuminated?"LOCKED":"LOCK",874,209,367,active&&game.liveTrack(selected)&&selected.priority&&!selected.illuminated&&game.channels()<2);button(c,"launch","FIRE",874,269,367,active&&game.launchBlock(selected)==null);button(c,"range","RANGE LIMIT: "+game.range+" KM",874,329,367,active);button(c,"release","RELEASE LOCK",874,389,367,active&&selected!=null&&selected.illuminated);}
+  void controlBar(Canvas c){boolean active=!paused&&!game.finished;boolean ir=game.irMode;
+   button(c,"next","NEXT TARGET",874,89,367,active);
+   button(c,"track",selected!=null&&selected.priority?"TRACKING":"TRACK",874,149,367,active&&game.visible(selected));
+   String label=ir?(game.ir.locked?"IR LOCKED":game.ir.active?"SEEKER ACTIVE":"IR LOCK / ACTIVATE"):selected!=null&&selected.illuminated?"RADAR LOCKED":"RADAR LOCK";
+   boolean canLock=ir?selected!=null&&selected.alive&&selected.priority&&game.ir.ammo>0&&!game.ir.active:game.liveTrack(selected)&&selected.priority&&!selected.illuminated&&game.channels()<2;
+   button(c,"illuminate",label,874,209,367,active&&canLock);button(c,"launch",ir?"FIRE IR-6":"FIRE MIM-23",874,269,367,active&&game.weaponBlock(selected)==null);
+   button(c,"range","RANGE LIMIT: "+game.range+" KM",874,329,367,active);button(c,"release",ir?"CANCEL IR SEEKER":"RELEASE RADAR LOCK",874,389,367,active&&(ir?game.ir.active:selected!=null&&selected.illuminated));
+   button(c,"weapon",ir?"WEAPON: IR-6  >  RADAR":"WEAPON: RADAR  >  IR-6",874,449,367,active);
+  }
+  void seekerPanel(Canvas c){rect(c,20,654,1240,46,border,false);if(game.irMode){text(c,"IR-6  "+game.ir.ammo+" READY / "+game.ir.reserve+" RES",36,675,15,green);text(c,game.ir.reload>0?fmt("RELOAD %.0fs",game.ir.reload):"ALL-ASPECT / 6-9km / PASSIVE LOCK",36,693,11,muted);
+    text(c,game.ir.state(),440,675,15,game.ir.locked?amber:green);double strength=game.ir.baseHeat();text(c,fmt("HEAT %.0f%% / LOCK %.0f%%",Math.min(150,strength*100),game.ir.acquire/Infrared.ACQUIRE_TIME*100),440,693,11,muted);rect(c,823,671,185,11,border,true);rect(c,823,671,185*(float)Math.min(1,strength),11,green,true);text(c,"SELF GUIDES AFTER FIRE",1030,681,12,amber);
+    if(sound&&tone!=null&&!paused&&!game.finished&&game.ir.active&&game.ir.cool>=Infrared.COOL_TIME){long now=System.nanoTime();if(now-lastSeekerTone>(game.ir.locked?400000000L:900000000L)){tone.startTone(ToneGenerator.TONE_PROP_BEEP,game.ir.locked?180:45);lastSeekerTone=now;}}
+   }else{text(c,"RADAR / MIM-23: KEEP LOCK UNTIL INTERCEPT",36,682,14,green);text(c,"IR-6: "+game.ir.ammo+" READY / "+game.ir.reserve+" RESERVE",670,682,14,muted);text(c,"SWITCH WEAPON ON RIGHT",1030,682,12,amber);}}
   void telemetry(Canvas c){rect(c,20,74,315,484,border,false);text(c,"TARGET ANALYSIS",36,101,18,green);
    if(selected==null){text(c,"SELECT AIRCRAFT OR MISSILE",36,140,14,amber);text(c,"TRACK > LOCK > FIRE",36,171,15,muted);}else{Game.Contact t=selected;int col=contactColor(t);text(c,game.tag(t)+" / "+game.trackState(t),36,129,14,col);text(c,game.identityLabel(t),36,155,13,col);text(c,game.identification(t),36,181,13,col);text(c,fmt("RNG %.1f km / ALT %.0f m",t.measuredRange(),t.palt),36,210,12,muted);text(c,fmt("SPD %.0f km/h / HDG %03d",t.pspeed,((int)Math.toDegrees(t.pheading)%360+360)%360),36,235,12,muted);
    if(t instanceof Game.EnemyMissile){text(c,"INCOMING / RADAR SITE",36,269,14,col);text(c,"INTERCEPTION AUTHORIZED",36,294,12,muted);}else{for(int i=0;i<5;i++)text(c,fmt("%-10s %2.0f%%",Game.NAMES[i],t.probabilities[i]*100),36,263+i*18,12,muted);text(c,fmt("UNKNOWN FACTOR %.0f%%",t.probabilities[5]*100),36,365,12,amber);}}
@@ -49,17 +61,19 @@ public class MainActivity extends Activity {
    for(int i=0;i<32;i++){p.setColor(Color.argb(55-i,0,255,0));p.setStyle(Paint.Style.FILL);c.drawArc(new RectF(cx-r,cy-r,cx+r,cy+r),(float)Math.toDegrees(game.sweep)-90-i,1.3f,true,p);}line(c,cx,cy,cx+(float)Math.sin(game.sweep)*r,cy-(float)Math.cos(game.sweep)*r,green);
    rect(c,cx-5,cy-5,10,10,green,true);
    for(Game.Contact t:game.contacts)if(game.visible(t)){float x=cx+(float)t.px/game.range*r,y=cy+(float)t.py/game.range*r;int col=contactColor(t);if(t.illuminated)line(c,cx,cy,x,y,0xff567856);aircraftGlyph(c,x,y,t,col);if(t.priority)circle(c,x,y,13,col,false);if(t==selected)rect(c,x-12,y-12,24,24,amber,false);text(c,fmt("%03d",t.id),x+9,y-8,12,col);}
-   for(Game.Missile m:game.missiles)if(m.alive&&Math.hypot(m.x,m.y)<=game.range){float x=cx+(float)m.x/game.range*r,y=cy+(float)m.y/game.range*r;missileGlyph(c,x,y,Math.atan2(m.target.x-m.x,-(m.target.y-m.y)),green);text(c,"MIM-23",x+7,y,9,green);}
+   for(Game.Missile m:game.missiles)if(m.alive&&Math.hypot(m.x,m.y)<=game.range){float x=cx+(float)m.x/game.range*r,y=cy+(float)m.y/game.range*r;missileGlyph(c,x,y,Math.atan2(m.target.x-m.x,-(m.target.y-m.y)),green);text(c,m.infrared?"IR-6":"MIM-23",x+7,y,9,green);}
    for(Game.EnemyMissile m:game.enemyMissiles)if(game.visible(m)){float x=cx+(float)m.px/game.range*r,y=cy+(float)m.py/game.range*r;int col=contactColor(m);missileGlyph(c,x,y,Math.atan2(-m.px,m.py),col);if(m.priority)circle(c,x,y,11,col,false);if(m==selected)rect(c,x-12,y-12,24,24,amber,false);text(c,"M-"+m.id,x+8,y,10,col);}
-   text(c,"PALE RING: 25 km / SHADE: TERRAIN",367,525,12,muted);text(c,"GRAY UNKNOWN / ORANGE UNSURE / RED ENEMY",367,548,11,muted);
+   if(game.irMode){circle(c,cx,cy,r*9/game.range,0xff70b870,false);Game.Contact t=game.ir.target;if(t!=null&&game.visible(t)){float x=cx+(float)t.px/game.range*r,y=cy+(float)t.py/game.range*r;if(game.ir.locked||((int)(game.elapsed*4)%2==0)){circle(c,x,y,20,amber,false);line(c,x-25,y,x-16,y,amber);line(c,x+16,y,x+25,y,amber);}text(c,game.ir.locked?"IR LOCK":"IR SEEK",x+24,y+17,11,amber);}}
+   for(Infrared.Flare f:game.ir.flares)if(Math.hypot(f.x,f.y)<=game.range&&game.visible(f.source)){float x=cx+(float)f.x/game.range*r,y=cy+(float)f.y/game.range*r;circle(c,x,y,3,amber,true);text(c,"FLARE",x+5,y-4,9,amber);}
+   text(c,game.irMode?"IR RING: 9km / HEAT & TERRAIN LIMIT LOCK":"PALE RING: 25 km / SHADE: TERRAIN",367,525,11,muted);text(c,"GRAY UNKNOWN / ORANGE UNSURE / RED ENEMY",367,548,11,muted);
   }
   void aircraftGlyph(Canvas c,float x,float y,Game.Contact t,int col){c.save();c.translate(x,y);c.rotate((float)Math.toDegrees(t.pheading));if(t.confidence<.75||game.elapsed-t.seen>7){line(c,0,-8,6,0,col);line(c,6,0,0,8,col);line(c,0,8,-6,0,col);line(c,-6,0,0,-8,col);}else{int type=t.guess;float wing=type==0?11:type==1?6:type==2?9:10;float sweep=type==0?1:type==1?6:type==2?4:type==3?5:6;line(c,0,-12,0,11,col);line(c,0,-5,-wing,sweep,col);line(c,-wing,sweep,0,3,col);line(c,0,-5,wing,sweep,col);line(c,wing,sweep,0,3,col);line(c,-4,9,4,9,col);}c.restore();}
   void missileGlyph(Canvas c,float x,float y,double heading,int col){c.save();c.translate(x,y);c.rotate((float)Math.toDegrees(heading));line(c,0,-6,0,6,col);line(c,-3,-1,0,-6,col);line(c,3,-1,0,-6,col);c.restore();}
-  void engagement(Canvas c){rect(c,855,74,405,484,border,false);text(c,"LOCK CHANNELS: "+game.channels()+" / 2",874,465,15,green);String why=game.launchBlock(selected);text(c,why==null?"READY TO FIRE":why,874,491,11,amber);text(c,"INCOMING MISSILES: "+game.incomingCount(),874,518,14,amber);text(c,"BASE: "+game.hitsRemaining()+" HITS REMAINING",874,545,14,green);}
-  void launchers(Canvas c){for(int i=0;i<3;i++){float x=20+i*282;Game.Launcher l=game.launchers[i];rect(c,x,570,270,73,bg,true);rect(c,x,570,270,73,i==game.chosenLauncher?amber:border,false);
+  void engagement(Canvas c){rect(c,855,74,405,484,border,false);String why=game.weaponBlock(selected);text(c,why==null?"READY TO FIRE":why,874,519,11,amber);text(c,"RADAR CH "+game.channels()+"/2   INCOMING "+game.incomingCount(),874,544,14,green);}
+  void launchers(Canvas c){for(int i=0;i<3;i++){float x=20+i*282;Game.Launcher l=game.launchers[i];rect(c,x,570,270,73,bg,true);rect(c,x,570,270,73,i==game.chosenLauncher&&!game.irMode?amber:border,false);
    if(launcherIcon!=null){float iw=122,ih=iw*launcherIcon.getHeight()/launcherIcon.getWidth();p.setFilterBitmap(true);p.setAlpha(l.ammo==0?100:255);c.drawBitmap(launcherIcon,null,new RectF(x+7,606.5f-ih/2,x+7+iw,606.5f+ih/2),p);p.setAlpha(255);}
    String status=l.reload>0?fmt("RELOAD %02ds",(int)Math.ceil(l.reload)):l.ammo==0?"EMPTY":"READY";
-   text(c,"L"+(i+1),x+141,591,16,i==game.chosenLauncher?amber:green);text(c,l.ammo+" / 3",x+210,591,13,muted);text(c,status,x+141,611,12,l.reload>0?amber:green);
+   text(c,"L"+(i+1),x+141,591,16,i==game.chosenLauncher&&!game.irMode?amber:green);text(c,l.ammo+" / 3",x+210,591,13,muted);text(c,status,x+141,611,12,l.reload>0?amber:green);
    for(int j=0;j<3;j++)rect(c,x+141+j*37,620,27,12,j<l.ammo?green:border,true);
    if(l.reload>0)rect(c,x+141,597,101*(float)(1-l.reload/90),2,green,true);
    buttons.add(new Btn(x,570,270,73,"l"+i,true));}
@@ -67,11 +81,12 @@ public class MainActivity extends Activity {
   }
   void overlay(Canvas c){rect(c,0,0,1280,720,0xee000000,true);rect(c,190,69,900,580,panel,true);rect(c,190,69,900,580,green,false);buttons.clear();String title=game.finished?(game.won?"MISSION COMPLETE":"BATTERY OVERRUN"):help?"OPERATOR GUIDE":started?"MISSION PAUSED":"AIR DEFAME 101";text(c,title,225,118,30,green);
    if(game.finished){text(c,fmt("COMMAND SITE %d%% / SCORE %d",game.health,game.score),225,170,23,amber);text(c,fmt("%d intercepts   %d missiles fired   %d leaks",game.kills,game.shots,game.leaks),225,208,19,green);text(c,"DEBRIEF / CONFIRMED AIRCRAFT",225,249,16,muted);int i=0;for(Game.Contact t:game.contacts){int col=i/6,row=i%6;text(c,fmt("%03d %-9s %s",t.id,Game.NAMES[t.type],t.alive?"UNRESOLVED":t.outcome),225+col*421,278+row*32,13,muted);i++;}text(c,"BEST SCORE "+best,225,505,17,amber);}
-   else{String[] rows={"Defend the site: the FOURTH missile hit ends the mission.","1. Select an aircraft OR incoming missile contact.","2. Check estimated identity, altitude, speed and range.","3. TRACK, then LOCK the target. FIRE inside the envelope.","4. Keep illumination active until intercept or miss.","", "Only TWO targets can be illuminated. RELEASE CH frees one.","Release risks missiles in flight. Low terrain can break guidance.","Select L1 / L2 / L3 below the radar to choose a launcher.","Empty launchers reload automatically: 90 simulation seconds.","9 ready + 9 reserve. A partially used launcher cannot reload.","25 km missile limit / 13,700 m ceiling / 40 km initial radar range.","1x, 2x and 4x accelerate the entire mission, including reloads."};for(int i=0;i<rows.length;i++)text(c,rows[i],225,163+i*27,15,i==0?amber:muted);}
+   else{String[] rows={"Defend the site: the FOURTH missile hit ends the mission.","1. Select an aircraft OR incoming missile contact.","2. Check estimated identity, altitude, speed and range.","3. TRACK, then LOCK the target. FIRE inside the envelope.","4. RADAR: keep lock until interception. Two channels maximum.","Switch WEAPON on the right for the separate IR-6 launcher.","IR: TRACK > IR LOCK. Wait for cooling and a steady heat lock.","IR: FIRE, then select another target. No radar channel needed.","IR has 6 ready + 6 reserve; 60s reload when empty.","IR: 6-9km depending on aspect / 6,000m ceiling / terrain limits.","Enemy flares can divert IR missiles. Heat lock is not an ID.","L1-L3 are radar launchers: 9 ready + 9 reserve / 90s reload.","SOUND enables beeps and IR seeker tones; all timers use game time."};for(int i=0;i<rows.length;i++)text(c,rows[i],225,163+i*27,15,i==0?amber:muted);}
    button(c,"start",started&&!game.finished?"RESUME MISSION":"START MISSION",225,558,270,true);button(c,"sound",sound?"SOUND ON":"SOUND OFF",510,558,240,true);if(started&&!game.finished)button(c,"restart","RESTART",765,558,285,true);button(c,"menu","MAIN MENU",765,615,285,true);
   }
-  @Override public boolean onTouchEvent(MotionEvent e){if(e.getAction()!=MotionEvent.ACTION_UP)return true;float x=(e.getX()-ox)/scale,y=(e.getY()-oy)/scale;for(Btn b:buttons)if(b.enabled&&b.r.contains(x,y)){act(b.id);performClick();invalidate();return true;}if(started&&!paused&&!game.finished){Game.Contact pick=null;double near=30;for(Game.Contact t:game.targets())if(game.visible(t)){double d=Math.hypot(x-(595+t.px/game.range*183),y-(302+t.py/game.range*183));if(d<near){near=d;pick=t;}}if(pick!=null){selected=pick;notice="TRACK "+pick.id+" SELECTED / "+game.trackState(pick);beep();}}invalidate();return true;}
+  @Override public boolean onTouchEvent(MotionEvent e){if(e.getAction()!=MotionEvent.ACTION_UP)return true;float x=(e.getX()-ox)/scale,y=(e.getY()-oy)/scale;for(Btn b:buttons)if(b.enabled&&b.r.contains(x,y)){act(b.id);performClick();invalidate();return true;}if(started&&!paused&&!game.finished){Game.Contact pick=null;double near=30;for(Game.Contact t:game.targets())if(game.visible(t)){double d=Math.hypot(x-(595+t.px/game.range*183),y-(302+t.py/game.range*183));if(d<near){near=d;pick=t;}}if(pick!=null){choose(pick);notice="TRACK "+pick.id+" SELECTED / "+game.trackState(pick);beep();}}invalidate();return true;}
   public boolean performClick(){super.performClick();return true;}
+  void choose(Game.Contact t){if(t!=selected)game.ir.cancel();selected=t;}
   void act(String id){if(id.equals("start")){if(!started||game.finished){game.start();selected=null;started=true;ended=false;speed=1;}paused=help=false;last=System.nanoTime();notice="SEARCH ACTIVE / TWO SWEEPS TO ESTABLISH TRACK";}
    else if(id.equals("restart")){game.start();selected=null;ended=false;paused=help=false;speed=1;notice="NEW MISSION STARTED";}
    else if(id.equals("pause")){paused=true;help=false;}
@@ -79,13 +94,14 @@ public class MainActivity extends Activity {
    else if(id.equals("sound"))sound=!sound;
    else if(id.equals("speed")){speed=speed==1?2:speed==2?4:1;notice="SIMULATION SPEED "+speed+"x / ALL TIMERS ACCELERATE";}
    else if(id.equals("range")){game.cycleRange();notice="RADAR DISPLAY RANGE "+game.range+" km";}
-   else if(id.equals("next")){selected=game.nextTarget(selected);notice=selected==null?"NO DETECTED CONTACTS / WAIT FOR SWEEP":"TARGET "+selected.id+" SELECTED";}
+   else if(id.equals("next")){choose(game.nextTarget(selected));notice=selected==null?"NO DETECTED CONTACTS / WAIT FOR SWEEP":"TARGET "+selected.id+" SELECTED";}
+   else if(id.equals("weapon")){game.toggleWeapon();notice=game.irMode?"IR-6 SELECTED / TRACK > IR LOCK > FIRE":"RADAR MIM-23 SELECTED / TWO ILLUMINATION CHANNELS";}
    else if(id.equals("track"))notice=game.track(selected);
-   else if(id.equals("menu")){started=false;paused=false;game.running=false;selected=null;}
-   else if(id.equals("illuminate"))notice=game.illuminate(selected);
-   else if(id.equals("release"))notice=game.release(selected);
-   else if(id.equals("launch"))notice=game.launch(selected);
-   else if(id.matches("l[012]")){game.chosenLauncher=Integer.parseInt(id.substring(1));notice="LAUNCHER "+(game.chosenLauncher+1)+" SELECTED";}
+   else if(id.equals("menu")){started=false;paused=false;game.running=false;game.ir.cancel();selected=null;}
+   else if(id.equals("illuminate"))notice=game.weaponLock(selected);
+   else if(id.equals("release"))notice=game.weaponRelease(selected);
+   else if(id.equals("launch"))notice=game.fireWeapon(selected);
+   else if(id.matches("l[012]")){game.irMode=false;game.ir.cancel();game.chosenLauncher=Integer.parseInt(id.substring(1));notice="RADAR LAUNCHER "+(game.chosenLauncher+1)+" SELECTED";}
    syncMusic();beep();
   }
  }
