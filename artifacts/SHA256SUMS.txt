@@ -1,1 +1,2 @@
 47eca9cb0c69a292f0896fb3849343921b82ee4d16aa06c4ea16fb3804dab1c0  HAWK-Radar-Watch-v0.2.apk
+776bba991502b84012c785eece9fcf5111cbdb6a68ad34ada56eb2143571042c  HAWK-Radar-Watch-v0.3.apk

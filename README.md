@@ -1,11 +1,11 @@
-# HAWK Radar Watch 0.2 — Mission 1
+# HAWK Radar Watch 0.3 — Mission 1
 
-Android game based on the creator's radar sketch and supplied "HAWK Air Defense Radar Game — Mission 1" guide (included as Mission-Guide.txt). Offline, landscape, Android 8+. No network or account permissions. Package com.jb.radar; version code 2; signed with the same development key as 0.1 for an in-place update.
+Android game based on the creator's radar sketch and supplied "HAWK Air Defense Radar Game — Mission 1" guide (included as Mission-Guide.txt). Offline, landscape, Android 8+. No network or account permissions. Package com.jb.radar; version code 3; signed with the same development key as 0.1 for an in-place update.
 
 ## Play
 Defend the command site from twelve incoming aircraft during a mission of up to ten simulation minutes. Tap a blip or NEXT TRACK. Two observations establish a track. Read its estimated identity and telemetry, press ILLUMINATE, and LAUNCH when within the measured engagement envelope. Maintain illumination until interception. RELEASE CH frees a channel but risks missiles already in flight. Protect the site; intercepts award 250 points, aircraft reaching the site cost 100 and damage it.
 
-The radar's maximum coverage is 80 km, independent of the 25 km missile envelope. RANGE changes only the display zoom (25/50/80 km). The amber ring marks 25 km. Brown map patches are fictional hills. Plus signs show missiles. Low aircraft may be masked, missed in clutter, or appear as a coasting track. Position and telemetry are last radar measurements, not perfect live data.
+The radar's maximum coverage is 80 km, independent of the 25 km missile envelope. RANGE changes only the display zoom (25/50/80 km). The pale ring marks 25 km. Shaded green map patches are fictional hills. Plus signs show missiles. Low aircraft may be masked, missed in clutter, or appear as a coasting track. Position and telemetry are last radar measurements, not perfect live data.
 
 Select launcher L1, L2 or L3 along the bottom. Each starts with three missiles; nine more are in reserve. Only completely empty launchers reload. A reload takes 90 simulation seconds. Three reserve rounds are allocated when reloading starts and transferred when it finishes; the reserve display includes allocated rounds until completion. A full three-round reserve allocation is required. A maximum of two aircraft may be illuminated; multiple missiles may target one illuminated aircraft.
 
@@ -33,7 +33,10 @@ Requires Java 17 JDK, Android platform 35, build-tools 35.0.0 and zip. Set RADAR
 - No actual Android device/emulator installation or touch test was available. Initial gameplay balance is unvalidated by a human player.
 
 ## Download
-The compiled version is in [artifacts/HAWK-Radar-Watch-v0.2.apk](artifacts/HAWK-Radar-Watch-v0.2.apk).
+The compiled version is in [artifacts/HAWK-Radar-Watch-v0.3.apk](artifacts/HAWK-Radar-Watch-v0.3.apk).
 
 ## Continue development
 Read [PROJECT_STATUS.md](PROJECT_STATUS.md), then the mission guide and source before making changes.
+
+## Version 0.3 UI update
+User-supplied launcher illustration displayed in L1/L2/L3 cards, with separate ammunition indicators and reload status. Terminal green (#00FF00) on black replaces the teal palette; selected states use white. The original image is bundled unchanged in assets/hawk_launcher.png and decoded once at a reduced resolution. Game rules are unchanged.

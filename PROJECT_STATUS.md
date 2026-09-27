@@ -1,7 +1,7 @@
 # Project checkpoint — 2026-09-27
 
 ## Current version
-HAWK Radar Watch 0.2.0 (Android versionCode 2), package `com.jb.radar`.
+HAWK Radar Watch 0.3.0 (Android versionCode 3), package `com.jb.radar`.
 This repository is the project backup and source of truth for continuing development.
 The initial sketch has an altitude-vs-speed display at left and a circular search radar at right.
 The detailed requirements are in `Mission-Guide.txt` supplied by the project owner.
@@ -25,3 +25,6 @@ The repository is public. Do not commit signing keys, passwords, tokens or priva
 
 ## Suggested checks
 Compile the standalone Game.java and tests with javac, then run `com.jb.radar.GameTest` and `com.jb.radar.MissionSmoke`. See README for Android build prerequisites.
+
+## Latest change
+Terminal-green UI and owner-supplied launcher icon added to all three launcher cards. APK and layout preview updated. Compile, signature, embedded asset check and desktop layout inspection passed; phone testing remains pending.
