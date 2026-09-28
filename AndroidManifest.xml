@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.jb.radar" android:versionCode="12" android:versionName="0.12.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.jb.radar" android:versionCode="13" android:versionName="0.13.0">
 <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35"/>
 <application android:label="AIR DEFENSE" android:theme="@android:style/Theme.Material.NoActionBar" android:icon="@drawable/icon" android:allowBackup="false" android:supportsRtl="true">
 <activity android:name=".MainActivity" android:screenOrientation="sensorLandscape" android:configChanges="orientation|screenSize" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity>

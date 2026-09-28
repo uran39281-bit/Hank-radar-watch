@@ -1,0 +1,8 @@
+AIR DEFENSE v0.13 — Mission 1 cinematic
+
+Request: black background, terminal-green Digital-7 Regular, exact twelve-section story; letter-by-letter fixed layout and cursor; 76-second runtime; persistent skip, pause/resume and music on/off; 65% supplied music with 0.8s fade-in, 3s crossfade repeat and final 2.5s fade-out. Begin mission activity only after completion/skip, preserve surprise.
+
+Source audio: the_watcher_s_desk.mp3
+SHA256: f84c8e5aa4288b65db7447e0609ada4083fc70e34253d2a4a097bd72676d246e
+
+Full exact story is maintained in IntroSequence.SECTIONS. Technical details, timings, credit and limits: INTRO.md.

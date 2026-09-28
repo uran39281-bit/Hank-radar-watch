@@ -1,0 +1,1 @@
+package android.media;public class ToneGenerator {public static int TONE_PROP_BEEP=1;public ToneGenerator(int a,int b){}public void release(){}public void startTone(int a,int b){}}

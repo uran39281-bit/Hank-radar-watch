@@ -1,0 +1,1 @@
+package android.content.res;public class AssetManager{public AssetFileDescriptor openFd(String n)throws java.io.IOException{return new AssetFileDescriptor(n);}public java.io.InputStream open(String n)throws java.io.IOException{return new java.io.FileInputStream("radar/assets/"+n);}}

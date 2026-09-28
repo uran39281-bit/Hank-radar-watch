@@ -1,0 +1,1 @@
+package android.media;public class AudioAttributes {public static int USAGE_GAME=1,CONTENT_TYPE_MUSIC=1;public static class Builder{public Builder setUsage(int u){return this;}public Builder setContentType(int c){return this;}public AudioAttributes build(){return new AudioAttributes();}}}

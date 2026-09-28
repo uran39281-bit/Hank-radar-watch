@@ -1,0 +1,1 @@
+package android.graphics;public class Bitmap{public java.awt.image.BufferedImage image;public int getWidth(){return image.getWidth();}public int getHeight(){return image.getHeight();}}

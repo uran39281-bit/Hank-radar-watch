@@ -1,0 +1,1 @@
+package android.media;public class AudioManager {public static int STREAM_MUSIC=1,AUDIOFOCUS_GAIN=1,AUDIOFOCUS_REQUEST_GRANTED=1;public interface OnAudioFocusChangeListener{void onAudioFocusChange(int c);}public int requestAudioFocus(OnAudioFocusChangeListener l,int s,int g){return 1;}public void abandonAudioFocus(OnAudioFocusChangeListener l){}}

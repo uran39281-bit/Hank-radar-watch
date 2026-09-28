@@ -1,0 +1,1 @@
+package android.graphics;public class BitmapFactory{public static class Options{public int inSampleSize;}public static Bitmap decodeStream(java.io.InputStream s,Object o,Options opts){try{Bitmap b=new Bitmap();b.image=javax.imageio.ImageIO.read(s);return b;}catch(Exception e){throw new RuntimeException(e);}}}

@@ -2,15 +2,31 @@ package com.jb.radar;
 import android.app.*;import android.os.*;import android.view.*;import android.graphics.*;import android.media.*;import java.util.*;
 public class MainActivity extends Activity {
  Radar view; MediaPlayer menuMusic;boolean foreground,musicReady,hasFocus;AudioManager audioManager;
- final AudioManager.OnAudioFocusChangeListener focusListener=change->{hasFocus=change==AudioManager.AUDIOFOCUS_GAIN;if(hasFocus){if(foreground&&view!=null&&!view.started&&musicReady)menuMusic.start();}else if(menuMusic!=null&&musicReady&&menuMusic.isPlaying())menuMusic.pause();};
- void syncMusic(){boolean wanted=foreground&&view!=null&&!view.started;if(!wanted){if(menuMusic!=null&&musicReady&&menuMusic.isPlaying())menuMusic.pause();if(hasFocus&&audioManager!=null)audioManager.abandonAudioFocus(focusListener);hasFocus=false;return;}if(menuMusic==null){try{audioManager=(AudioManager)getSystemService(AUDIO_SERVICE);menuMusic=new MediaPlayer();menuMusic.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build());try(android.content.res.AssetFileDescriptor fd=getAssets().openFd("menu_theme.mp3")){menuMusic.setDataSource(fd.getFileDescriptor(),fd.getStartOffset(),fd.getLength());}menuMusic.setLooping(true);menuMusic.setVolume(.65f,.65f);menuMusic.setOnPreparedListener(m->{musicReady=true;syncMusic();});menuMusic.setOnErrorListener((m,w,e)->{musicReady=false;return true;});menuMusic.prepareAsync();}catch(Exception e){if(menuMusic!=null)menuMusic.release();menuMusic=null;musicReady=false;}}if(musicReady){if(!hasFocus)hasFocus=audioManager.requestAudioFocus(focusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN)==AudioManager.AUDIOFOCUS_REQUEST_GRANTED;if(hasFocus&&!menuMusic.isPlaying())menuMusic.start();}}
+ final IntroAudio introAudio=new IntroAudio();
+ final AudioManager.OnAudioFocusChangeListener focusListener=change->{
+  hasFocus=change==AudioManager.AUDIOFOCUS_GAIN;
+  if(view!=null&&view.intro.active){if(!hasFocus)view.captureIntro();view.last=System.nanoTime();introAudio.sync(hasFocus&&foreground&&!view.intro.paused,view.intro.music);}
+  else if(hasFocus){if(foreground&&view!=null&&!view.started&&musicReady)menuMusic.start();}
+  else if(menuMusic!=null&&musicReady&&menuMusic.isPlaying())menuMusic.pause();
+ };
+ void syncMusic(){
+  boolean cinematic=view!=null&&view.intro.active;
+  boolean wanted=foreground&&view!=null&&(!view.started||cinematic);
+  if(audioManager==null)audioManager=(AudioManager)getSystemService(AUDIO_SERVICE);
+  if(cinematic){if(menuMusic!=null&&musicReady&&menuMusic.isPlaying())menuMusic.pause();if(wanted&&!hasFocus)hasFocus=audioManager.requestAudioFocus(focusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN)==AudioManager.AUDIOFOCUS_REQUEST_GRANTED;introAudio.sync(wanted&&hasFocus&&!view.intro.paused,view.intro.music);return;}
+  introAudio.sync(false,false);
+  if(!wanted){if(menuMusic!=null&&musicReady&&menuMusic.isPlaying())menuMusic.pause();if(hasFocus)audioManager.abandonAudioFocus(focusListener);hasFocus=false;return;}
+  if(menuMusic==null){try{menuMusic=new MediaPlayer();menuMusic.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build());try(android.content.res.AssetFileDescriptor fd=getAssets().openFd("menu_theme.mp3")){menuMusic.setDataSource(fd.getFileDescriptor(),fd.getStartOffset(),fd.getLength());}menuMusic.setLooping(true);menuMusic.setVolume(.65f,.65f);menuMusic.setOnPreparedListener(m->{musicReady=true;syncMusic();});menuMusic.setOnErrorListener((m,w,e)->{musicReady=false;return true;});menuMusic.prepareAsync();}catch(Exception e){if(menuMusic!=null)menuMusic.release();menuMusic=null;musicReady=false;}}
+  if(musicReady){if(!hasFocus)hasFocus=audioManager.requestAudioFocus(focusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN)==AudioManager.AUDIOFOCUS_REQUEST_GRANTED;if(hasFocus&&!menuMusic.isPlaying())menuMusic.start();}
+ }
 
  public void onCreate(Bundle b){super.onCreate(b);getWindow().setFlags(1024,1024);getWindow().addFlags(128);view=new Radar();setContentView(view);view.setOnApplyWindowInsetsListener((v,i)->{int l=i.getSystemWindowInsetLeft(),r=i.getSystemWindowInsetRight(),t=i.getSystemWindowInsetTop(),bt=i.getSystemWindowInsetBottom();if(Build.VERSION.SDK_INT>=28&&i.getDisplayCutout()!=null){DisplayCutout d=i.getDisplayCutout();l=Math.max(l,d.getSafeInsetLeft());r=Math.max(r,d.getSafeInsetRight());t=Math.max(t,d.getSafeInsetTop());bt=Math.max(bt,d.getSafeInsetBottom());}v.setPadding(l,t,r,bt);return i;});}
  public void onResume(){super.onResume();foreground=true;syncMusic();if(view!=null){if(view.economy.saveFailed)view.economy.flush();view.last=System.nanoTime();view.invalidate();}}
- public void onPause(){foreground=false;syncMusic();super.onPause();if(view!=null){view.economy.flush();view.paused=true;view.last=0;}}
- public void onDestroy(){if(menuMusic!=null){menuMusic.release();menuMusic=null;}if(view!=null&&view.tone!=null)view.tone.release();super.onDestroy();}
- @Override public void onBackPressed(){if(view.treeOpen){view.treeOpen=false;view.invalidate();return;}if(view.equipmentOpen){view.equipmentOpen=false;view.invalidate();return;}if(view.economyOpen){view.economyOpen=false;view.invalidate();return;}view.statusOpen=false;view.paused=true;view.help=false;view.invalidate();}
+ public void onPause(){if(view!=null)view.captureIntro();foreground=false;syncMusic();super.onPause();if(view!=null){view.economy.flush();view.paused=true;view.last=0;}}
+ public void onDestroy(){introAudio.close();if(menuMusic!=null){menuMusic.release();menuMusic=null;}if(view!=null&&view.tone!=null)view.tone.release();super.onDestroy();}
+ @Override public void onBackPressed(){if(view.intro.active){view.act("intropause");return;}if(view.treeOpen){view.treeOpen=false;view.invalidate();return;}if(view.equipmentOpen){view.equipmentOpen=false;view.invalidate();return;}if(view.economyOpen){view.economyOpen=false;view.invalidate();return;}view.statusOpen=false;view.paused=true;view.help=false;view.invalidate();}
  class Radar extends View {
+  final IntroSequence intro=new IntroSequence();final IntroScene introScene=new IntroScene(Typeface.createFromAsset(getAssets(),"fonts/digital-7.ttf"));
   final int green=0xff00ff00,muted=0xff70b870,amber=0xffeeeeee,red=0xffffffff,bg=0xff000000,border=0xff164516,panel=0xff020a02;
   Economy economy=new Economy(new EconomyStore(getPreferences(0)));boolean economyOpen,equipmentOpen,treeOpen,profileFallback,statusOpen;String treeSelected="stonebolt",treeNotice="SELECT EQUIPMENT / RESEARCH > BUY > EQUIP";int equipmentIndex;Equipment equipment=loadEquipment();CombatRules combatRules=loadCombatRules();Paint p=new Paint(3);Game game=new Game(System.nanoTime(),economy,equipment,combatRules);Game.Contact selected;ArrayList<Btn> buttons=new ArrayList<>();long last,lastSeekerTone;float scale,ox,oy;boolean paused=false,started=false,sound=false,ended=false,help=false;int speed=1,best=getPreferences(0).getInt("hawk_best",0);String notice="MISSION 1 / ADS-201 WATCHPOST";ToneGenerator tone;Bitmap launcherIcon;
   class Btn{RectF r;String id;boolean enabled;Btn(float x,float y,float w,float h,String i,boolean e){r=new RectF(x,y,x+w,y+h);id=i;enabled=e;}}
@@ -23,9 +39,9 @@ public class MainActivity extends Activity {
   void circle(Canvas c,float x,float y,float r,int col,boolean fill){p.setColor(col);p.setStyle(fill?Paint.Style.FILL:Paint.Style.STROKE);p.setStrokeWidth(1);c.drawCircle(x,y,r,p);p.setStyle(Paint.Style.FILL);}
   void button(Canvas c,String id,String label,float x,float y,float w,boolean enabled){rect(c,x,y,w,48,enabled?border:0xff061006,true);rect(c,x,y,w,48,enabled?muted:border,false);text(c,label,x+12,y+30,15,enabled?green:muted);buttons.add(new Btn(x,y,w,48,id,enabled));}
   String fmt(String s,Object...o){return String.format(Locale.US,s,o);}void beep(){if(sound&&tone!=null)tone.startTone(ToneGenerator.TONE_PROP_BEEP,60);}
-  protected void onDraw(Canvas c){super.onDraw(c);long now=System.nanoTime();if(last!=0&&!paused&&started){double remaining=Math.min(.15,(now-last)/1e9)*speed;while(remaining>0){double d=Math.min(.05,remaining);game.tick(d);remaining-=d;}}last=now;
+  protected void onDraw(Canvas c){super.onDraw(c);long now=System.nanoTime();if(intro.active&&foreground&&!intro.paused&&hasFocus){double audioTime=introAudio.position();if(audioTime>=0)intro.sync(audioTime);else if(introAudio.failed&&last!=0)intro.advance((now-last)/1e9);if(intro.done())finishIntro();}if(last!=0&&!intro.active&&!paused&&started){double remaining=Math.min(.15,(now-last)/1e9)*speed;while(remaining>0){double d=Math.min(.05,remaining);game.tick(d);remaining-=d;}}last=now;
    if(game.finished&&!ended){ended=true;if(game.score>best){best=game.score;getPreferences(0).edit().putInt("hawk_best",best).apply();}}
-   float aw=getWidth()-getPaddingLeft()-getPaddingRight(),ah=getHeight()-getPaddingTop()-getPaddingBottom();scale=Math.min(aw/1280f,ah/720f);ox=getPaddingLeft()+(aw-1280*scale)/2;oy=getPaddingTop()+(ah-720*scale)/2;c.drawColor(bg);c.save();c.translate(ox,oy);c.scale(scale,scale);buttons.clear();if(!started){if(treeOpen)techTreeScreen(c);else if(equipmentOpen)equipmentScreen(c);else if(economyOpen)economyScreen(c);else mainMenu(c);c.restore();if(isShown())postInvalidateDelayed(33);return;}
+   float aw=getWidth()-getPaddingLeft()-getPaddingRight(),ah=getHeight()-getPaddingTop()-getPaddingBottom();scale=Math.min(aw/1280f,ah/720f);ox=getPaddingLeft()+(aw-1280*scale)/2;oy=getPaddingTop()+(ah-720*scale)/2;c.drawColor(bg);c.save();c.translate(ox,oy);c.scale(scale,scale);buttons.clear();if(intro.active){introScreen(c);c.restore();if(isShown()&&foreground)postInvalidateDelayed(16);return;}if(!started){if(treeOpen)techTreeScreen(c);else if(equipmentOpen)equipmentScreen(c);else if(economyOpen)economyScreen(c);else mainMenu(c);c.restore();if(isShown())postInvalidateDelayed(33);return;}
    text(c,"CMD "+game.battery.parts[Battery.COMMAND].percent()+"% / RADAR "+game.battery.parts[Battery.RADAR].percent()+"%",20,31,18,green);text(c,game.battery.warning(game.elapsed),20,54,12,muted);
    Economy.State wallet=economy.snapshot();text(c,"$"+compact(wallet.dollars)+"   BP "+compact(wallet.bp),405,33,18,green);if(economy.saveFailed)text(c,"SAVE PENDING",665,54,11,amber);
    button(c,"status","BATTERY",705,8,140,true);button(c,"speed",speed+"x TIME",855,8,120,true);button(c,"help","GUIDE",985,8,120,true);button(c,"pause","PAUSE",1115,8,145,!game.finished);
@@ -33,6 +49,11 @@ public class MainActivity extends Activity {
    text(c,notice,20,717,11,amber);
    if(statusOpen)batteryScreen(c);else if(!started||paused||game.finished)overlay(c);c.restore();if(isShown())postInvalidateDelayed(33);
   }
+  void captureIntro(){if(intro.active&&!intro.paused){double t=introAudio.position();if(t>=0)intro.sync(t);}}
+  void beginIntro(){game.running=false;game.ir.cancel();intro.start();introAudio.open(getAssets());started=false;paused=help=statusOpen=economyOpen=equipmentOpen=treeOpen=false;selected=null;last=System.nanoTime();syncMusic();}
+  void finishIntro(){intro.stop();introAudio.close();last=0;if(!game.start()){started=false;paused=false;economyOpen=true;notice="SAVE FAILED / RETRY IN ECONOMY";syncMusic();return;}selected=null;started=true;ended=false;speed=1;paused=help=statusOpen=false;notice="SEARCH ACTIVE / TWO SWEEPS TO ESTABLISH TRACK";syncMusic();}
+  void introButton(Canvas c,String id,String label,float x,float y,float w,boolean enabled){rect(c,x,y,w,56,green,false);text(c,label,x+20,y+35,23,green);buttons.add(new Btn(x,y,w,56,id,true));}
+  void introScreen(Canvas c){introScene.draw(c,intro);introButton(c,"intropause",intro.paused?"RESUME":"PAUSE",55,640,230,true);introButton(c,"intromusic",intro.music?"MUSIC ON":"MUSIC OFF",310,640,245,true);introButton(c,"introskip","SKIP INTRO",995,640,230,true);if(introAudio.failed)text(c,"MUSIC UNAVAILABLE",55,610,14,green);}
   final MenuScene menuScene=new MenuScene();
   void mainMenu(Canvas c){Economy.State wallet=economy.snapshot();menuScene.draw(c,System.nanoTime()/1e9,"$"+compact(wallet.dollars),compact(wallet.bp),economy.saveFailed,profileFallback);buttons.add(new Btn(52,309,554,91,"start",true));buttons.add(new Btn(52,418,554,71,"techtree",true));buttons.add(new Btn(52,504,554,71,"economy",true));buttons.add(new Btn(52,590,554,71,"equipment",true));}
   String compact(long n){if(n<1000000)return fmt("%,d",n);if(n<1000000000L)return fmt("%.1fM",n/1000000.0);if(n<1000000000000L)return fmt("%.1fB",n/1000000000.0);return fmt("%.1fT",n/1000000000000.0);}
@@ -54,9 +75,9 @@ public class MainActivity extends Activity {
    rect(c,35,90,595,488,panel,true);rect(c,35,90,595,488,border,false);rect(c,650,90,595,488,panel,true);rect(c,650,90,595,488,border,false);
    text(c,"RADAR SYSTEM",57,120,13,muted);text(c,r.name,57,154,24,green);
    stat(c,"Detection range",r.detectionKm+" km",57,197);stat(c,"Tracking range",fmt("%.1f km",r.trackingKm),57,235);stat(c,"Radar lock range",fmt("%.1f km",r.lockKm),57,273);stat(c,"Simultaneous tracks",""+r.tracks,57,311);stat(c,"Datalink channels",""+r.channels,57,349);stat(c,"Scan speed",fmt("%.2f / 10.00",r.scanSpeed),57,387);stat(c,"Full sweep",fmt("%.1f seconds",r.sweepSeconds()),57,425);stat(c,"IR guidance support",r.infrared?"YES":"N/A",57,463);stat(c,"Maximum IR lock",r.infrared?fmt("%.1f km",r.irLockKm):"N/A",57,501);text(c,"Radar damage reduces available range.",57,551,12,muted);
-   text(c,(equipmentIndex<2?"USA MISSILES":"HOSTILE LOADOUT")+" / "+(equipmentIndex+1)+" OF "+equipment.all.length,673,120,13,muted);text(c,w.name,673,154,24,green);
+   text(c,"USA MISSILES / "+(equipmentIndex+1)+" OF 2",673,120,13,muted);text(c,w.name,673,154,24,green);
    stat(c,"Guidance",w.guidance.toString(),673,193);stat(c,"Radar mode",w.radarMode.toString().replace('_',' '),673,225);stat(c,"Maximum guidance",fmt("%.0f s",w.guidanceSeconds),673,257);stat(c,"Maximum speed",fmt("%,.0f km/h",w.maxSpeedKmh),673,289);stat(c,"Maximum G load",fmt("%.1f G",w.maxG),673,321);stat(c,"Mass",fmt("%,.0f kg",w.massKg),673,353);stat(c,"Maximum AOA",fmt("%.0f deg",w.maxAoADeg),673,385);stat(c,"Maximum thrust",fmt("%,.0f N",w.thrustN),673,417);stat(c,"Motor burn",fmt("%.1f s",w.burnSeconds),673,449);stat(c,"Flight range",fmt("%.1f km",w.rangeKm),673,481);stat(c,"Seeker / ceiling",(w.guidance==Equipment.Guidance.INFRARED||w.radarMode==Equipment.RadarMode.ACTIVE?fmt("%.1f km",w.seekerKm):"--")+fmt(" / %.0f m",w.ceilingM),673,513);text(c,fmt("WARHEAD %.1f kg / BLAST %.2f km",w.explosiveKg,w.blastRadiusKm),673,551,12,muted);
-   button(c,"equipprev","< PREVIOUS",650,596,280,true);button(c,"equipnext","NEXT >",950,596,295,true);
+   text(c,"INTRO FONT: DIGITAL-7 / SIZENKO ALEXANDER, STYLE-7",55,706,12,muted);button(c,"equipprev","< PREVIOUS",650,596,280,true);button(c,"equipnext","NEXT >",950,596,295,true);
    text(c,"FICTIONAL GAME BALANCE",55,617,15,green);text(c,"Thrust and mass control acceleration; turns cost speed.",55,644,13,muted);text(c,"Research, buy and equip your missiles in the USA TECH TREE.",55,686,14,muted);
   }
   void techCard(Canvas c,TechTree.Node n,float x,float y,Economy.State w){boolean selected=n.id.equals(treeSelected);boolean owned=w.owned.contains(n.id);rect(c,x,y,304,165,selected?0xff082208:panel,true);rect(c,x,y,304,165,selected?amber:owned?green:border,false);
@@ -151,8 +172,14 @@ public class MainActivity extends Activity {
   @Override public boolean onTouchEvent(MotionEvent e){if(e.getAction()!=MotionEvent.ACTION_UP)return true;float x=(e.getX()-ox)/scale,y=(e.getY()-oy)/scale;for(Btn b:buttons)if(b.enabled&&b.r.contains(x,y)){act(b.id);performClick();invalidate();return true;}if(started&&!paused&&!game.finished){Game.Contact pick=null;double near=30;for(Game.Contact t:game.targets())if(game.visible(t)){double d=Math.hypot(x-(595+t.px/game.range*183),y-(302+t.py/game.range*183));if(d<near){near=d;pick=t;}}if(pick!=null){choose(pick);notice="TRACK "+pick.id+" SELECTED / "+game.trackState(pick);beep();}}invalidate();return true;}
   public boolean performClick(){super.performClick();return true;}
   void choose(Game.Contact t){if(t!=selected)game.ir.cancel();selected=t;}
-  void act(String id){if(id.equals("start")){if(!started||game.finished){if(!game.start()){notice="SAVE FAILED / RETRY IN ECONOMY";economyOpen=!started;return;}economyOpen=equipmentOpen=treeOpen=false;selected=null;started=true;ended=false;speed=1;}paused=help=statusOpen=false;last=System.nanoTime();notice="SEARCH ACTIVE / TWO SWEEPS TO ESTABLISH TRACK";}
-   else if(id.equals("restart")){if(!game.start()){notice="SAVE FAILED / RETRY FROM MAIN MENU";return;}selected=null;ended=false;paused=help=statusOpen=false;speed=1;notice="NEW MISSION STARTED";}
+  void act(String id){if(intro.active){
+    if(id.equals("introskip"))finishIntro();
+    else if(id.equals("intropause")){captureIntro();intro.paused=!intro.paused;last=System.nanoTime();syncMusic();}
+    else if(id.equals("intromusic")){intro.music=!intro.music;syncMusic();}
+    invalidate();return;
+   }
+   if(id.equals("start")){if(!started||game.finished)beginIntro();else{paused=help=statusOpen=false;last=System.nanoTime();notice="SEARCH ACTIVE / TWO SWEEPS TO ESTABLISH TRACK";}}
+   else if(id.equals("restart"))beginIntro();
    else if(id.equals("techtree")){treeOpen=true;treeNotice="SELECT EQUIPMENT / RESEARCH > BUY > EQUIP";}
    else if(id.equals("treeback"))treeOpen=false;
    else if(id.startsWith("node:")){String node=id.substring(5);if(TechTree.get(node)!=null){treeSelected=node;treeNotice="SELECT EQUIPMENT / RESEARCH > BUY > EQUIP";}}
@@ -161,8 +188,8 @@ public class MainActivity extends Activity {
    else if(id.equals("equip"))treeNotice=economy.equip(treeSelected);
    else if(id.equals("equipment"))equipmentOpen=true;
    else if(id.equals("equipmentback"))equipmentOpen=false;
-   else if(id.equals("equipnext"))equipmentIndex=(equipmentIndex+1)%equipment.all.length;
-   else if(id.equals("equipprev"))equipmentIndex=(equipmentIndex+equipment.all.length-1)%equipment.all.length;
+   else if(id.equals("equipnext"))equipmentIndex=(equipmentIndex+1)%2;
+   else if(id.equals("equipprev"))equipmentIndex=(equipmentIndex+1)%2;
    else if(id.equals("economy"))economyOpen=true;
    else if(id.equals("economyback"))economyOpen=false;
    else if(id.equals("retrysave"))economy.flush();
@@ -180,7 +207,7 @@ public class MainActivity extends Activity {
    else if(id.equals("release"))notice=game.weaponRelease(selected);
    else if(id.equals("launch"))notice=game.fireWeapon(selected);
    else if(id.matches("l[012]")){game.irMode=false;game.ir.cancel();game.chosenLauncher=Integer.parseInt(id.substring(1));notice="RADAR LAUNCHER "+(game.chosenLauncher+1)+" SELECTED";}
-   syncMusic();beep();
+   syncMusic();if(!intro.active)beep();
   }
  }
 }

@@ -1,0 +1,1 @@
+package android.view;public class Window {public void setFlags(int a,int b){}public void addFlags(int a){}}

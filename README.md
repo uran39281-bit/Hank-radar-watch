@@ -1,12 +1,20 @@
-# AIR DEFENSE 0.12 — TRACK, LOCK and active guidance
+# AIR DEFENSE 0.13 — Mission 1 cinematic
 
-Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 12. No network/account permissions. Signed with the existing development certificate for in-place updates.
+Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 13. No network/account permissions. Signed with the existing development certificate for in-place updates.
 
 ## Download
 
-[Air-Defense-v0.12.apk](artifacts/Air-Defense-v0.12.apk)
+[Air-Defense-v0.13.apk](artifacts/Air-Defense-v0.13.apk)
 
 Install over the previous version to retain Dollars, BP and best score. Uninstalling or clearing app data removes local progress. Existing mission progress does not resume after process termination.
+
+## New in 0.13
+
+Mission 1 starts with the creator's twelve-section, 76-second story on black, in bundled Digital-7 Regular and terminal green. Letters reveal at fixed positions, with an underscore cursor. PAUSE / RESUME, MUSIC ON / OFF and SKIP INTRO remain available. The supplied Watcher's Desk music fades in at 65% playback volume, crossfades into a repeat, and fades out during the final 2.5 seconds. Backgrounding and audio-focus loss pause both media and text; skipping immediately releases the music and starts radar gameplay at time zero. Restart replays the introduction from its beginning. There is no narration, threat roster or new enemy activity during the introduction. Pre-mission equipment browsing now shows only USA equipment.
+
+See [INTRO.md](INTRO.md) for timings, audio provenance, font credit/license and verification. Digital-7 by Sizenko Alexander / Style-7 is included under its credited freeware-software terms; the supplied license is retained with the font.
+
+![Mission 1 cinematic](docs/intro-v013.png)
 
 ## New in 0.12
 
@@ -61,4 +69,4 @@ Edit `assets/combat.properties` for damage/AI balance, `assets/equipment.propert
 
 Build requires Java 17 JDK, Android platform 35, build-tools 35.0.0 and zip. Set `RADAR_ANDROID_JAR`, `RADAR_BUILD_TOOLS`, `RADAR_KEYSTORE`, `RADAR_KEY_PASSWORD` and run `./build.sh`. Optional `RADAR_ECJ` selects ECJ when javac is unavailable. Signing alias: radar. Never publish the private signing key or password. A different key requires a fresh installation.
 
-Run `./test.sh` for ten pure Java model suites and ten seeded missions. Current checks also cover explosive falloff, component failures, warning delays, bombing release/scatter, bounded learning/reset, requested stats, partial research, purchase/equip persistence, migration, failures/retries, duplicate charges, missile motion/interception, ammunition, radar limits and rewards. Desktop renders exercise the actual drawing code and preference/audio stubs. APK signature, manifest, assets and previous signing identity were verified. No Android device/emulator installation, real audio playback or human balance playtest was available.
+Run `./test.sh` for eleven pure Java model suites and ten seeded missions. Current checks also cover explosive falloff, component failures, warning delays, bombing release/scatter, bounded learning/reset, requested stats, partial research, purchase/equip persistence, migration, failures/retries, duplicate charges, missile motion/interception, ammunition, radar limits and rewards. Desktop renders exercise the actual drawing code and preference/audio stubs. APK signature, manifest, assets and previous signing identity were verified. No Android device/emulator installation, real audio playback or human balance playtest was available.
