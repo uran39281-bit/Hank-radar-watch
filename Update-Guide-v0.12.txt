@@ -1,0 +1,16 @@
+TARGET TRACKING AND LOCK SYMBOLS
+TRACK: dashed outline surrounding the target icon, TWS-style tracking.
+LOCK: solid outline surrounding the target, with an additional star-shaped marker, hard lock for weapons requiring it.
+Keep target icons visible inside both symbols and preserve identification colors.
+
+MISSILE FIRING REQUIREMENTS
+Active Homing: fire at tracked or locked targets. Before onboard seeker acquisition, updates use available battery datalink channels. After acquisition, guidance is independent.
+Semi-Active Homing: cannot fire on tracking alone; establish and maintain hard lock. Losing lock interrupts guidance.
+
+CONTROLS AND FEEDBACK
+TRACK begins tracking and displays a dashed outline.
+LOCK on a tracked target replaces it with a solid outline and star.
+Releasing lock returns to TRACK if tracking remains available.
+Losing tracking and lock removes both markers.
+Disable FIRE when requirements are unmet and show LOCK REQUIRED, OUT OF RANGE, or NO DATALINK CHANNEL AVAILABLE as appropriate.
+AI must recognize tracking and hard locking as separate events; tracking must not automatically produce a hard-lock warning.

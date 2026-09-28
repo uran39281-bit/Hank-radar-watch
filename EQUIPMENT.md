@@ -1,4 +1,4 @@
-# USA equipment — v0.10
+# USA equipment — v0.12
 
 `assets/equipment.properties` supplies runtime radar and missile values. `TechTree.java` supplies the USA research catalog, prerequisites and initial prices. The menu offers USA TECH TREE, ECONOMY / REWARDS and EQUIPMENT / STATS.
 
@@ -45,3 +45,7 @@ Research, ownership, loadout and currency are saved in the same preference trans
 ## Damage fields
 
 Missiles now expose `.explosiveKg` and `.blastRadiusKm` separately from `.massKg`. Hostile warheads use the component damage model; changing total mass never changes explosive content. Radar and other component damage can reduce the healthy performance values above. See [COMBAT-AI.md](COMBAT-AI.md) for defaults and effects.
+
+## Tracking support
+
+Active radar profiles can fire from a player-designated TRACK and consume a per-target datalink allocation until their seeker acquires. Explicit hard locks share that budget. Semi-active Rampart and Stonebolt still need LOCK. See [TRACKING.md](TRACKING.md) for symbols, support loss/recovery and handoff behavior.

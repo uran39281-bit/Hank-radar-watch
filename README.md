@@ -1,12 +1,18 @@
-# AIR DEFENSE 0.11 — animated radar menu
+# AIR DEFENSE 0.12 — TRACK, LOCK and active guidance
 
-Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 11. No network/account permissions. Signed with the existing development certificate for in-place updates.
+Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 12. No network/account permissions. Signed with the existing development certificate for in-place updates.
 
 ## Download
 
-[Air-Defense-v0.11.apk](artifacts/Air-Defense-v0.11.apk)
+[Air-Defense-v0.12.apk](artifacts/Air-Defense-v0.12.apk)
 
 Install over the previous version to retain Dollars, BP and best score. Uninstalling or clearing app data removes local progress. Existing mission progress does not resume after process termination.
+
+## New in 0.12
+
+TRACK now uses a dashed ring; LOCK uses a solid ring and a star. Icons retain identity colors. Active-homing profiles can launch from TRACK using shared battery channels until seeker acquisition; semi-active missiles need a maintained hard lock. Clear firing-block messages, missile support-state labels and separate AI warning events complete the update. See [TRACKING.md](TRACKING.md) for allocation and handoff rules. The current Rampart/Stonebolt loadouts remain semi-active.
+
+![Tracking and hard-lock symbols](docs/tracking-v012.png)
 
 ## New in 0.11
 
@@ -39,7 +45,7 @@ Watchpost: 30km detection, 24km tracking, 16km radar locking, five simultaneous 
 
 Defend the site against twelve aircraft during a mission of up to ten simulation minutes. Select an aircraft or incoming missile; TRACK, LOCK, then FIRE inside the battery's envelope. Maintain the target lock until interception. Target identity is uncertain and measurements depend on scan history, range, clutter and terrain. Gray means unknown, orange uncertain enemy type, red positively identified enemy. Green friendly identification is reserved for future friendly contacts.
 
-L1/L2/L3 each hold three missiles. Nine more are in reserve; a healthy, completely empty launcher reloads in 90 simulation seconds. Damage slows reloads and radar performance. Power hits interrupt equipment; command destruction defeats the battery. Explosive charge, distance and protection determine individual component damage. Priority tracking uses no datalink channel; locks share two target channels. The selected missile's guidance, acceleration, speed, G/AOA limits and energy affect the projectile's actual flight.
+L1/L2/L3 each hold three missiles. Nine more are in reserve; a healthy, completely empty launcher reloads in 90 simulation seconds. Damage slows reloads and radar performance. Power hits interrupt equipment; command destruction defeats the battery. Explosive charge, distance and protection determine individual component damage. Priority tracking alone uses no datalink channel; hard locks and active midcourse updates share two target channels. The selected missile's guidance, acceleration, speed, G/AOA limits and energy affect the projectile's actual flight.
 
 The original supplied menu song loops in menu screens and pauses during gameplay, backgrounding and audio-focus loss. Optional beeps are enabled in the pause menu. 1x/2x/4x affects all simulation timers.
 
@@ -55,4 +61,4 @@ Edit `assets/combat.properties` for damage/AI balance, `assets/equipment.propert
 
 Build requires Java 17 JDK, Android platform 35, build-tools 35.0.0 and zip. Set `RADAR_ANDROID_JAR`, `RADAR_BUILD_TOOLS`, `RADAR_KEYSTORE`, `RADAR_KEY_PASSWORD` and run `./build.sh`. Optional `RADAR_ECJ` selects ECJ when javac is unavailable. Signing alias: radar. Never publish the private signing key or password. A different key requires a fresh installation.
 
-Run `./test.sh` for nine pure Java model suites and ten seeded missions. Current checks also cover explosive falloff, component failures, warning delays, bombing release/scatter, bounded learning/reset, requested stats, partial research, purchase/equip persistence, migration, failures/retries, duplicate charges, missile motion/interception, ammunition, radar limits and rewards. Desktop renders exercise the actual drawing code and preference/audio stubs. APK signature, manifest, assets and previous signing identity were verified. No Android device/emulator installation, real audio playback or human balance playtest was available.
+Run `./test.sh` for ten pure Java model suites and ten seeded missions. Current checks also cover explosive falloff, component failures, warning delays, bombing release/scatter, bounded learning/reset, requested stats, partial research, purchase/equip persistence, migration, failures/retries, duplicate charges, missile motion/interception, ammunition, radar limits and rewards. Desktop renders exercise the actual drawing code and preference/audio stubs. APK signature, manifest, assets and previous signing identity were verified. No Android device/emulator installation, real audio playback or human balance playtest was available.
