@@ -1,12 +1,19 @@
-# AIR DEFENSE 0.15 — Story and mission selection
+# AIR DEFENSE 0.16 — Automatic radar tracking
 
-Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 15. No network/account permissions. Signed with the existing development certificate for in-place updates.
+Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 16. No network/account permissions. Signed with the existing development certificate for in-place updates.
 
 ## Download
 
-[Air-Defense-v0.15.apk](artifacts/Air-Defense-v0.15.apk)
+[Air-Defense-v0.16.apk](artifacts/Air-Defense-v0.16.apk)
 
 Install over the previous version to retain Dollars, BP and best score. Uninstalling or clearing app data removes local progress. Existing mission progress does not resume after process termination.
+
+## New in 0.16
+
+Radar tracking is automatic and limited by battery capacity. Incoming missiles take priority over ordinary aircraft; PRIORITIZE lets the player override automatic ordering without displacing locked or engaged tracks. TRACK is removed. Tracked targets have estimated altitude/speed/heading and snapshot-based motion prediction; untracked detections remain stationary between sweeps, show range and mask detail with `---`. Missed detections show STALE and freeze predictions before tracks expire. LOCK/FIRE remain independent and stale data cannot support a new launch or ground guidance. See [TRACKING.md](TRACKING.md).
+
+![Untracked detection, configured three-track example](docs/auto-detected-v016.png)
+![Stale tracked estimates](docs/auto-stale-v016.png)
 
 ## New in 0.15
 
@@ -66,7 +73,7 @@ Watchpost: 30km detection, 24km tracking, 16km radar locking, five simultaneous 
 
 ## Play
 
-Defend the site against twelve aircraft during a mission of up to ten simulation minutes. Select an aircraft or incoming missile; TRACK, LOCK, then FIRE inside the battery's envelope. Maintain the target lock until interception. Target identity is uncertain and measurements depend on scan history, range, clutter and terrain. Gray means unknown, orange uncertain enemy type, red positively identified enemy. Green friendly identification is reserved for future friendly contacts.
+Defend the site against twelve aircraft during a mission of up to ten simulation minutes. Select an automatically tracked aircraft or incoming missile; LOCK, then FIRE inside the battery's envelope. Use PRIORITIZE when a desired contact lacks a slot. Maintain the target lock until interception. Target identity is uncertain and measurements depend on scan history, range, clutter and terrain. Gray means unknown, orange uncertain enemy type, red positively identified enemy. Green friendly identification is reserved for future friendly contacts.
 
 L1/L2/L3 each hold three missiles. Nine more are in reserve; a healthy, completely empty launcher reloads in 90 simulation seconds. Damage slows reloads and radar performance. Power hits interrupt equipment; command destruction defeats the battery. Explosive charge, distance and protection determine individual component damage. Priority tracking alone uses no datalink channel; hard locks and active midcourse updates share two target channels. The selected missile's guidance, acceleration, speed, G/AOA limits and energy affect the projectile's actual flight.
 
@@ -84,4 +91,4 @@ Edit `assets/combat.properties` for damage/AI balance, `assets/equipment.propert
 
 Build requires Java 17 JDK, Android platform 35, build-tools 35.0.0 and zip. Set `RADAR_ANDROID_JAR`, `RADAR_BUILD_TOOLS`, `RADAR_KEYSTORE`, `RADAR_KEY_PASSWORD` and run `./build.sh`. Optional `RADAR_ECJ` selects ECJ when javac is unavailable. Signing alias: radar. Never publish the private signing key or password. A different key requires a fresh installation.
 
-Run `./test.sh` for eleven pure Java model suites and ten seeded missions. Current checks also cover explosive falloff, component failures, warning delays, bombing release/scatter, bounded learning/reset, requested stats, partial research, purchase/equip persistence, migration, failures/retries, duplicate charges, missile motion/interception, ammunition, radar limits and rewards. Desktop renders exercise the actual drawing code and preference/audio stubs. APK signature, manifest, assets and previous signing identity were verified. No Android device/emulator installation, real audio playback or human balance playtest was available.
+Run `./test.sh` for twelve pure Java model suites and ten seeded missions. Current checks also cover explosive falloff, component failures, warning delays, bombing release/scatter, bounded learning/reset, requested stats, partial research, purchase/equip persistence, migration, failures/retries, duplicate charges, missile motion/interception, ammunition, radar limits and rewards. Desktop renders exercise the actual drawing code and preference/audio stubs. APK signature, manifest, assets and previous signing identity were verified. No Android device/emulator installation, real audio playback or human balance playtest was available.

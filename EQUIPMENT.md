@@ -14,7 +14,7 @@
 | Scan speed | 1.00 / 10.00 |
 | IR guidance / IR lock | N/A |
 
-Scan rating accepts decimals from 1.00 to 10.00. A full sweep takes `11 - scanSpeed` seconds (Watchpost: ten seconds). Aircraft and incoming missiles share track slots. Two observations establish a track if there is capacity and it is within the tracking envelope. Coasting, terrain/clutter, priority refreshes, radar damage, selected display range and uncertain identification still apply. Channels are allocated per locked target; multiple shots can share the target's channel. Both equipped missiles need a maintained target lock. No IR missile is included in the Watchpost loadout.
+Scan rating accepts decimals from 1.00 to 10.00. A full sweep takes `11 - scanSpeed` seconds (Watchpost: ten seconds). Aircraft and incoming missiles share track slots. A detected contact can receive an automatic track if capacity and the tracking envelope permit it. Missile/player priorities, stale data, track expiry, terrain/clutter, radar damage and uncertain identification apply. Display zoom does not restrict the sensor envelope, and measurements update only on radar sweeps. Channels are allocated per locked target; multiple shots can share the target's channel. Both equipped missiles need a maintained target lock. No IR missile is included in the Watchpost loadout.
 
 ## USA missiles
 
@@ -48,4 +48,4 @@ Missiles now expose `.explosiveKg` and `.blastRadiusKm` separately from `.massKg
 
 ## Tracking support
 
-Active radar profiles can fire from a player-designated TRACK and consume a per-target datalink allocation until their seeker acquires. Explicit hard locks share that budget. Semi-active Rampart and Stonebolt still need LOCK. See [TRACKING.md](TRACKING.md) for symbols, support loss/recovery and handoff behavior.
+Active radar profiles can fire from a fresh automatic track and consume a per-target datalink allocation until their seeker acquires. Explicit hard locks share that budget. Semi-active Rampart and Stonebolt still need LOCK. See [TRACKING.md](TRACKING.md) for symbols, support loss/recovery and handoff behavior.

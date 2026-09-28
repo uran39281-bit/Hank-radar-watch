@@ -1,0 +1,5 @@
+AUTOMATIC TRACKING UPDATE
+
+Detection provides position and range; tracking provides detailed estimates and movement prediction. Remove TRACK. Automatically prioritize incoming missiles, then nearest aircraft. Allow selected contact priority to replace the lowest unprotected track, protecting locks/live engagements. Free slots on destruction/expiry. Mark missed detections stale. Preserve ID colors and separate LOCK/FIRE.
+
+TRACKING.md documents exact rules and tests. Watchpost capacity remains 5; configured 3-track/6-contact scenario is tested.
