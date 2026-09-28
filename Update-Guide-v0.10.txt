@@ -1,0 +1,74 @@
+NEW BATTERY DAMAGE MODEL
+
+Replace fixed damage with a system based on the weapon’s explosive content in kilograms. Larger explosive charges cause more damage, while impact distance and battery protection affect the final result.
+
+Bomb category| Explosive content
+Super-small| 24.5 kg
+Small| 44.4 kg
+Medium| 87.1 kg
+Large| 201.8 kg
+Super-large| 428.6 kg
+Mega-large| 898.8 kg
+Nuclear*| 1,554.5 kg
+
+The nuclear category uses a fictional game balance value, not a real nuclear yield.
+
+Damage calculation
+
+"Damage = Explosive kg × Damage multiplier × Distance factor × Protection factor"
+
+- Damage multiplier: An adjustable value used to balance weapon damage against battery health.
+- Distance factor: Direct hits cause full damage. Near misses cause reduced damage, falling to zero outside the explosion’s damage radius.
+- Protection factor: Determines how much damage reaches a protected component. Lower values mean better protection.
+- Give each bomb category an adjustable blast radius for gameplay balance.
+
+Use explosive content, rather than the weapon’s total weight, when calculating damage. Missiles should follow the same system using their warhead’s explosive content.
+
+Battery components
+
+The battery should take damage to individual components:
+
+- Radar: Damage reduces detection and tracking performance. Destruction disables radar tracking and locking.
+- Launchers: Damage increases reload time. A destroyed launcher cannot fire.
+- Power supply: Damage causes temporary interruptions. Destruction disables connected equipment.
+- Command unit: Damage slows target processing. Destruction defeats the battery.
+
+A single explosion can damage multiple components within its radius. Avoid applying the full explosion damage repeatedly to a shared health bar simply because several components were hit.
+
+Show damaged components on the interface, with warnings such as RADAR DEGRADED, LAUNCHER DISABLED, and POWER FAILURE.
+
+AI BOMBING RULES
+
+An aircraft carrying unguided bombs must pass directly over the battery’s designated bombing area before releasing them. This is the game’s simplified bombing rule.
+
+The AI must approach, reach the release area, drop its bombs, and leave the attack area. It cannot release bombs from anywhere on the map or guarantee a hit automatically.
+
+Evasive maneuvers can interrupt a bombing run. If the aircraft misses its release opportunity, it must circle back, attempt another pass, or retreat. Aircraft without bombs cannot begin another bombing run.
+
+AI INTELLIGENCE AND AWARENESS
+
+Give each pilot a Smart Level from 1 to 5. Intelligence affects reaction time, warning recognition, decision quality, and adaptation—not aircraft performance.
+
+Level| Behavior
+1 — Rookie| Reacts slowly, misses some warnings, and usually continues its bombing run.
+2 — Basic| Recognizes obvious threats and occasionally abandons an unsafe approach.
+3 — Trained| Responds reliably to detected locks and launches; chooses between attacking and evading.
+4 — Veteran| Recognizes repeated player behavior and varies its approach and reactions.
+5 — Elite| Adapts quickly, balances survival against the objective, and avoids repeating failed decisions.
+
+Treat tracking, locking, and missile-launch warnings as separate events. Each event has a recognition chance and reaction delay influenced by Smart Level. Silent tracking should remain hidden unless the game provides a detectable cue.
+
+When warned, the AI can continue attacking, perform an evasive maneuver, attempt the game’s notch maneuver, abandon the pass, or retreat. No reaction should guarantee survival.
+
+LEARNING FROM THE PLAYER
+
+Each aircraft should use a small behavior memory, shared with its side if enabled. Record:
+
+- Whether the player usually fires early or waits until aircraft approach.
+- Whether the player repeatedly attacks the same aircraft.
+- Which AI reactions previously succeeded or failed.
+- Whether completed bombing runs caused damage.
+
+Use these observations to adjust the probability of future decisions. Repeated early launches may make surviving pilots more cautious. Repeated failed bombing runs may encourage another approach or an earlier abort.
+
+Learning should be gradual, limited by Smart Level, and reset between missions by default. The AI must respond to observed behavior rather than read the player’s next input.

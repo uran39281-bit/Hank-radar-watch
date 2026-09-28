@@ -19,5 +19,5 @@ fi
 "$RADAR_BUILD_TOOLS/d8" --lib "$RADAR_ANDROID_JAR" --min-api 26 --output build/dex build/classes.jar
 (cd build/dex && zip -q ../unsigned.apk classes.dex)
 "$RADAR_BUILD_TOOLS/zipalign" -f 4 build/unsigned.apk build/aligned.apk
-"$RADAR_BUILD_TOOLS/apksigner" sign --ks "$RADAR_KEYSTORE" --ks-key-alias radar --ks-pass env:RADAR_KEY_PASSWORD --out build/Air-Defame-101-v0.9.apk build/aligned.apk
-"$RADAR_BUILD_TOOLS/apksigner" verify --verbose build/Air-Defame-101-v0.9.apk
+"$RADAR_BUILD_TOOLS/apksigner" sign --ks "$RADAR_KEYSTORE" --ks-key-alias radar --ks-pass env:RADAR_KEY_PASSWORD --out build/Air-Defame-101-v0.10.apk build/aligned.apk
+"$RADAR_BUILD_TOOLS/apksigner" verify --verbose build/Air-Defame-101-v0.10.apk

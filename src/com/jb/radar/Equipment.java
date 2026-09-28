@@ -17,11 +17,14 @@ public final class Equipment {
   public final String id,name;
   public final Guidance guidance;
   public final RadarMode radarMode;
-  public final double guidanceSeconds,maxSpeedKmh,maxG,massKg,maxAoADeg,thrustN,burnSeconds,rangeKm,minRangeKm,ceilingM,seekerKm;
+  public final double guidanceSeconds,maxSpeedKmh,maxG,massKg,maxAoADeg,thrustN,burnSeconds,rangeKm,minRangeKm,ceilingM,seekerKm,explosiveKg,blastRadiusKm;
   Weapon(Properties p,String key,String title,Guidance guide,RadarMode mode,double time,double speed,double g,double mass,double aoa,double thrust,double burn,double range,double min,double ceiling){
    id=key;String k="missile."+key+".";name=name(p,k+"name",title);guidance=enumeration(p,k+"guidance",guide,Guidance.class);radarMode=enumeration(p,k+"radarMode",mode,RadarMode.class);
    if((guidance==Guidance.RADAR)==(radarMode==RadarMode.NONE))throw new IllegalArgumentException(k+"radarMode must match guidance");
    guidanceSeconds=number(p,k+"guidanceSeconds",time,1,300);maxSpeedKmh=number(p,k+"maxSpeedKmh",speed,100,10000);maxG=number(p,k+"maxG",g,.1,100);massKg=number(p,k+"massKg",mass,1,10000);maxAoADeg=number(p,k+"maxAoADeg",aoa,1,70);thrustN=number(p,k+"thrustN",thrust,0,1000000);burnSeconds=number(p,k+"burnSeconds",burn,0,guidanceSeconds);rangeKm=number(p,k+"rangeKm",range,.1,200);minRangeKm=number(p,k+"minRangeKm",min,0,rangeKm);ceilingM=number(p,k+"ceilingM",ceiling,100,40000);seekerKm=number(p,k+"seekerKm",key.equals("ir6")?9:8,.1,200);
+   // Fictional warhead charge and blast footprint; independent of launch mass.
+   explosiveKg=number(p,k+"explosiveKg",key.equals("kh29")||key.equals("kh58")?87.1:key.equals("kh23")||key.equals("kh27")?44.4:key.equals("kh25")?24.5:15,0,10000);
+   blastRadiusKm=number(p,k+"blastRadiusKm",key.equals("kh29")||key.equals("kh58")?.32:.20,.01,5);
   }
   public String guidanceLabel(){return guidance==Guidance.RADAR?"RADAR / "+radarMode.toString().replace('_',' '):guidance.toString();}
  }
@@ -43,7 +46,7 @@ public final class Equipment {
    new Weapon(p,"kh58","Kh-58U",Guidance.RADAR,RadarMode.PASSIVE,80,3060,9,640,22,76800,7,32,3,20000)};
   all=infrared==null?new Weapon[]{primary,stonebolt,enemy[0],enemy[1],enemy[2],enemy[3],enemy[4]}:new Weapon[]{primary,stonebolt,enemy[0],enemy[1],enemy[2],enemy[3],enemy[4],infrared};
   HashSet<String> allowed=new HashSet<>();for(String k:new String[]{"name","detectionKm","trackingKm","lockKm","tracks","channels","scanSpeed","infrared","irLockKm"})allowed.add("radar."+k);
-  for(Weapon w:all)for(String k:new String[]{"name","guidance","radarMode","guidanceSeconds","maxSpeedKmh","maxG","massKg","maxAoADeg","thrustN","burnSeconds","rangeKm","minRangeKm","ceilingM","seekerKm"})allowed.add("missile."+w.id+"."+k);
+  for(Weapon w:all)for(String k:new String[]{"name","guidance","radarMode","guidanceSeconds","maxSpeedKmh","maxG","massKg","maxAoADeg","thrustN","burnSeconds","rangeKm","minRangeKm","ceilingM","seekerKm","explosiveKg","blastRadiusKm"})allowed.add("missile."+w.id+"."+k);
   for(String k:p.stringPropertyNames())if(!allowed.contains(k))throw new IllegalArgumentException("Unknown equipment property: "+k);
  }
  public Weapon playerWeapon(String id){return "stonebolt".equals(id)?stonebolt:primary;}

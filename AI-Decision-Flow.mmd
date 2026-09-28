@@ -1,0 +1,17 @@
+flowchart TD
+    A["Observe player actions and warnings"] --> B{"Critically damaged or out of bombs?"}
+    B -->|Yes| C["Retreat and record outcome"]
+    B -->|No| D{"Threat warning detected?"}
+    D -->|No| E["Continue bombing approach"]
+    D -->|Tracking or lock| F["Evaluate warning using Smart Level"]
+    D -->|Missile launch| G["Choose evasive or notch maneuver"]
+    F --> H{"Continue this attack pass?"}
+    G --> H
+    H -->|Yes| E
+    H -->|No| I["Abort pass and record outcome"]
+    E --> J{"Over the bombing area?"}
+    J -->|No| A
+    J -->|Yes| K["Release bombs and exit"]
+    K --> L["Assess result and update behavior memory"]
+    I --> L
+    C --> L

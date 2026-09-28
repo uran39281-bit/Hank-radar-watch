@@ -1,12 +1,18 @@
-# Air Defame 101 0.9 — USA tech tree
+# Air Defame 101 0.10 — component damage and adaptive pilots
 
-Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 9. No network/account permissions. Signed with the existing development certificate for in-place updates.
+Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 10. No network/account permissions. Signed with the existing development certificate for in-place updates.
 
 ## Download
 
-[Air-Defame-101-v0.9.apk](artifacts/Air-Defame-101-v0.9.apk)
+[Air-Defame-101-v0.10.apk](artifacts/Air-Defame-101-v0.10.apk)
 
 Install over the previous version to retain Dollars, BP and best score. Uninstalling or clearing app data removes local progress. Existing mission progress does not resume after process termination.
+
+## New in 0.10
+
+Explosive-based component damage replaces the four-hit rule. BATTERY shows radar, three launchers, power and command health. Bombers must reach the overhead release area; bombs have flight time and scatter. Smart Levels 1–5 govern delayed threat recognition, evasion/notch, pass aborts and retreat. Bounded behavior memories adapt to observed actions and reset each mission. Read [COMBAT-AI.md](COMBAT-AI.md) for rules, balance settings and limitations.
+
+![Battery status](docs/battery-v010.png)
 
 ## USA tech tree
 
@@ -25,20 +31,20 @@ Watchpost: 30km detection, 24km tracking, 16km radar locking, five simultaneous 
 
 Defend the site against twelve aircraft during a mission of up to ten simulation minutes. Select an aircraft or incoming missile; TRACK, LOCK, then FIRE inside the battery's envelope. Maintain the target lock until interception. Target identity is uncertain and measurements depend on scan history, range, clutter and terrain. Gray means unknown, orange uncertain enemy type, red positively identified enemy. Green friendly identification is reserved for future friendly contacts.
 
-L1/L2/L3 each hold three missiles. Nine more are in reserve; a completely empty launcher reloads in 90 simulation seconds. The fourth enemy missile impact destroys the base. Each impact also reduces radar range. Priority tracking uses no datalink channel; locks share two target channels. The selected missile's guidance, acceleration, speed, G/AOA limits and energy affect the projectile's actual flight.
+L1/L2/L3 each hold three missiles. Nine more are in reserve; a healthy, completely empty launcher reloads in 90 simulation seconds. Damage slows reloads and radar performance. Power hits interrupt equipment; command destruction defeats the battery. Explosive charge, distance and protection determine individual component damage. Priority tracking uses no datalink channel; locks share two target channels. The selected missile's guidance, acceleration, speed, G/AOA limits and energy affect the projectile's actual flight.
 
 The original supplied menu song loops in menu screens and pauses during gameplay, backgrounding and audio-focus loss. Optional beeps are enabled in the pause menu. 1x/2x/4x affects all simulation timers.
 
 ## Economy
 
-Aircraft interceptions earn $250 / 100 BP; incoming-missile interceptions $150 / 75 BP; victory $500 / 250 BP; each remaining base hit on victory $100 / 50 BP. Combat rewards remain after defeat or withdrawal. Research spends BP, purchases spend Dollars, and lifetime/mission totals retain gross earnings. Ammunition/repairs are free. Balances, research, ownership and loadout save together; duplicate charges and payouts are blocked. Failed saves offer retry.
+Aircraft interceptions earn $250 / 100 BP; incoming-missile interceptions $150 / 75 BP; victory $500 / 250 BP; each 25% battery-condition tier on victory (rounded up) $100 / 50 BP. Combat rewards remain after defeat or withdrawal. Research spends BP, purchases spend Dollars, and lifetime/mission totals retain gross earnings. Ammunition/repairs are free. Balances, research, ownership and loadout save together; duplicate charges and payouts are blocked. Failed saves offer retry.
 
 ## Development
 
-Read [PROJECT_STATUS.md](PROJECT_STATUS.md), [EQUIPMENT.md](EQUIPMENT.md), [Mission-Guide.txt](Mission-Guide.txt) and [Update-Guide-v0.9.txt](Update-Guide-v0.9.txt). Previous update guides and APKs are retained as history. All performance values are fictional game balance, not validated operational data.
+Read [PROJECT_STATUS.md](PROJECT_STATUS.md), [EQUIPMENT.md](EQUIPMENT.md), [Mission-Guide.txt](Mission-Guide.txt) and [Update-Guide-v0.10.txt](Update-Guide-v0.10.txt) and [AI-Decision-Flow.mmd](AI-Decision-Flow.mmd). Previous update guides and APKs are retained as history. All performance values are fictional game balance, not validated operational data.
 
-Edit `assets/equipment.properties` for stats and `TechTree.java` for catalog/prices. Additional supporting flight values not supplied by the creator are documented in EQUIPMENT.md. The reusable IR engine remains dormant for future compatible systems.
+Edit `assets/combat.properties` for damage/AI balance, `assets/equipment.properties` for stats and `TechTree.java` for catalog/prices. Additional supporting flight values not supplied by the creator are documented in EQUIPMENT.md. The reusable IR engine remains dormant for future compatible systems.
 
 Build requires Java 17 JDK, Android platform 35, build-tools 35.0.0 and zip. Set `RADAR_ANDROID_JAR`, `RADAR_BUILD_TOOLS`, `RADAR_KEYSTORE`, `RADAR_KEY_PASSWORD` and run `./build.sh`. Optional `RADAR_ECJ` selects ECJ when javac is unavailable. Signing alias: radar. Never publish the private signing key or password. A different key requires a fresh installation.
 
-Run `./test.sh` for seven pure Java model suites and ten seeded missions. Current checks cover requested stats, partial research, purchase/equip persistence, migration, failures/retries, duplicate charges, missile motion/interception, ammunition, radar limits and rewards. Desktop renders exercise the actual drawing code and preference/audio stubs. APK signature, manifest, assets and previous signing identity were verified. No Android device/emulator installation, real audio playback or human balance playtest was available.
+Run `./test.sh` for nine pure Java model suites and ten seeded missions. Current checks also cover explosive falloff, component failures, warning delays, bombing release/scatter, bounded learning/reset, requested stats, partial research, purchase/equip persistence, migration, failures/retries, duplicate charges, missile motion/interception, ammunition, radar limits and rewards. Desktop renders exercise the actual drawing code and preference/audio stubs. APK signature, manifest, assets and previous signing identity were verified. No Android device/emulator installation, real audio playback or human balance playtest was available.

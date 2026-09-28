@@ -1,4 +1,4 @@
-# USA equipment — v0.9
+# USA equipment — v0.10
 
 `assets/equipment.properties` supplies runtime radar and missile values. `TechTree.java` supplies the USA research catalog, prerequisites and initial prices. The menu offers USA TECH TREE, ECONOMY / REWARDS and EQUIPMENT / STATS.
 
@@ -41,3 +41,7 @@ Watchpost and Rampart are free and owned for every new or migrated save. Stonebo
 Research, ownership, loadout and currency are saved in the same preference transaction. Lifetime/mission earnings remain gross earnings, while wallet balances show spendable funds. Old `economy_*` keys and `hawk_best` remain compatible. Schema 2 adds `economy_tech_research`, `economy_tech_owned` and `economy_equipped_missile`. No historical currency is reset. A failed transaction does not change the in-memory wallet/ownership/loadout; the UI reports failure and offers retry. The existing rewards save/retry behavior is retained.
 
 `./test.sh` runs the pure Java suites. TechTreeTest verifies exact requested stats, starter migration, partial research, insufficient funds, duplicate prevention, save failures/retries, persistent equip state, and actual Rampart/Stonebolt interceptions. Desktop Android stubs check the tree UI and preference adapter; real-device installation/playtesting remains unverified.
+
+## Damage fields
+
+Missiles now expose `.explosiveKg` and `.blastRadiusKm` separately from `.massKg`. Hostile warheads use the component damage model; changing total mass never changes explosive content. Radar and other component damage can reduce the healthy performance values above. See [COMBAT-AI.md](COMBAT-AI.md) for defaults and effects.
