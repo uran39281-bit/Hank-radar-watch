@@ -1,12 +1,20 @@
-# Air Defame 101 0.10 — component damage and adaptive pilots
+# AIR DEFENSE 0.11 — animated radar menu
 
-Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 10. No network/account permissions. Signed with the existing development certificate for in-place updates.
+Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 11. No network/account permissions. Signed with the existing development certificate for in-place updates.
 
 ## Download
 
-[Air-Defame-101-v0.10.apk](artifacts/Air-Defame-101-v0.10.apk)
+[Air-Defense-v0.11.apk](artifacts/Air-Defense-v0.11.apk)
 
 Install over the previous version to retain Dollars, BP and best score. Uninstalling or clearing app data removes local progress. Existing mission progress does not resume after process termination.
+
+## New in 0.11
+
+Corrected the game and Android launcher name to **AIR DEFENSE**. The main menu follows the supplied reference: large white title, neon-green PLAY button, three outlined navigation rows on the left, saved Dollars/BP at the top, and a large decorative radar on the right. The sweep rotates continuously, contacts drift and fade after detection, pulses expand, scan lines move, and the PLAY button has a gentle moving highlight. Everything is drawn natively; controls remain interactive.
+
+The displayed wallet is your actual progress, not the reference image's sample values. Package, signing identity, preference keys, loadout, game rules and original menu music are preserved. There is no extra battery/equipment card in the menu's lower-right corner. Rendering uses cached coastline paths and system typefaces; the screenshot font can differ slightly from Android's condensed font.
+
+![Animated menu design, shown at one moment](docs/menu-v011.png)
 
 ## New in 0.10
 

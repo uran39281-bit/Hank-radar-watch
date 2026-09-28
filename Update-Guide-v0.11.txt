@@ -1,0 +1,3 @@
+User request: Correct the game name to "AIR DEFENSE" and make the main menu resemble the supplied reference, animated.
+
+Implemented: white AIR DEFENSE title (without 101), prominent neon-green PLAY, outlined USA TECH TREE / ECONOMY / REWARDS / EQUIPMENT / STATS navigation on the left, Dollars and BP counters along the top, large radar on the right. Animated beam, contact fade/drift, expanding pulses, scan lines and subtle play-button shine. Original menu music remains. No extra lower-right battery card. Wallet values come from the existing save, not the mockup. Android launcher label and APK name corrected; package and signing identity preserved for in-place updates.

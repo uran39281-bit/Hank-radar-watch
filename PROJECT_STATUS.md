@@ -1,8 +1,10 @@
-# Project status — v0.10
+# Project status — v0.11
 
-Repository: uran39281-bit/Hank-radar-watch. Android package com.jb.radar; versionCode 10 / versionName 0.10.0; title AIR DEFAME 101. APK: artifacts/Air-Defame-101-v0.10.apk.
+Repository: uran39281-bit/Hank-radar-watch. Android package com.jb.radar; versionCode 11 / versionName 0.11.0; title AIR DEFENSE. APK: artifacts/Air-Defense-v0.11.apk.
 
-Latest request: linked "ai rules" guide plus supplied bombing decision flow. Both preserved in Update-Guide-v0.10.txt and AI-Decision-Flow.mmd. COMBAT-AI.md documents implementation and adjustable fictional balance.
+Latest request: rename the game to AIR DEFENSE and restyle/animate its main menu from the supplied image. MenuScene.java renders the reference-inspired split layout: large left title/play/navigation, top saved currency counters, right radar with rotating beam, fading/moving contacts and pulse rings, plus subtle scan lines and play-button shine. MainActivity keeps existing button actions and shows real saved balances. Manifest label and current APK filename match the corrected name. Package, preference keys, signer, game rules and original menu song are unchanged. The title intentionally omits 101 as requested. Existing UI navigation/save/music checks passed and two animation phases were visually reviewed. Real-device animation performance/touch remains unverified.
+
+Previous update: linked "ai rules" guide plus supplied bombing decision flow. Both preserved in Update-Guide-v0.10.txt and AI-Decision-Flow.mmd. COMBAT-AI.md documents implementation and adjustable fictional balance.
 
 Battery.java owns six independent 100HP components. CombatRules.java loads combat.properties: explosive multiplier, bomb kg/radii, protection, overhead release radius and AI sharing/cue options. Game.explode applies charge/falloff/protection once per component, not to a shared damage pool. Average condition drives display and the existing four-tier victory bonus. Command destruction defeats the mission. Radar damage reduces coverage/quality; launcher damage slows or prevents use; power damage interrupts connected equipment; command damage slows observation processing. Enemy missile explosive content is separate from total mass in Equipment. Site/terrain impacts use the same damage formula.
 
