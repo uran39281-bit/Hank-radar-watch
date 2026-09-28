@@ -1,0 +1,17 @@
+package com.jb.radar;
+import android.graphics.Canvas;import android.view.MotionEvent;import android.content.SharedPreferences;import javax.imageio.ImageIO;import java.io.File;
+public class MissionMenuCheck {
+ static void ok(boolean b,String m){if(!b)throw new AssertionError(m);}
+ static void draw(MainActivity.Radar v,String name)throws Exception{Canvas c=new Canvas();v.last=0;v.onDraw(c);if(name!=null)ImageIO.write(c.image,"png",new File("out/"+name+".png"));}
+ static void tap(MainActivity.Radar v,final float x,final float y)throws Exception{draw(v,null);v.onTouchEvent(new MotionEvent(){public float getX(){return x;}public float getY(){return y;}});}
+ public static void main(String[] args)throws Exception{
+  MainActivity a=new MainActivity();a.getPreferences(0).edit().putLong("economy_dollars",2400).putLong("economy_bp",800).commit();a.onCreate(null);a.onResume();MainActivity.Radar v=a.view;
+  tap(v,300,350);ok(v.selectionScreen==1&&!v.intro.active&&!v.game.running,"PLAY opens modes, not intro/combat");draw(v,"modes-v015");tap(v,900,330);ok(v.selectionScreen==1&&!v.intro.active,"SURVIVAL cannot start");ok(a.menuMusic.isPlaying(),"mode screen music");
+  tap(v,350,330);ok(v.selectionScreen==2,"STORY opens missions");draw(v,"missions-v015");for(int i=1;i<8;i++){tap(v,150+i%4*284,215+i/4*209);ok(v.selectionScreen==2&&!v.intro.active,"locked tile "+i);}
+  tap(v,150,630);ok(v.treeOpen,"STORE opens research/store");v.act("node:stonebolt");v.act("research");v.act("purchase");a.onBackPressed();ok(v.selectionScreen==2&&!v.treeOpen,"STORE returns to missions");
+  tap(v,1090,630);ok(v.selectionScreen==3,"LOADOUT opens");draw(v,"loadout-v015");tap(v,800,420);ok(v.economy.snapshot().equippedMissile.equals("stonebolt"),"owned missile selectable");draw(v,"loadout-equipped-v015");
+  a.onPause();a.onResume();ok(v.selectionScreen==3&&a.menuMusic.isPlaying(),"background preserves menu and music resumes");a.onBackPressed();ok(v.selectionScreen==2,"loadout back");a.onBackPressed();ok(v.selectionScreen==1,"mission back");a.onBackPressed();ok(v.selectionScreen==0,"mode back");
+  tap(v,300,350);tap(v,350,330);tap(v,160,225);ok(v.selectionScreen==3,"ready tile opens loadout");ok(v.game.elapsed==0&&v.game.contacts.isEmpty(),"menu navigation never starts enemies");tap(v,1060,630);ok(v.intro.active&&!v.game.running&&v.selectionScreen==0,"deploy begins intro only");v.act("introskip");ok(v.started&&v.game.running&&v.game.elapsed==0&&v.game.weapon.id.equals("stonebolt"),"skip enters selected loadout at time zero");v.act("pause");v.act("start");ok(!v.paused&&!v.intro.active,"resume skips selection");v.act("restart");ok(v.intro.active,"restart replays same mission intro");v.act("introskip");v.act("menu");ok(v.selectionScreen==0&&!v.started,"return main menu resets selection");
+  tap(v,300,350);tap(v,350,330);tap(v,1090,630);SharedPreferences.failWrites=true;v.act("loadout:rampart");ok(v.economy.saveFailed&&v.economy.snapshot().equippedMissile.equals("stonebolt"),"failed equip rolls back");tap(v,1060,630);ok(!v.intro.active&&v.selectionScreen==3,"save failure blocks deployment");SharedPreferences.failWrites=false;a.onBackPressed();tap(v,150,630);v.act("retrysave");ok(!v.economy.saveFailed,"store retry recovers");a.onDestroy();System.out.println("PASS: actual touch navigation, disabled survival/locked missions, store round-trip, owned loadout, back/background, intro gate, deployment, resume/restart and save failure");
+ }
+}

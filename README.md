@@ -1,12 +1,21 @@
-# AIR DEFENSE 0.14 — Supplied Digital-7 intro
+# AIR DEFENSE 0.15 — Story and mission selection
 
-Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 14. No network/account permissions. Signed with the existing development certificate for in-place updates.
+Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 15. No network/account permissions. Signed with the existing development certificate for in-place updates.
 
 ## Download
 
-[Air-Defense-v0.14.apk](artifacts/Air-Defense-v0.14.apk)
+[Air-Defense-v0.15.apk](artifacts/Air-Defense-v0.15.apk)
 
 Install over the previous version to retain Dollars, BP and best score. Uninstalling or clearing app data removes local progress. Existing mission progress does not resume after process termination.
+
+## New in 0.15
+
+PLAY opens SELECT MODE with separate STORY and SURVIVAL cards. STORY opens the reference-inspired mission grid: 01 is ready, BEFORE THE DAWN; 02–08 are nonfunctional locked placeholders. SURVIVAL is visibly unavailable and disabled. The dark animated radar background, separated chamfered frames, white labels and green accents are drawn natively.
+
+Select 01 or LOADOUT to choose an owned missile, then START MISSION to play the existing introduction. STORE opens the existing USA research/purchase screen and returns to mission selection. Back controls and Android Back follow the menu hierarchy. No mission time, enemies or rewards start until the intro completes or is skipped. Saved ownership/loadout/balances are preserved. See [MODES.md](MODES.md).
+
+![Game mode selection](docs/modes-v015.png)
+![Story mission selection](docs/missions-v015.png)
 
 ## New in 0.14
 

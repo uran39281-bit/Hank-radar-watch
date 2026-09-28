@@ -12,7 +12,7 @@ The supplied font and soundtrack are used byte-for-byte. The soundtrack lasts 75
 
 ## Android integration
 
-Existing PLAY and RESTART call the intro directly, following the archive's embedding instructions. The standalone HTML demo's landing, read-story view and RADAR ONLINE/replay page are not inserted into the game flow. Normal completion or skip immediately releases music and calls Game.start once; mission time is zero and no enemies move or spawn during the intro. No threat roster, names, numbers or schedules are added before gameplay.
+Since v0.15, PLAY opens mode selection, STORY opens missions, and Mission 01 / LOADOUT opens the loadout screen. START MISSION calls the intro; RESTART replays it directly. The standalone HTML demo's landing, read-story view and RADAR ONLINE/replay page are not inserted into the game flow. Normal completion or skip immediately releases music and calls Game.start once; mission time is zero and no enemies move or spawn during the intro. No threat roster, names, numbers or schedules are added before gameplay.
 
 MediaPlayer position drives typing. Pause stops both; background/focus loss freezes both and resuming continues from the same position. Manual pause survives backgrounding. Mute keeps playback synchronized silently. Replay creates a fresh player from zero. If audio fails, foreground-only text timing continues with MUSIC UNAVAILABLE. No narration or typing sounds are added. Process termination returns to the menu; mid-intro or mission state is not persisted.
 

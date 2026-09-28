@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
  public void onResume(){super.onResume();foreground=true;syncMusic();if(view!=null){if(view.economy.saveFailed)view.economy.flush();view.last=System.nanoTime();view.invalidate();}}
  public void onPause(){if(view!=null)view.captureIntro();foreground=false;syncMusic();super.onPause();if(view!=null){view.economy.flush();view.paused=true;view.last=0;}}
  public void onDestroy(){introAudio.close();if(menuMusic!=null){menuMusic.release();menuMusic=null;}if(view!=null&&view.tone!=null)view.tone.release();super.onDestroy();}
- @Override public void onBackPressed(){if(view.intro.active){view.act("intropause");return;}if(view.treeOpen){view.treeOpen=false;view.invalidate();return;}if(view.equipmentOpen){view.equipmentOpen=false;view.invalidate();return;}if(view.economyOpen){view.economyOpen=false;view.invalidate();return;}view.statusOpen=false;view.paused=true;view.help=false;view.invalidate();}
+ @Override public void onBackPressed(){if(view.intro.active){view.act("intropause");return;}if(view.treeOpen){view.treeOpen=false;view.invalidate();return;}if(view.equipmentOpen){view.equipmentOpen=false;view.invalidate();return;}if(view.economyOpen){view.economyOpen=false;view.invalidate();return;}if(!view.started&&view.selectionScreen>0){view.act("selectionback");view.invalidate();return;}view.statusOpen=false;view.paused=true;view.help=false;view.invalidate();}
  class Radar extends View {
   final IntroSequence intro=new IntroSequence();final IntroScene introScene=new IntroScene(Typeface.createFromAsset(getAssets(),"fonts/digital-7.ttf"));
   final int green=0xff00ff00,muted=0xff70b870,amber=0xffeeeeee,red=0xffffffff,bg=0xff000000,border=0xff164516,panel=0xff020a02;
@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
   String fmt(String s,Object...o){return String.format(Locale.US,s,o);}void beep(){if(sound&&tone!=null)tone.startTone(ToneGenerator.TONE_PROP_BEEP,60);}
   protected void onDraw(Canvas c){super.onDraw(c);long now=System.nanoTime();if(intro.active&&foreground&&!intro.paused&&hasFocus){double audioTime=introAudio.position();if(audioTime>=0)intro.sync(audioTime);else if(introAudio.failed&&last!=0)intro.advance((now-last)/1e9);if(intro.done())finishIntro();}if(last!=0&&!intro.active&&!paused&&started){double remaining=Math.min(.15,(now-last)/1e9)*speed;while(remaining>0){double d=Math.min(.05,remaining);game.tick(d);remaining-=d;}}last=now;
    if(game.finished&&!ended){ended=true;if(game.score>best){best=game.score;getPreferences(0).edit().putInt("hawk_best",best).apply();}}
-   float aw=getWidth()-getPaddingLeft()-getPaddingRight(),ah=getHeight()-getPaddingTop()-getPaddingBottom();scale=Math.min(aw/1280f,ah/720f);ox=getPaddingLeft()+(aw-1280*scale)/2;oy=getPaddingTop()+(ah-720*scale)/2;c.drawColor(bg);c.save();c.translate(ox,oy);c.scale(scale,scale);buttons.clear();if(intro.active){introScreen(c);c.restore();if(isShown()&&foreground)postInvalidateDelayed(16);return;}if(!started){if(treeOpen)techTreeScreen(c);else if(equipmentOpen)equipmentScreen(c);else if(economyOpen)economyScreen(c);else mainMenu(c);c.restore();if(isShown())postInvalidateDelayed(33);return;}
+   float aw=getWidth()-getPaddingLeft()-getPaddingRight(),ah=getHeight()-getPaddingTop()-getPaddingBottom();scale=Math.min(aw/1280f,ah/720f);ox=getPaddingLeft()+(aw-1280*scale)/2;oy=getPaddingTop()+(ah-720*scale)/2;c.drawColor(bg);c.save();c.translate(ox,oy);c.scale(scale,scale);buttons.clear();if(intro.active){introScreen(c);c.restore();if(isShown()&&foreground)postInvalidateDelayed(16);return;}if(!started){if(treeOpen)techTreeScreen(c);else if(equipmentOpen)equipmentScreen(c);else if(economyOpen)economyScreen(c);else if(selectionScreen>0)selectionMenu(c);else mainMenu(c);c.restore();if(isShown())postInvalidateDelayed(33);return;}
    text(c,"CMD "+game.battery.parts[Battery.COMMAND].percent()+"% / RADAR "+game.battery.parts[Battery.RADAR].percent()+"%",20,31,18,green);text(c,game.battery.warning(game.elapsed),20,54,12,muted);
    Economy.State wallet=economy.snapshot();text(c,"$"+compact(wallet.dollars)+"   BP "+compact(wallet.bp),405,33,18,green);if(economy.saveFailed)text(c,"SAVE PENDING",665,54,11,amber);
    button(c,"status","BATTERY",705,8,140,true);button(c,"speed",speed+"x TIME",855,8,120,true);button(c,"help","GUIDE",985,8,120,true);button(c,"pause","PAUSE",1115,8,145,!game.finished);
@@ -50,12 +50,18 @@ public class MainActivity extends Activity {
    if(statusOpen)batteryScreen(c);else if(!started||paused||game.finished)overlay(c);c.restore();if(isShown())postInvalidateDelayed(33);
   }
   void captureIntro(){if(intro.active&&!intro.paused){double t=introAudio.position();if(t>=0)intro.sync(t);}}
-  void beginIntro(){game.running=false;game.ir.cancel();intro.start();introAudio.open(getAssets());started=false;paused=help=statusOpen=economyOpen=equipmentOpen=treeOpen=false;selected=null;last=System.nanoTime();syncMusic();}
+  void beginIntro(){selectionScreen=0;game.running=false;game.ir.cancel();intro.start();introAudio.open(getAssets());started=false;paused=help=statusOpen=economyOpen=equipmentOpen=treeOpen=false;selected=null;last=System.nanoTime();syncMusic();}
   void finishIntro(){intro.stop();introAudio.close();last=0;if(!game.start()){started=false;paused=false;economyOpen=true;notice="SAVE FAILED / RETRY IN ECONOMY";syncMusic();return;}selected=null;started=true;ended=false;speed=1;paused=help=statusOpen=false;notice="SEARCH ACTIVE / TWO SWEEPS TO ESTABLISH TRACK";syncMusic();}
   void introButton(Canvas c,String id,String label,float x,float y,float w,boolean enabled){introScene.control(c,label,x,y,w);buttons.add(new Btn(x,y,w,56,id,true));}
   void introScreen(Canvas c){introScene.draw(c,intro);introButton(c,"intropause",intro.paused?"RESUME":"PAUSE",55,640,230,true);introButton(c,"intromusic",intro.music?"MUSIC ON":"MUSIC OFF",517,640,245,true);introButton(c,"introskip","SKIP INTRO >",995,640,230,true);if(introAudio.failed)text(c,"MUSIC UNAVAILABLE",55,610,14,IntroScene.GREEN);}
+  int selectionScreen;String loadoutNotice="SELECT YOUR MISSILE / LOADOUT APPLIES TO ALL LAUNCHERS";final MissionScene missionScene=new MissionScene();
   final MenuScene menuScene=new MenuScene();
-  void mainMenu(Canvas c){Economy.State wallet=economy.snapshot();menuScene.draw(c,System.nanoTime()/1e9,"$"+compact(wallet.dollars),compact(wallet.bp),economy.saveFailed,profileFallback);buttons.add(new Btn(52,309,554,91,"start",true));buttons.add(new Btn(52,418,554,71,"techtree",true));buttons.add(new Btn(52,504,554,71,"economy",true));buttons.add(new Btn(52,590,554,71,"equipment",true));}
+  void mainMenu(Canvas c){Economy.State wallet=economy.snapshot();menuScene.draw(c,System.nanoTime()/1e9,"$"+compact(wallet.dollars),compact(wallet.bp),economy.saveFailed,profileFallback);buttons.add(new Btn(52,309,554,91,"playmodes",true));buttons.add(new Btn(52,418,554,71,"techtree",true));buttons.add(new Btn(52,504,554,71,"economy",true));buttons.add(new Btn(52,590,554,71,"equipment",true));}
+  void selectionMenu(Canvas c){double time=System.nanoTime()/1e9;
+   if(selectionScreen==1){missionScene.modes(c,time);buttons.add(new Btn(150,202,445,263,"storymode",true));buttons.add(new Btn(685,202,445,263,"survival",false));buttons.add(new Btn(28,640,200,64,"selectionback",true));}
+   else if(selectionScreen==2){missionScene.missions(c,time);buttons.add(new Btn(28,62,210,64,"selectionback",true));for(int i=0;i<8;i++)buttons.add(new Btn(115+(i%4)*284,178+(i/4)*209,195,140,"mission:"+i,i==0));buttons.add(new Btn(36,594,280,76,"missionstore",true));buttons.add(new Btn(964,594,280,76,"missionloadout",true));}
+   else{Economy.State w=economy.snapshot();missionScene.loadout(c,time,w,equipment,economy.saveFailed?"SAVE FAILED / RETRY IN STORE":loadoutNotice);buttons.add(new Btn(36,594,280,76,"selectionback",true));buttons.add(new Btn(876,594,368,76,"missiondeploy",!economy.saveFailed));for(int i=0;i<2;i++)buttons.add(new Btn(64+i*592,329,560,189,"loadout:"+equipment.all[i].id,w.owned.contains(equipment.all[i].id)&&!economy.saveFailed));}
+  }
   String compact(long n){if(n<1000000)return fmt("%,d",n);if(n<1000000000L)return fmt("%.1fM",n/1000000.0);if(n<1000000000000L)return fmt("%.1fB",n/1000000000.0);return fmt("%.1fT",n/1000000000000.0);}
   void rewardRow(Canvas c,String label,long dollars,long bp,float y){text(c,label,245,y,14,muted);text(c,"$"+compact(dollars),483,y,15,green);text(c,"+"+compact(bp),599,y,15,amber);}
   void rewardReceipt(Canvas c){Economy.State w=economy.snapshot();rect(c,225,175,460,320,border,false);text(c,"MISSION REWARDS",245,202,16,green);text(c,"DOLLARS",483,202,12,muted);text(c,"BP",599,202,12,muted);
@@ -178,7 +184,14 @@ public class MainActivity extends Activity {
     else if(id.equals("intromusic")){intro.music=!intro.music;syncMusic();}
     invalidate();return;
    }
-   if(id.equals("start")){if(!started||game.finished)beginIntro();else{paused=help=statusOpen=false;last=System.nanoTime();notice="SEARCH ACTIVE / TWO SWEEPS TO ESTABLISH TRACK";}}
+   if(id.equals("playmodes")&&!started){selectionScreen=1;economyOpen=equipmentOpen=treeOpen=false;}
+   else if(id.equals("storymode")&&selectionScreen==1&&!started)selectionScreen=2;
+   else if(id.equals("selectionback")&&!started){if(selectionScreen>0)selectionScreen--;}
+   else if(id.equals("missionstore")&&selectionScreen==2&&!started){treeOpen=true;treeNotice="RESEARCH / BUY / EQUIP FOR MISSION 01";}
+   else if((id.equals("missionloadout")||id.equals("mission:0"))&&selectionScreen==2&&!started){selectionScreen=3;loadoutNotice="SELECT YOUR MISSILE / LOADOUT APPLIES TO ALL LAUNCHERS";}
+   else if(id.startsWith("loadout:")&&selectionScreen==3&&!started){loadoutNotice=economy.equip(id.substring(8));}
+   else if(id.equals("missiondeploy")&&selectionScreen==3&&!started&&!economy.saveFailed)beginIntro();
+   else if(id.equals("start")){if(!started||game.finished)beginIntro();else{paused=help=statusOpen=false;last=System.nanoTime();notice="SEARCH ACTIVE / TWO SWEEPS TO ESTABLISH TRACK";}}
    else if(id.equals("restart"))beginIntro();
    else if(id.equals("techtree")){treeOpen=true;treeNotice="SELECT EQUIPMENT / RESEARCH > BUY > EQUIP";}
    else if(id.equals("treeback"))treeOpen=false;
@@ -202,7 +215,7 @@ public class MainActivity extends Activity {
    else if(id.equals("next")){choose(game.nextTarget(selected));notice=selected==null?"NO DETECTED CONTACTS / WAIT FOR SWEEP":"TARGET "+selected.id+" SELECTED";}
    else if(id.equals("weapon")){game.toggleWeapon();notice=game.irMode?"IR-6 SELECTED / TRACK > IR LOCK > FIRE":game.weapon.name+" SELECTED / "+equipment.radar.channels+" DATALINK CHANNELS";}
    else if(id.equals("track"))notice=game.track(selected);
-   else if(id.equals("menu")){economy.abandon();economyOpen=equipmentOpen=treeOpen=false;started=false;paused=statusOpen=false;game.running=false;game.ir.cancel();selected=null;}
+   else if(id.equals("menu")){selectionScreen=0;economy.abandon();economyOpen=equipmentOpen=treeOpen=false;started=false;paused=statusOpen=false;game.running=false;game.ir.cancel();selected=null;}
    else if(id.equals("illuminate"))notice=game.weaponLock(selected);
    else if(id.equals("release"))notice=game.weaponRelease(selected);
    else if(id.equals("launch"))notice=game.fireWeapon(selected);

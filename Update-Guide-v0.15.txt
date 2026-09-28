@@ -1,0 +1,3 @@
+After PLAY show two modes: STORY and SURVIVAL (unavailable). STORY currently contains one mission: BEFORE THE DAWN. Follow the two supplied images for mode selection and separated mission tiles, STORE and LOADOUT.
+
+Implemented flow and validation: MODES.md.
