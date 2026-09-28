@@ -1,12 +1,18 @@
-# AIR DEFENSE 0.13 — Mission 1 cinematic
+# AIR DEFENSE 0.14 — Supplied Digital-7 intro
 
-Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 13. No network/account permissions. Signed with the existing development certificate for in-place updates.
+Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 14. No network/account permissions. Signed with the existing development certificate for in-place updates.
 
 ## Download
 
-[Air-Defense-v0.13.apk](artifacts/Air-Defense-v0.13.apk)
+[Air-Defense-v0.14.apk](artifacts/Air-Defense-v0.14.apk)
 
 Install over the previous version to retain Dollars, BP and best score. Uninstalling or clearing app data removes local progress. Existing mission progress does not resume after process termination.
+
+## New in 0.14
+
+Mission 1 now uses the supplied `Air_Defense_Digital7_Intro.zip` design: a centered, narrower text block, #58ff7e green, Digital-7 footer controls without borders, fixed full-section layout, and the ZIP's exact story punctuation, line breaks and typing cadence. Its included music replaces the previous mix byte-for-byte. Runtime is 75.64 seconds, matching the demo's approximately 76 seconds. Existing pause/mute/skip and direct radar transition remain. The HTML demo's standalone landing and ending screens are omitted when embedding into the game's existing PLAY flow, as described by its integration instructions.
+
+![Updated supplied intro design](docs/intro-v014.png)
 
 ## New in 0.13
 

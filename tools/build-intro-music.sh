@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
-source_track=${1:?Pass the supplied the_watcher_s_desk.mp3 path}
+reference_zip=${1:?Pass the supplied Air_Defense_Digital7_Intro.zip path}
 project_dir=$(cd "$(dirname "$0")/.." && pwd)
-ffmpeg -y -v error -i "$source_track" -filter_complex '[0:a]asplit=2[a][b];[a][b]acrossfade=d=3:c1=tri:c2=tri,atrim=duration=76,afade=t=in:st=0:d=0.8,afade=t=out:st=73.5:d=2.5[out]' -map '[out]' -c:a libmp3lame -b:a 192k "$project_dir/assets/intro_music.mp3"
+python3 - "$reference_zip" "$project_dir" <<'PY'
+import sys
+from pathlib import Path
+from zipfile import ZipFile
+with ZipFile(sys.argv[1]) as z:
+ for source,target in [('intro-music.mp3','intro_music.mp3'),('digital-7.ttf','fonts/digital-7.ttf'),('FONT-LICENSE.txt','fonts/Digital-7-LICENSE.txt')]:
+  dest=Path(sys.argv[2])/'assets'/target
+  dest.parent.mkdir(parents=True,exist_ok=True)
+  dest.write_bytes(z.read('air-defense-digital7/assets/'+source))
+PY

@@ -1,0 +1,5 @@
+Use the attached Air_Defense_Digital7_Intro.zip for Mission 1 intro.
+
+Reference ZIP SHA256: 6fbf1559762a56e4aef132e8fca2d3c392d4a90d54de553068ec382adb98f564
+Exact source archived at docs/reference/Air_Defense_Digital7_Intro.zip.
+Implementation and integration choices: INTRO.md.

@@ -1,7 +1,7 @@
 package com.jb.radar;
 import android.content.res.AssetManager;import android.content.res.AssetFileDescriptor;import android.media.*;
 
-/** The supplied track is crossfaded into its repeat in the bundled 76s mix. */
+/** The supplied track is crossfaded into its repeat in the supplied ZIP soundtrack mix. */
 final class IntroAudio {
  MediaPlayer player;boolean ready,failed,wanted,muted;
  void open(AssetManager assets){close();failed=false;try{final MediaPlayer current=new MediaPlayer();player=current;current.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build());try(AssetFileDescriptor fd=assets.openFd("intro_music.mp3")){current.setDataSource(fd.getFileDescriptor(),fd.getStartOffset(),fd.getLength());}current.setLooping(false);current.setVolume(.65f,.65f);current.setOnPreparedListener(m->{if(player!=m)return;ready=true;sync(wanted,!muted);});current.setOnErrorListener((m,w,e)->{if(player==m){failed=true;ready=false;}return true;});current.prepareAsync();}catch(Exception e){failed=true;if(player!=null)player.release();player=null;}}
