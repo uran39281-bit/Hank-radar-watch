@@ -1,0 +1,52 @@
+AIR DEFENSE v0.17 — sensor and guidance rebuild
+
+Based on AIR_DEFENSE_Rebuild_Design_Notes.md, retained as REBUILD-NOTES.md.
+Built on v0.16; menus, Mission 1, cinematic, music, currency, research and save keys are retained.
+Work branch: radar-rebuild-v0.17. The main branch retains v0.16 for comparison.
+
+Operator flow
+1. PLAY > STORY > BEFORE THE DAWN > LOADOUT.
+2. Choose Rampart/Stonebolt (semi-active), Sentinel (active radar), or Ember (IR).
+3. Deploy. The existing introduction finishes or skips directly to radar gameplay.
+4. Detection supplies last measured position/range. Tracking slots are automatic.
+5. Wait for a stable track before a radar engagement. PRIORITIZE requests a slot.
+6. Semi-active: LOCK and maintain illumination. Active radar: FIRE from a stable track.
+7. IR: cue and acquire the missile's own seeker, then FIRE; battery IRST is not required.
+
+Radar states
+ACQUIRING: observations are still establishing a motion estimate.
+STABLE: detailed estimated information and movement prediction are available.
+COASTING: update missed; clearly aged estimates, no new radar firing solution.
+LOST: track expired; slot released, last-known plot briefly remains.
+Identity colors remain separate from tracking/lock symbols.
+
+Capacity
+Watchpost keeps 5 tracks, 30 km detection / 24 km tracking / 16 km locking and scan 1.00.
+It now has independent 2-target illumination and 2-missile midcourse support pools.
+Multiple semi-active missiles may share illumination of one target; supported missile cap is 6.
+Active missiles consume one midcourse slot each, even against the same target.
+Acquisition, missile termination or explicit release frees their slot. No silent overflow eviction.
+
+Guidance
+Semi-active support loss follows the last estimate during a short recovery window.
+Active stages distinguish MIDCOURSE, SEARCHING and ACTIVE - TARGET ACQUIRED.
+Searching alone is not successful acquisition. Seekers have limited range, cone and time.
+IR missiles require seeker lock before launch and can lose/reacquire or be distracted by flares.
+All families use the selected launcher's ready ammunition and normal reload system.
+Only the selected engagement's guidance lines are shown, with an operator toggle.
+
+Aircraft awareness
+Automatic TWS allocation does not notify aircraft. Fictional receiver profiles govern
+search, fire-control, active-seeker, optical/visual warning availability. Skill and delay
+influence reactions; a contact without suitable equipment cannot read hidden player actions.
+
+Playtest equipment
+MIM-303 Sentinel and FIM-306 Ember are free prototype options for testing the new families.
+Their characteristics are fictional initial balance. Stonebolt research and purchase prices
+are unchanged. Equip one family before deployment; it supplies all three launchers.
+Watchpost has no IRST. Standalone IRST search and IRST-only unknown-range plots are future work.
+Optional retargeting and overflow support eviction are disabled; no lock change redirects a missile.
+
+Install over the existing AIR DEFENSE app to preserve progress. The signing identity is unchanged.
+Active missions are not restored after process termination. Hardware/touch/audio and balance
+still require testing on a real phone; desktop stubs are not an Android emulator.

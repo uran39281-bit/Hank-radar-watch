@@ -11,7 +11,9 @@ public final class TechTree {
  public static final Node WATCHPOST=new Node("watchpost","ADS-201 Watchpost",null,true,0,0);
  public static final Node RAMPART=new Node("rampart","MIM-301 Rampart","watchpost",false,0,0);
  public static final Node STONEBOLT=new Node("stonebolt","FIM-352 Stonebolt","rampart",false,600,1500);
- public static final Node[] NODES={WATCHPOST,RAMPART,STONEBOLT};
+ public static final Node ACTIVE=new Node("active","MIM-303 Sentinel","watchpost",false,0,0);
+ public static final Node INFRARED=new Node("ir6","FIM-306 Ember","watchpost",false,0,0);
+ public static final Node[] NODES={WATCHPOST,RAMPART,STONEBOLT,ACTIVE,INFRARED};
  private TechTree(){}
  public static Node get(String id){for(Node n:NODES)if(n.id.equals(id))return n;return null;}
  public static int progress(Economy.State s,Node n){Integer p=s.research.get(n.id);return n.starter()?n.bp:p==null?0:Math.max(0,Math.min(n.bp,p));}
@@ -19,7 +21,7 @@ public final class TechTree {
  public static boolean prerequisite(Economy.State s,Node n){return n.parent==null||s.owned.contains(n.parent);}
  public static String status(Economy.State s,Node n){if(n.battery||n.id.equals(s.equippedMissile))return "EQUIPPED";if(s.owned.contains(n.id))return "OWNED";if(!prerequisite(s,n))return "LOCKED";return researched(s,n)?"READY TO BUY":progress(s,n)>0?"RESEARCHING":"AVAILABLE";}
  public static void normalize(Economy.State s){
-  s.owned.retainAll(new HashSet<String>(Arrays.asList("watchpost","rampart","stonebolt")));s.research.keySet().retainAll(new HashSet<String>(Arrays.asList("watchpost","rampart","stonebolt")));
+  s.owned.retainAll(new HashSet<String>(Arrays.asList("watchpost","rampart","stonebolt","active","ir6")));s.research.keySet().retainAll(new HashSet<String>(Arrays.asList("watchpost","rampart","stonebolt","active","ir6")));
   for(Node n:NODES){if(n.starter())s.owned.add(n.id);int p=progress(s,n);if(s.owned.contains(n.id))p=n.bp;s.research.put(n.id,p);}
   Node selected=get(s.equippedMissile);if(selected==null||selected.battery||!s.owned.contains(selected.id))s.equippedMissile=RAMPART.id;
  }

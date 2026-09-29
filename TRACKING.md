@@ -1,47 +1,43 @@
-# Automatic tracking, LOCK and missile support — v0.16
+# Radar tracking and missile support — v0.17
 
-Detection provides a measured position and range; tracking provides detailed estimates and predicted movement. TRACK is removed from the UI. The radar assigns tracks automatically after detection, within the battery's tracking range and simultaneous-track cap. Watchpost retains its configured five tracks and two datalink channels; the three-of-six example is covered by a configured test battery, not a change to Watchpost stats.
+This implements the approved sensor/guidance rebuild on the existing game. See REBUILD-NOTES.md for the supplied design and EQUIPMENT.md for configurable fictional balance.
 
-## Radar observations and display
+## Detection and track quality
 
-All aircraft and incoming missiles are observed only when the search beam reaches them. Detection is bounded by the battery's detection range, terrain/horizon, clutter/probability and radar/command damage. Changing RANGE LIMIT zooms the display; it no longer prevents detection outside the displayed radius. No player-priority fast refreshes or independent frequent incoming-missile refreshes remain.
+The sensor observes a contact only when the sweep crosses it. Display zoom does not limit sensor range. A detection stores a noisy position/range and bearing. Untracked contacts remain at that measurement, show `---` for altitude/speed/heading and do not predict movement.
 
-A successful observation stores range/position and noisy estimated altitude, speed and heading. Only assigned tracks expose the detailed estimates. Untracked contacts display their last measured position/range and `---` for altitude, speed and heading; their icons have no direction. Internal simulation truth is never used for displayed prediction. Track icons move using the last observed speed/heading until a fresh detection corrects the estimate. Stored altitude/speed remain estimates from the last detection, not continuously sampled live data.
+An assigned track begins ACQUIRING. Successive observations establish estimated motion; one detection does not reveal perfect speed or direction. Sufficient observations and quality produce STABLE. Tracking does not identify a contact automatically and never establishes a hard lock. Tracked motion is predicted from cached measurements, never from the hidden live position.
 
-Tracked contacts have identity-colored dashed rings; hard locks have a solid ring and white star. Untracked aircraft use a fixed diamond, and untracked missiles a directionless circle. Existing gray/orange/red identification rules are retained. A white caret marks the selected contact. Scope labels include range; selection/hit-testing uses the same predicted coordinates as drawing.
+A missed detection or excessive update age produces COASTING. Cached estimates are visibly aged and faded; prediction is bounded and a coasting track cannot provide a new radar firing solution. After the expiry period the track is LOST, releasing its slot. A last-known plot can remain briefly before disappearing. Reacquisition must rebuild useful observations and does not silently restore a hard lock.
 
-## Allocation and player priority
+Watchpost's normal sweep is ten seconds. Freshness is 1.15 sweep periods; track expiry is at least 22 seconds or 2.2 sweep periods; plot expiry is at least 32 seconds or 3.2 sweep periods. Actual failed sweeps mark coasting immediately. Radar outage removes radar support while preserving recent last-known plots.
 
-Existing locked tracks and tracks with any live friendly missile engagement are protected from priority replacement. Protection lasts through an active engagement (including independent seeker flight) but does not override real track loss, expiry, radar outage or tracking-range limits.
+## Allocation
 
-Remaining slots sort by explicit player priority (most recent request first), incoming missiles, then closest aircraft, using measured range and contact ID for deterministic ties. Player requests override ordinary automatic ordering. No friendly aircraft are currently spawned.
+Allocation order is protected support/locks, incoming missiles, player-prioritized contacts, then nearest eligible aircraft. PRIORITIZE never displaces a protected engagement or higher-priority incoming missile. Protection does not prevent expiry, loss of visibility to the sensor or sensor failure. Autonomous missile seekers do not need a protected battery track.
 
-PRIORITIZE marks the selected contact and replaces the lowest-ranked unprotected track if needed. CLEAR PRIORITY removes that override and returns the contact to normal automatic ranking; it does not manually disable automatic tracking. If every allocated track is protected, the request is refused with ALL TRACKS PROTECTED / NO SLOT. Stale untracked contacts must be detected again before acquiring a new track slot. Contacts beyond tracking range can still be detected but cannot be prioritized into a track.
+There is no TRACK button. An explicit LOCK/UNLOCK action changes fire-control support. Changing selection does not unlock another contact. Lock loss reports the affected supporting engagement. Identity-colored icons remain inside the track/lock geometry; radar locks use solid circles/star markers, tracks dotted/dashed circles, IR seeker locks distinct brackets. Stale/lost labels also distinguish status without color alone.
 
-Destroyed or expired tracks immediately free capacity for the next eligible detection. Player priority preferences remain with a surviving contact for reacquisition. Slot allocation consumes no datalink channels and never establishes LOCK.
+## Separate resources
 
-## Missed detections and expiry
+Watchpost provides five track slots, two illumination-target channels and two active midcourse-missile channels. Tracking alone consumes no guidance channel.
 
-A failed beam pass immediately marks STALE; without an explicit failed pass, age above 1.15 sweep periods also marks STALE. A small S appears by stale scope plots and the selected readout shows LAST SEEN age. Predictions stop at the first missed pass or freshness deadline, whichever is earlier. Stale assigned tracks retain their cached detail, explicitly labeled stale; new launches and ground guidance updates require a fresh track. Hard locks break when their track becomes stale.
+Semi-active missiles sharing one illuminated target share that illumination channel. The independent support cap is six missiles. Launches still require a ready compatible selected launcher and remaining ammunition.
 
-Track expiry is max(22 seconds, 2.2 sweep periods). Old detection plots remain until max(32 seconds, 3.2 sweep periods), as untracked stale contacts with masked detail. Radar outage drops assigned tracks/locks but leaves old plots temporarily visible. Reacquisition updates observations and can regain an automatic slot without silently reestablishing a hard lock.
+Active missiles each reserve a midcourse channel, including missiles fired at the same target. A temporary missed track does not silently give their reservation to another missile; recovery uses their existing reservation. Acquisition, expiry/destruction or explicit RELEASE SUPPORT frees it. The player sees a clear block when capacity is full. Basic IR uses neither pool after launch.
 
-## Datalink allocation
+## Missile states
 
-The existing channel convention is retained: one channel per supported target, shared by shots to that target. Explicit hard locks and active missiles awaiting seeker acquisition share the same battery budget. TWS tracking without a launch consumes a track slot but no datalink channel. Launching at a new active-missile target needs a free channel; launching at an already supported target shares that channel. FIRE is disabled when a requirement fails, with messages including TRACK REQUIRED, LOCK REQUIRED, OUT OF RANGE and NO DATALINK CHANNEL AVAILABLE.
+Semi-active missiles require a sufficiently accurate track and radar LOCK to launch. Continued illumination supplies guidance. Loss produces SUPPORT LOST; the missile continues toward its stored estimate during a configurable recovery period. Reestablishing support in time can recover guidance. No random direction change occurs, and unsupported missiles cannot score a guided hit.
 
-Active missiles receive updates from a valid TRACK before onboard seeker acquisition. They do not require LOCK during this phase. A lost track or power interruption removes support and frees the channel. Reacquisition can restore updates while the missile still survives, provided a channel is available; it cannot steal a channel from an existing hard lock or earlier supported target. More than four continuous seconds without guidance still loses the missile under the existing arcade model.
+Active missiles may launch from a stable track without LOCK. MIDCOURSE follows stored estimates refreshed through the reserved datalink. Losing updates leaves the last estimate; it does not automatically force early seeker activation. SEARCHING means the onboard radar is looking in its bounded acquisition area. Only actual range/FOV/LOS acquisition produces ACTIVE — TARGET ACQUIRED, independent guidance and channel release. Failure to acquire or reacquire before the configured timeout ends the missile. A manual radar lock is not silently released by seeker handoff.
 
-When an active missile acquires its target within its configured seeker range and line of sight, it becomes autonomous. It then ignores battery tracking/lock/power loss. Its midcourse allocation ends; a shared allocation remains if another missile still needs updates to that target. Missile destruction, target destruction and expired guidance also release allocations. An explicitly selected hard lock remains until the player releases it or loses radar support, even after the active missile becomes autonomous. This avoids silently changing the player's selected radar mode. Radar missile labels show DATALINK, ACTIVE or LINK LOST.
+IR missiles acquire their own passive seeker lock before launch. Radar cues the seeker; a battery IRST is not required. Terrain, aspect, heat strength, seeker range/cone and flares affect acquisition. IR can guide after battery tracking, locking or power is lost. Seeker loss removes the confirmed guidance line and allows a limited search; it cannot see every contact on the map. All three families use the equipped profile and L1–L3 inventory.
 
-Semi-active guidance requires a maintained hard lock throughout flight. Releasing LOCK can leave the target in TRACK but immediately interrupts semi-active guidance. Reestablishing the lock before the projectile is lost can restore guidance. Semi-active flight labels show SARH or LOCK LOST.
+Guidance lines are limited to selected engagements and can be hidden: solid battery-to-missile for supported semi-active flight, dotted battery-to-missile for active updates, solid missile-to-target only for acquired active/IR seekers. No confirmed target line is shown during search or support loss. These are status indicators, not literal radio-beam geometry.
 
-## Equipment and AI
+## Warnings and scope
 
-The supplied MIM-301 Rampart and FIM-352 Stonebolt profiles remain semi-active, as originally specified. No new missile or research purchase was invented for this update. Active behavior applies to profiles with `guidance=RADAR` and `radarMode=ACTIVE`; `seekerKm` defines acquisition distance. Tests exercise active profiles through the existing validated equipment configuration. Guidance labels on the UI use the selected profile rather than a hard-coded semi-active label.
+TWS allocation never generates a special tracking warning, including when a legacy trackingCue configuration is present. Pilot warning profiles independently specify search-radar, fire-control, active-radar and optical/visual warning capabilities. Emission/visibility checks, probability and reaction delays determine delivery. Search presence can alert without forcing evasive action; incompatible receivers cannot read hidden player commands.
 
-Automatic track acquisition and LOCK produce distinct PilotAI warning events. Silent TRACK is hidden by default; when `ai.trackingCue=true`, it can produce only a TRACK warning. Explicit hard locking produces LOCK, while an active TWS launch produces LAUNCH without implicitly producing LOCK. Datalink allocation or seeker handoff never creates a hard-lock warning.
-
-## Checks
-
-AutoTrackingTest covers the three-tracks/six-contacts case, masked untracked detail, snapshot-only prediction, missile/manual priority, protected lock/engagement replacement, destruction/expiry refill, stale freeze/reacquisition, sweep-only observations and zoom-independent detection. AutoTrackingRenderCheck exercises the actual Canvas output and touch targets, stale feedback and disabled FIRE. TrackingTest covers automatic track support, active firing beyond hard-lock range, shared channel limits, blocked-launch ammunition conservation, multiple missiles sharing a target, seeker handoff and independence, track/power loss, channel recovery without stealing a lock, guidance expiry, manual-lock preservation, semi-active interruption/recovery, state loss and separate AI cues. A simulated active TWS engagement acquires its seeker and intercepts geometrically. Existing equipment/economy/tech-tree/AI suites and ten full seeded missions pass. Desktop renders check the three states, identity colors, guide and feedback. APK signing/build is verified; physical Android installation/touch and balance playtesting remain unverified.
+The stock Watchpost has no IRST, so independent IRST search and unknown-range IRST-only plots remain future equipment work. Optional semi-active retargeting and overflow eviction are disabled. This build is an arcade game abstraction, not an operational simulation.

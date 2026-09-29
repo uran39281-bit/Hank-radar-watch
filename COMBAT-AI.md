@@ -1,4 +1,4 @@
-# Battery damage and pilot behavior — v0.10
+# Battery damage and pilot behavior — v0.17
 
 Implements the supplied `Update-Guide-v0.10.txt` and `AI-Decision-Flow.mmd`. These are simplified fictional game rules. Existing player equipment, research, Dollars/BP, terminal-green interface, launcher artwork and menu music remain.
 
@@ -47,17 +47,13 @@ Missing the overhead opportunity aborts the pass. The pilot turns away, then cir
 
 ## Awareness and decisions
 
-Each spawned pilot receives Smart Level 1–5. TRACK, LOCK and LAUNCH are separate queued cues, with recognition probability and delayed delivery. Silent tracking is hidden by default (`ai.trackingCue=false`); enabling this option represents a detectable tracking cue. An undetectable cue never reaches the decision logic. IR launches have no automatic radar warning; the dormant IR engine can deliver a close visual cue for compatible future batteries.
+Each spawned pilot receives Smart Level 1–5 and a separate fictional warning-equipment fit. The fit is a game profile, not a claim about real aircraft. `PilotAI.WarningProfile` independently enables search radar, fire-control, active missile radar, optical missile warning and visual observation. No-warning profiles cannot react to hidden actions. `assign(..., profile)` allows scenario overrides; the default array assigns fits by aircraft type.
 
-| Smart Level | Track recognition* | Lock recognition | Launch recognition | Base reaction seconds |
-| --- | ---: | ---: | ---: | ---: |
-| 1 Rookie | 5% | 28% | 35% | 5.0 |
-| 2 Basic | 15% | 50% | 60% | 3.8 |
-| 3 Trained | 30% | 76% | 82% | 2.5 |
-| 4 Veteran | 55% | 91% | 94% | 1.4 |
-| 5 Elite | 75% | 97% | 99% | 0.7 |
+TWS tracking produces no warning, even if an old configuration still includes `ai.trackingCue=true`. Suitable search emissions can produce SEARCH and raise awareness to ALERTED after a delay, without forcing a maneuver. Compatible fire-control receivers can receive LOCK. Nearby transmitting active seekers can produce ACTIVE_SEEKER when range/LOS permits. Launches alone do not universally signal radar warnings; optical/visual fits require an observable launch or missile within their fictional range. Passive IR acquisition produces no warning.
 
-*Only when a detectable tracking cue is configured. Base delay is multiplied by 1.2 for TRACK, 1 for LOCK, 0.8 for LAUNCH, with 0.85–1.15 random timing variation. There are at most six queued cues per pilot.
+Recognition remains probabilistic and delayed; at most six cues can be pending per pilot. Base delays by Smart Level are 5.0, 3.8, 2.5, 1.4 and 0.7 seconds, with ±15% variation. SEARCH uses a 1.2 delay multiplier; LAUNCH/ACTIVE_SEEKER use 0.8. SEARCH recognition runs from 20% to 94%, LOCK 28% to 97%, LAUNCH 35% to 99%, and ACTIVE_SEEKER 30% to 99% across the five levels. Awareness progresses from UNAWARE through ALERTED to DEFENSIVE when an actual defensive maneuver is chosen. A recognized lock does not guarantee an abort or panic.
+
+IR seeker visibility can be adjusted through `setConditions(thermalContrast, visibility)`. The default factors are 1.0; reduced contrast smoothly reduces sensing and zero visibility blocks it. Watchpost has no IRST. An optional sensor-model `observeIrst` API produces same-contact bearing/elevation with unknown range; there is no standalone IRST search UI in this build.
 
 Rookies tend to continue; higher levels increasingly consider evasive turns, a tangential notch attempt, abort or retreat. A notch only intermittently breaks radar guidance after the aircraft actually turns roughly perpendicular to the radar bearing. Missiles retain motion and can reacquire; no maneuver guarantees survival. The supplied launch branch is implemented as a Smart-weighted decision, including missed/late warnings and occasional continuation, as required by the written guide.
 

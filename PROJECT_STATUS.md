@@ -1,4 +1,18 @@
-# Project status — v0.16
+# Project status — v0.17
+
+Repository: uran39281-bit/Hank-radar-watch. Work branch radar-rebuild-v0.17; main preserves v0.16. Package com.jb.radar; versionCode 17 / versionName 0.17.0; title AIR DEFENSE. Deliverable artifacts/Air-Defense-v0.17.apk.
+
+Approved update: retain v0.16 menus/intro/economy and rebuild sensor/missile systems from the supplied design notes, retained in REBUILD-NOTES.md. See Update-Guide-v0.17.txt, TRACKING.md and EQUIPMENT.md for current behavior and fictional balance. Existing preference keys and signing identity are retained. Never publish the private signing key or password.
+
+Sources: Game.java owns radar quality/state allocation and radar missile support/seeker states. Equipment.java validates separate effective/absolute envelopes, capacities and seeker/recovery parameters. Infrared.java owns radar-cued missile seeker acquisition and independent flight. PilotAI.java separates warning fits, delivered cues and delayed decisions. MainActivity/MissionScene expose four own loadouts, statuses, independent capacity counts and selected guidance lines. TechTree grants free Sentinel/Ember prototype access without resetting paid Stonebolt progress or balances.
+
+Important scope: no new nation/mission. Watchpost has no IRST, so standalone passive IRST search/unknown-range-only plots remain future work. Optional retargeting and forced overflow are disabled. Values are fictional game balance. Preserve older APKs/docs as historical references, not current rules. The active mission does not persist across process death; economy/research/equipment do.
+
+Validation: 14 pure Java assertion suites and 10 seeded complete missions passed. RebuildUIRenderCheck, MissionMenuCheck and IntroRenderCheck passed against the actual Canvas/lifecycle code with desktop Android stubs. Rendered loadout, tree, radar states and support/IR screens were inspected. APK validated: v2/v3 signature with the original certificate, versionCode17/0.17.0, all bundled assets exact. APK SHA256 7f4cf6f4f25f1568665dc8dbbd418ff7ae2e769b9663ef5a7463140142f92f1a (4,641,756 bytes). Real-phone installation, audio, touch/performance and human balance playtesting are unavailable in this environment.
+
+## Previous implementation history
+
+### v0.16 history
 
 Repository: uran39281-bit/Hank-radar-watch. Android package com.jb.radar; versionCode 16 / versionName 0.16.0; title AIR DEFENSE. APK: artifacts/Air-Defense-v0.16.apk.
 

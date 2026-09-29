@@ -11,3 +11,7 @@ Android Back and visible Back controls return through loadout → missions → m
 Visuals use a native 1280x720 design canvas fitted to landscape safe insets: quiet grid, radar circles/ticks, drifting sweep/scan line, green chamfered borders, white type, separate cards without images, large STORE and LOADOUT controls. Existing main-menu title AIR DEFENSE is retained. No threat names, schedules or enemy roster are revealed.
 
 MissionMenuCheck drives actual touch hit targets and verifies disabled cards, store and owned-loadout selection, parent return paths, background behavior, no early combat, intro-to-game deployment, resume/restart, and save-failure rollback/retry. IntroRenderCheck and TechTreeRenderCheck pass. Screens were visually reviewed and signed APK assets checked. Real Android installation/touch testing remains unavailable.
+
+## v0.17 loadout expansion
+
+The same navigation now presents four missile cards in a 2×2 grid. Sentinel (active radar) and Ember (IR) are free prototype options; Stonebolt retains paid research. All four use the same generic launchers/ammunition and preserve the intro gate. Equipment browsing shows only the four player profiles, never the enemy roster.

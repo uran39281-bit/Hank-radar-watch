@@ -1,14 +1,22 @@
-# AIR DEFENSE 0.16 — Automatic radar tracking
+# AIR DEFENSE 0.17 — Sensor and guidance rebuild
 
-Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 16. No network/account permissions. Signed with the existing development certificate for in-place updates.
+Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 17. No network/account permissions. Signed with the existing development certificate for in-place updates.
 
 ## Download
 
-[Air-Defense-v0.16.apk](artifacts/Air-Defense-v0.16.apk)
+[Air-Defense-v0.17.apk](artifacts/Air-Defense-v0.17.apk)
 
 Install over the previous version to retain Dollars, BP and best score. Uninstalling or clearing app data removes local progress. Existing mission progress does not resume after process termination.
 
-## New in 0.16
+## New in 0.17
+
+Built on the existing game using [REBUILD-NOTES.md](REBUILD-NOTES.md). Tracks now acquire a motion estimate before becoming stable, then coast and expire after lost contact. Radar illumination and active-missile midcourse channels are separate resources. Semi-active support can recover within a short window; active seekers distinguish searching from confirmed acquisition. Aircraft warnings depend on fictional receiver profiles rather than the internal target list. IR seeker locking does not require a battery IRST.
+
+The loadout now includes free prototype **MIM-303 Sentinel** (active radar) and **FIM-306 Ember** (IR) so all three guidance families can be playtested. These are initial fictional balance choices; Rampart/Stonebolt retain their supplied characteristics and Stonebolt's price. All equipped families use L1–L3 ammunition and reloads. Existing saves, menus, economy, story and music are preserved. Read [Update-Guide-v0.17.txt](Update-Guide-v0.17.txt), [TRACKING.md](TRACKING.md) and [EQUIPMENT.md](EQUIPMENT.md).
+
+Work is backed up on `radar-rebuild-v0.17`, while `main` retains v0.16. Standalone IRST search, optional retargeting and overflow eviction remain outside this first playtest build. The Watchpost has no IRST; its radar can cue an IR missile's own seeker.
+
+## New in 0.16 (historical)
 
 Radar tracking is automatic and limited by battery capacity. Incoming missiles take priority over ordinary aircraft; PRIORITIZE lets the player override automatic ordering without displacing locked or engaged tracks. TRACK is removed. Tracked targets have estimated altitude/speed/heading and snapshot-based motion prediction; untracked detections remain stationary between sweeps, show range and mask detail with `---`. Missed detections show STALE and freeze predictions before tracks expire. LOCK/FIRE remain independent and stale data cannot support a new launch or ground guidance. See [TRACKING.md](TRACKING.md).
 
@@ -62,7 +70,7 @@ Explosive-based component damage replaces the four-hit rule. BATTERY shows radar
 
 USA is the only playable research nation. ADS-201 Watchpost and MIM-301 Rampart are free Rank I starters. FIM-352 Stonebolt follows Rampart: research for 600 BP, purchase for $1,500, then EQUIP. Research uses banked BP and saves partial progress. Purchases and equip actions are separate. One equipped missile supplies L1/L2/L3 next mission. Prices are initial game balance.
 
-Watchpost: 30km detection, 24km tracking, 16km radar locking, five simultaneous tracks, two datalink channels, scan speed 1.00/10.00 (ten-second sweep), no IR capability. The previous HAWK/MIM-23/IR-6 starter loadout has been replaced. Existing hostile aircraft and missile loadouts remain.
+Watchpost: 30km detection, 24km tracking, 16km radar locking, five simultaneous tracks, two target-illumination channels, two per-missile midcourse channels, scan speed 1.00/10.00 (ten-second sweep), no battery IRST. The previous HAWK/MIM-23/IR-6 starter loadout has been replaced. Existing hostile aircraft and missile loadouts remain.
 
 | Missile | Guidance | Time | Speed | G | Mass | AOA | Thrust |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -73,9 +81,9 @@ Watchpost: 30km detection, 24km tracking, 16km radar locking, five simultaneous 
 
 ## Play
 
-Defend the site against twelve aircraft during a mission of up to ten simulation minutes. Select an automatically tracked aircraft or incoming missile; LOCK, then FIRE inside the battery's envelope. Use PRIORITIZE when a desired contact lacks a slot. Maintain the target lock until interception. Target identity is uncertain and measurements depend on scan history, range, clutter and terrain. Gray means unknown, orange uncertain enemy type, red positively identified enemy. Green friendly identification is reserved for future friendly contacts.
+Defend the site against twelve aircraft during a mission of up to ten simulation minutes. Select a detected contact. Wait for a stable track for radar shots; use PRIORITIZE to request a slot. Rampart/Stonebolt need maintained LOCK, Sentinel can fire from a stable track with a free midcourse channel, and Ember needs its own IR seeker lock. Watch the guidance state and remaining resources. Target identity is uncertain and measurements depend on scan history, range, clutter and terrain. Gray means unknown, orange uncertain enemy type, red positively identified enemy. Green friendly identification is reserved for future friendly contacts.
 
-L1/L2/L3 each hold three missiles. Nine more are in reserve; a healthy, completely empty launcher reloads in 90 simulation seconds. Damage slows reloads and radar performance. Power hits interrupt equipment; command destruction defeats the battery. Explosive charge, distance and protection determine individual component damage. Priority tracking alone uses no datalink channel; hard locks and active midcourse updates share two target channels. The selected missile's guidance, acceleration, speed, G/AOA limits and energy affect the projectile's actual flight.
+L1/L2/L3 each hold three missiles. Nine more are in reserve; a healthy, completely empty launcher reloads in 90 simulation seconds. Damage slows reloads and radar performance. Power hits interrupt equipment; command destruction defeats the battery. Explosive charge, distance and protection determine individual component damage. Automatic tracking alone uses no guidance channel. Hard locks use target-illumination channels; active missiles use independent per-missile midcourse channels until acquisition. The selected missile's guidance, acceleration, speed, G/AOA limits and energy affect the projectile's actual flight.
 
 The original supplied menu song loops in menu screens and pauses during gameplay, backgrounding and audio-focus loss. Optional beeps are enabled in the pause menu. 1x/2x/4x affects all simulation timers.
 
@@ -87,8 +95,8 @@ Aircraft interceptions earn $250 / 100 BP; incoming-missile interceptions $150 /
 
 Read [PROJECT_STATUS.md](PROJECT_STATUS.md), [EQUIPMENT.md](EQUIPMENT.md), [Mission-Guide.txt](Mission-Guide.txt) and [Update-Guide-v0.10.txt](Update-Guide-v0.10.txt) and [AI-Decision-Flow.mmd](AI-Decision-Flow.mmd). Previous update guides and APKs are retained as history. All performance values are fictional game balance, not validated operational data.
 
-Edit `assets/combat.properties` for damage/AI balance, `assets/equipment.properties` for stats and `TechTree.java` for catalog/prices. Additional supporting flight values not supplied by the creator are documented in EQUIPMENT.md. The reusable IR engine remains dormant for future compatible systems.
+Edit `assets/combat.properties` for damage/AI balance, `assets/equipment.properties` for stats and `TechTree.java` for catalog/prices. Additional supporting flight values not supplied by the creator are documented in EQUIPMENT.md. The IR seeker can now be used by equipping Ember; passive IRST search is not installed on Watchpost.
 
 Build requires Java 17 JDK, Android platform 35, build-tools 35.0.0 and zip. Set `RADAR_ANDROID_JAR`, `RADAR_BUILD_TOOLS`, `RADAR_KEYSTORE`, `RADAR_KEY_PASSWORD` and run `./build.sh`. Optional `RADAR_ECJ` selects ECJ when javac is unavailable. Signing alias: radar. Never publish the private signing key or password. A different key requires a fresh installation.
 
-Run `./test.sh` for twelve pure Java model suites and ten seeded missions. Current checks also cover explosive falloff, component failures, warning delays, bombing release/scatter, bounded learning/reset, requested stats, partial research, purchase/equip persistence, migration, failures/retries, duplicate charges, missile motion/interception, ammunition, radar limits and rewards. Desktop renders exercise the actual drawing code and preference/audio stubs. APK signature, manifest, assets and previous signing identity were verified. No Android device/emulator installation, real audio playback or human balance playtest was available.
+Run `./test.sh` for fourteen pure Java model suites and ten seeded missions. Current checks also cover explosive falloff, component failures, warning delays, bombing release/scatter, bounded learning/reset, requested stats, partial research, purchase/equip persistence, migration, failures/retries, duplicate charges, missile motion/interception, ammunition, radar limits and rewards. Desktop renders exercise the actual drawing code and preference/audio stubs. APK signature, manifest, assets and previous signing identity were verified. No Android device/emulator installation, real audio playback or human balance playtest was available.

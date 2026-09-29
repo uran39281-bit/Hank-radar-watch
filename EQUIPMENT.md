@@ -1,51 +1,65 @@
-# USA equipment — v0.12
+# USA equipment — v0.17
 
-`assets/equipment.properties` supplies runtime radar and missile values. `TechTree.java` supplies the USA research catalog, prerequisites and initial prices. The menu offers USA TECH TREE, ECONOMY / REWARDS and EQUIPMENT / STATS.
+All numbers are fictional game balance. `assets/equipment.properties` controls sensor/missile profiles; `TechTree.java` controls ownership, prerequisites and prices. Invalid values or unknown keys reject the profile as a whole and the UI reports fallback to defaults.
 
-## Starter battery
+## Watchpost
 
 | ADS-201 Watchpost | Value |
 | --- | ---: |
-| Detection range | 30 km |
-| Tracking range | 24 km |
-| Radar lock range | 16 km |
+| Effective / absolute detection | 30 / 30 km |
+| Effective / absolute tracking | 24 / 24 km |
+| Effective / absolute radar locking | 16 / 16 km |
 | Simultaneous tracks | 5 |
-| Datalink channels | 2 |
+| Illumination channels (targets) | 2 |
+| Midcourse support channels (missiles) | 2 |
+| Semi-active supported missile cap | 6 |
+| Observations to establish track | 2 |
+| Minimum track / lock quality | 0.25 / 0.30 |
 | Scan speed | 1.00 / 10.00 |
-| IR guidance / IR lock | N/A |
+| Battery IRST | Not installed |
 
-Scan rating accepts decimals from 1.00 to 10.00. A full sweep takes `11 - scanSpeed` seconds (Watchpost: ten seconds). Aircraft and incoming missiles share track slots. A detected contact can receive an automatic track if capacity and the tracking envelope permit it. Missile/player priorities, stale data, track expiry, terrain/clutter, radar damage and uncertain identification apply. Display zoom does not restrict the sensor envelope, and measurements update only on radar sweeps. Channels are allocated per locked target; multiple shots can share the target's channel. Both equipped missiles need a maintained target lock. No IR missile is included in the Watchpost loadout.
+A complete sweep takes `11 - scanSpeed` seconds. Aircraft and incoming missiles share track slots; support channels are distinct from track slots, launcher readiness and ammunition. `radar.channels` is only the legacy fallback default for the two new pools.
 
-## USA missiles
+Effective ranges express nominal quality and absolute ranges set hard outer boundaries. The stock Watchpost has no beyond-effective extension. Other configurations may extend an absolute limit; sensor quality declines toward the boundary. Terrain, clutter and radar damage still apply. Lock range cannot exceed track range and track range cannot exceed detection range. Configuration also enforces the corresponding absolute-limit order.
 
-| Characteristic | MIM-301 Rampart | FIM-352 Stonebolt |
-| --- | ---: | ---: |
-| Guidance | Radar / semi-active | Radar / semi-active |
-| Guidance time | 35 s | 40 s |
-| Maximum speed | 2,400 km/h | 2,700 km/h |
-| Maximum G | 14 | 12 |
-| Mass | 140 kg | 180 kg |
-| Maximum AOA | 12 degrees | 10 degrees |
-| Maximum thrust | 18 kN | 22 kN |
-| Research cost | Free starter | 600 BP |
-| Purchase cost | Free starter | $1,500 |
+`radar.infrared` denotes an IRST sensor, not whether the launcher can use an IR missile. Radar cueing can point Ember's own seeker without an IRST. Standalone IRST search is not supplied by this battery/build.
 
-The supplied speeds are interpreted as km/h and the thrust figures as kN, converted to N internally. Supporting values absent from the request are initial arcade balance: 5s/6s motor burns, 24km/28km flight-path caps, and the existing 13,700m ceiling. Watchpost's 16km radar lock remains the tighter launch limit. Stonebolt is faster and guides longer but has lower G/AOA and more mass; it is not better in every maneuver.
+## Player missile profiles
 
-Each weapon property is prefixed `missile.rampart.` or `missile.stonebolt.`; the existing five hostile profiles remain under `kh25`, `kh29`, `kh23`, `kh27`, `kh58`. `Game.weapon` snapshots the owned/equipped missile at mission start and each projectile retains its own profile. MissileMotion applies common thrust/mass acceleration, speed caps, finite turns, coast drag and turn energy loss. This is fictional arcade pursuit, not an operational weapon model.
+| Characteristic | Rampart | Stonebolt | Sentinel | Ember |
+| --- | ---: | ---: | ---: | ---: |
+| Full name | MIM-301 Rampart | FIM-352 Stonebolt | MIM-303 Sentinel | FIM-306 Ember |
+| Guidance | Semi-active radar | Semi-active radar | Active radar | Infrared |
+| Guidance duration | 35 s | 40 s | 40 s | 28 s |
+| Maximum speed | 2,400 km/h | 2,700 km/h | 2,600 km/h | 2,592 km/h |
+| Maximum G | 14 | 12 | 16 | 22 |
+| Mass | 140 kg | 180 kg | 160 kg | 90 kg |
+| Maximum AOA | 12° | 10° | 16° | 35° |
+| Thrust | 18 kN | 22 kN | 21 kN | 14.4 kN |
+| Motor burn | 5 s | 6 s | 6 s | 4 s |
+| Maximum flight path | 24 km | 28 km | 26 km | 12 km |
+| Minimum launch range | 0 km | 0 km | 0.8 km | 0.6 km |
+| Ceiling | 13,700 m | 13,700 m | 13,700 m | 6,000 m |
+| Seeker range | Support-dependent | Support-dependent | 8 km | 9 km |
+| Research | Free | 600 BP | Free prototype | Free prototype |
+| Purchase | Free | $1,500 | Free prototype | Free prototype |
 
-## Research and ownership
+Rampart and Stonebolt preserve the creator's specified characteristics. Additional flight parameters and the new Sentinel/Ember profiles are initial playtest choices. Their free access lets the player exercise all three guidance categories without altering saved currency. Stonebolt keeps its existing research/purchase progression.
 
-Watchpost and Rampart are free and owned for every new or migrated save. Stonebolt follows Rampart. Select its tree card, apply banked BP (partial progress allowed), buy it with Dollars after research completes, then EQUIP. Research deducts at most the remaining requirement. Purchase alone does not switch the loadout. EQUIP is free and reversible between missions; all three launchers use the chosen missile next mission. Ammunition and repairs remain free.
+The equipped missile supplies every launcher next mission. L1–L3 each hold three rounds, with nine shared reserve rounds. An empty healthy launcher reloads in 90 simulation seconds; damage changes reload performance. IR now uses this same inventory, rather than the earlier separate IR magazine. No guidance-family switching grants ammunition mid-mission.
 
-Research, ownership, loadout and currency are saved in the same preference transaction. Lifetime/mission earnings remain gross earnings, while wallet balances show spendable funds. Old `economy_*` keys and `hawk_best` remain compatible. Schema 2 adds `economy_tech_research`, `economy_tech_owned` and `economy_equipped_missile`. No historical currency is reset. A failed transaction does not change the in-memory wallet/ownership/loadout; the UI reports failure and offers retry. The existing rewards save/retry behavior is retained.
+Semi-active missiles share one illumination channel per locked target, subject to the separate six-missile support cap. Each active missile reserves its own midcourse channel even when multiple missiles share a target. Its reservation is freed on acquisition, termination, or explicit release. Basic IR consumes no illumination or midcourse channel after launch.
 
-`./test.sh` runs the pure Java suites. TechTreeTest verifies exact requested stats, starter migration, partial research, insufficient funds, duplicate prevention, save failures/retries, persistent equip state, and actual Rampart/Stonebolt interceptions. Desktop Android stubs check the tree UI and preference adapter; real-device installation/playtesting remains unverified.
+## Configuration and failure rules
 
-## Damage fields
+New radar keys: `detectionAbsoluteKm`, `trackingAbsoluteKm`, `lockAbsoluteKm`, `illuminationChannels`, `midcourseChannels`, `supportedMissiles`, `acquireObservations`, `trackQualityMinimum`, `lockQualityMinimum` (all prefixed `radar.`).
 
-Missiles now expose `.explosiveKg` and `.blastRadiusKm` separately from `.massKg`. Hostile warheads use the component damage model; changing total mass never changes explosive content. Radar and other component damage can reduce the healthy performance values above. See [COMBAT-AI.md](COMBAT-AI.md) for defaults and effects.
+New weapon keys: `supportRecoverySeconds` (default 4), `seekerSearchSeconds` (6), `seekerFovDeg` (60), `earlyActivation` (false), `retargeting` (false), prefixed `missile.<id>.`. Existing `seekerKm`, guidance time and physical flight limits remain separate. Optional retargeting is not enabled by this build; switching selected contacts or locks never silently redirects an in-flight missile. Overflow launch eviction is not implemented; insufficient support blocks FIRE.
 
-## Tracking support
+MissileMotion applies thrust/mass acceleration, speed limits, finite turns, coast drag and turn energy loss. Support loss uses stored estimates rather than random steering. Seeker search has finite range, field of view and timeout. A successful seeker search, not merely activation, produces the acquired indication. Charge (`explosiveKg`) and blast radius remain separate from total mass.
 
-Active radar profiles can fire from a fresh automatic track and consume a per-target datalink allocation until their seeker acquires. Explicit hard locks share that budget. Semi-active Rampart and Stonebolt still need LOCK. See [TRACKING.md](TRACKING.md) for symbols, support loss/recovery and handoff behavior.
+## Save compatibility
+
+Existing Dollars, BP, lifetime earnings, partial Stonebolt research, ownership, selected missile and best score are preserved. Normalization adds the new free prototype nodes without resetting earned funds. Research, purchase and equip remain separate atomic transactions; save failure leaves the previous state and offers retry. Purchase/equip remains unavailable during an active mission. Schema/key compatibility is unchanged.
+
+Build/install with the original certificate to update in place. Uninstalling or clearing app data deletes local progress. Real-device playtesting is still required.

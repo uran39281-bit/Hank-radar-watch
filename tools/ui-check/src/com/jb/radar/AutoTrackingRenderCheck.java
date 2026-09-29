@@ -1,5 +1,7 @@
 package com.jb.radar;
 import android.graphics.*;import android.view.MotionEvent;import java.util.*;import java.io.File;import javax.imageio.ImageIO;
+/** Historical v0.16 preview harness. First-observation lock assertions are superseded
+ * by RebuildUIRenderCheck; do not include this in current verification runs. */
 public class AutoTrackingRenderCheck {
  static void ok(boolean b,String m){if(!b)throw new AssertionError(m);}
  static class Recording extends Canvas {ArrayList<String> labels=new ArrayList<>();public void drawText(String s,float x,float y,Paint p){labels.add(s);super.drawText(s,x,y,p);}}
