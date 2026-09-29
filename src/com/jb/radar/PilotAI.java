@@ -49,7 +49,7 @@ public final class PilotAI {
  public void visualWarning(Game.Contact t,Game.Missile m){Pilot p=t==null?null:t.pilot;if(p==null||!t.alive||game.elapsed-p.lastVisual<5)return;double reach=p.warnings.missileWarning?10:p.warnings.visual?3.5:0;if(reach<=0||Math.sqrt(Math.pow(t.x-m.x,2)+Math.pow(t.y-m.y,2)+Math.pow(t.alt/1000-m.z,2))>reach||!game.ir.lineOfSight(m.x,m.y,m.z,t))return;p.lastVisual=game.elapsed;warn(t,Warning.LAUNCH,true);}
  Memory memory(Pilot p){return game.rules.sharedMemory?side:p.memory;}
  public double caution(Pilot p){Memory m=memory(p);double samples=m.early+m.late;return (p.smart-1)/4.0*(.18*Math.min(1,samples/8)*m.early/Math.max(1,samples)+.07*Math.min(1,m.repeated/5.0)+.06*Math.min(1,m.failedRuns/5.0));}
- public double[] weights(Pilot p,Warning warning){boolean launch=warning==Warning.LAUNCH||warning==Warning.ACTIVE_SEEKER;double l=p.smart,c=caution(p);double[] w=launch?new double[]{1.2-.19*l,.2+.14*l,l>=3?.1+.08*l:.025,.06+.05*l+c,p.health<50?.35:.015}:new double[]{1.6-.15*l,.04*l,l>=3?.03*l:.01,.04*l+c,p.health<50?.20:.005};
+ public double[] weights(Pilot p,Warning warning){boolean launch=warning==Warning.LAUNCH||warning==Warning.ACTIVE_SEEKER;double l=p.smart,c=caution(p);double[] w=launch?new double[]{1.2-.19*l,.2+.14*l,l>=3?.1+.08*l:0,.06+.05*l+c,p.health<50?.35:.015}:new double[]{1.6-.15*l,.04*l,l>=3?.03*l:0,.04*l+c,p.health<50?.20:.005};
   Memory m=memory(p);for(int i=0;i<w.length;i++){double samples=m.success[i]+m.failure[i],learn=(p.smart-1)/4.0*Math.min(.18,samples*.015);double rate=(m.success[i]+1.0)/(samples+2);w[i]*=1+learn*2*(rate-.5);}return w;
  }
  Action choose(Pilot p,Warning warning){double[] w=weights(p,warning);double sum=0;for(double x:w)sum+=x;double pick=game.random.nextDouble()*sum;for(int i=0;i<w.length;i++){pick-=w[i];if(pick<=0)return Action.values()[i];}return Action.CONTINUE;}
@@ -76,7 +76,7 @@ public final class PilotAI {
   switch(p.state){case RETREAT:case EXIT:case ABORT:return Game.angle(t.x,t.y);case REPOSITION:return Game.angle(p.wayX-t.x,p.wayY-t.y);case NOTCH:return Game.angle(t.x,t.y)+t.side*Math.PI/2;case EVADE:return inbound+t.side*1.45;default:return inbound;}
  }
  public boolean defensive(Game.Contact t){return t.pilot!=null&&(t.pilot.state==State.NOTCH||t.pilot.state==State.EVADE);}
- public boolean notchBreak(Game.Contact t){return t.pilot!=null&&t.pilot.state==State.NOTCH&&Math.abs(Math.cos(Game.delta(t.heading,Game.angle(t.x,t.y))))<.25&&(game.elapsed+t.id)%2.7<1.5;}
+ public boolean notchBreak(Game.Contact t){return t.pilot!=null&&t.pilot.smart>=3&&t.pilot.state==State.NOTCH&&Math.abs(Math.cos(Game.delta(t.heading,Game.angle(t.x,t.y))))<.25&&(game.elapsed+t.id)%2.7<1.5;}
  public boolean canBomb(Game.Contact t){Pilot p=t.pilot;return t.alive&&p!=null&&p.health>30&&p.bombs>0&&p.state==State.APPROACH&&t.range()<=game.rules.releaseKm;}
  public void released(Game.Contact t,int count){Pilot p=t.pilot;p.pendingBombs+=count;p.bombs-=count;p.state=State.EXIT;p.passes++;p.bombDamage=0;p.cues.clear();}
  public void bombOutcome(Game.Contact t,double damage){Pilot p=t.pilot;if(p==null||p.pendingBombs<=0)return;p.bombDamage+=damage;if(game.finished)p.pendingBombs=1;if(--p.pendingBombs==0){boolean hit=p.bombDamage>0;p.memory.bomb(hit);if(game.rules.sharedMemory)side.bomb(hit);bombRuns++;if(hit)damagingRuns++;}}

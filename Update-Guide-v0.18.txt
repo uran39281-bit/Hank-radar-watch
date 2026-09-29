@@ -1,0 +1,25 @@
+AIR DEFENSE v0.18 — easier Mission 1
+
+BEFORE THE DAWN now uses Rookie / Smart Level 1 for every aircraft.
+Previously the mission randomly assigned Smart Levels 1 through 5.
+
+Rookie behavior:
+- Lower warning recognition: 28% for a compatible radar-lock warning.
+- Slower reaction: approximately 5 seconds to a recognized radar lock, with timing variation.
+- More likely to continue an attack pass and less likely to evade.
+- No advanced notch maneuver or notch-related guidance break below Smart Level 3.
+- Rookie approaches stay at least 1,800 m above local terrain and skip low evasive dives.
+- No learned increase in caution at Smart Level 1.
+
+Fixed a separate collision bug: radar missiles previously detonated as a weak graze while
+still approaching an aircraft, before they could reach direct-hit distance. Graze damage now
+occurs only after closest approach. Direct hits can destroy moving, piloted aircraft normally.
+
+Aircraft and missiles retain their existing physical characteristics. Radar, player weapons,
+ammunition, mission roster, rewards, research and saves are unchanged.
+Stronger AI remains available for later missions. Developers can adjust mission1.smartLevel
+from 1 through 5 in assets/combat.properties before rebuilding.
+
+Install over v0.17 to preserve local progress. Restart Mission 1 to use the new rookie profile.
+Model tests check assignment, warning delays and meaningful engagement behavior.
+Final difficulty still needs player feedback on a real phone.

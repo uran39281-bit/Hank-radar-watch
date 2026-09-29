@@ -1,12 +1,16 @@
-# AIR DEFENSE 0.17 — Sensor and guidance rebuild
+# AIR DEFENSE 0.18 — Mission 1 rookie difficulty
 
-Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 17. No network/account permissions. Signed with the existing development certificate for in-place updates.
+Offline Android radar-defense game in terminal green, based on the creator's sketch and mission guides. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 18. No network/account permissions. Signed with the existing development certificate for in-place updates.
 
 ## Download
 
-[Air-Defense-v0.17.apk](artifacts/Air-Defense-v0.17.apk)
+[Air-Defense-v0.18.apk](artifacts/Air-Defense-v0.18.apk)
 
 Install over the previous version to retain Dollars, BP and best score. Uninstalling or clearing app data removes local progress. Existing mission progress does not resume after process termination.
+
+## New in 0.18
+
+BEFORE THE DAWN now spawns only **Smart Level 1 / Rookie** pilots instead of random levels 1–5. Rookies recognize fewer warnings, react more slowly, favor continuing their approach and cannot perform the advanced notch maneuver. Rookies also avoid terrain-hugging approaches and low evasive dives. Fixed premature missile graze explosions so direct hits can reach and destroy moving aircraft. Smarter profiles remain available for future missions. `mission1.smartLevel=1` in `assets/combat.properties` sets the mission profile. Player missile stats, sensor limits, economy and saves are unchanged.
 
 ## New in 0.17
 
@@ -99,4 +103,4 @@ Edit `assets/combat.properties` for damage/AI balance, `assets/equipment.propert
 
 Build requires Java 17 JDK, Android platform 35, build-tools 35.0.0 and zip. Set `RADAR_ANDROID_JAR`, `RADAR_BUILD_TOOLS`, `RADAR_KEYSTORE`, `RADAR_KEY_PASSWORD` and run `./build.sh`. Optional `RADAR_ECJ` selects ECJ when javac is unavailable. Signing alias: radar. Never publish the private signing key or password. A different key requires a fresh installation.
 
-Run `./test.sh` for fourteen pure Java model suites and ten seeded missions. Current checks also cover explosive falloff, component failures, warning delays, bombing release/scatter, bounded learning/reset, requested stats, partial research, purchase/equip persistence, migration, failures/retries, duplicate charges, missile motion/interception, ammunition, radar limits and rewards. Desktop renders exercise the actual drawing code and preference/audio stubs. APK signature, manifest, assets and previous signing identity were verified. No Android device/emulator installation, real audio playback or human balance playtest was available.
+Run `./test.sh` for fifteen pure Java model suites and ten seeded missions. Current checks also cover explosive falloff, component failures, warning delays, bombing release/scatter, bounded learning/reset, requested stats, partial research, purchase/equip persistence, migration, failures/retries, duplicate charges, missile motion/interception, ammunition, radar limits and rewards. Desktop renders exercise the actual drawing code and preference/audio stubs. APK signature, manifest, assets and previous signing identity were verified. No Android device/emulator installation, real audio playback or human balance playtest was available.

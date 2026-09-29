@@ -8,6 +8,6 @@ if [ -n "${RADAR_ECJ:-}" ]; then
 else
  javac --release 8 -d build/test "${sources[@]}"
 fi
-for test in GameTest InfraredTest InterceptionTest UpdateTest EconomyTest EquipmentTest TechTreeTest DamageTest AIBehaviorTest TrackingTest AutoTrackingTest RebuildTest WarningProfileTest IntroTest MissionSmoke; do
+for test in GameTest InfraredTest InterceptionTest UpdateTest EconomyTest EquipmentTest TechTreeTest DamageTest AIBehaviorTest TrackingTest AutoTrackingTest RebuildTest WarningProfileTest MissionDifficultyTest IntroTest MissionSmoke; do
  java -cp build/test "com.jb.radar.$test"
 done

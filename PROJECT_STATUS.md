@@ -1,4 +1,14 @@
-# Project status — v0.17
+# Project status — v0.18
+
+Latest request: Mission 1 is too difficult; lower AI smartness. All BEFORE THE DAWN aircraft now use CombatRules.mission1SmartLevel (mission1.smartLevel=1, valid 1–5), rather than randomized levels 1–5. Rookie warning probabilities/delays and lower evasion weighting apply naturally. NOTCH action weights are zero below Smart Level 3, and notchBreak requires Smart Level 3+. Rookie approaches have a minimum 1,800 m AGL and no low evasive dive. Existing advanced profiles remain testable/configurable for future missions. Fixed premature radar-missile graze detonation: Game.passedClosest gates the near-miss branch, letting an approaching missile reach the 0.12 km direct-hit threshold instead of detonating at 0.25 km for 27–29 damage.
+
+Package com.jb.radar, versionCode 18 / versionName 0.18.0. Artifact artifacts/Air-Defense-v0.18.apk. Work continues on radar-rebuild-v0.17; main remains the earlier v0.16 backup. Existing signer and local save keys preserved. No missile performance, radar, economy or mission-roster balance changes; only AI behavior and the collision bug fix.
+
+MissionDifficultyTest checks all 12 spawns, config validation/overrides, rookie recognition/delays, notch gating and an actual moving-aircraft intercept. Validation: all 15 model suites and 10 complete mission seeds passed. Moving Rookie interceptions succeed at 25/50/100 ms steps; genuine near misses still damage without false kills. Seeded simulation totals rose from 13 to 49 kills across ten seeds (illustrative, not an isolated comparison because RNG trajectories differ). See Update-Guide-v0.18.txt. Physical Android and human balance testing remain unavailable.
+
+## Previous version history
+
+### v0.17
 
 Repository: uran39281-bit/Hank-radar-watch. Work branch radar-rebuild-v0.17; main preserves v0.16. Package com.jb.radar; versionCode 17 / versionName 0.17.0; title AIR DEFENSE. Deliverable artifacts/Air-Defense-v0.17.apk.
 

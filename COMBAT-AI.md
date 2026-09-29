@@ -1,4 +1,4 @@
-# Battery damage and pilot behavior — v0.17
+# Battery damage and pilot behavior — v0.18
 
 Implements the supplied `Update-Guide-v0.10.txt` and `AI-Decision-Flow.mmd`. These are simplified fictional game rules. Existing player equipment, research, Dollars/BP, terminal-green interface, launcher artwork and menu music remain.
 
@@ -43,11 +43,11 @@ Aircraft must enter the designated overhead circle, default 0.35km from the batt
 
 Released bombs take 2–10 simulation seconds to fall. Heading, speed, altitude and random scatter set a fixed endpoint at release; later aircraft movement cannot steer the bomb. Hits are not guaranteed. Observed releases get BOMB markers on the radar and impact rings. Bombs are not selectable radar-missile targets.
 
-Missing the overhead opportunity aborts the pass. The pilot turns away, then circles toward a 5–9km waypoint and retries. After three abandoned passes it retreats. Critically damaged aircraft (30% HP or less) immediately retreat. Existing finite aircraft turn, acceleration, speed and altitude limits apply regardless of Smart Level. Radar missile near misses can damage an aircraft and trigger this retreat; only kills pay interception rewards.
+Missing the overhead opportunity aborts the pass. The pilot turns away, then circles toward a 5–9km waypoint and retries. After three abandoned passes it retreats. Critically damaged aircraft (30% HP or less) immediately retreat. Existing finite aircraft turn, acceleration, speed and altitude limits apply regardless of Smart Level. Radar missile near misses can damage an aircraft and trigger this retreat; only kills pay interception rewards. From v0.18, the graze branch waits until the missile has passed its closest approach, so a still-approaching direct hit is not prematurely converted into a weak graze. Rookie Mission 1 approaches stay at least 1,800 m AGL and do not perform low evasive dives.
 
 ## Awareness and decisions
 
-Each spawned pilot receives Smart Level 1–5 and a separate fictional warning-equipment fit. The fit is a game profile, not a claim about real aircraft. `PilotAI.WarningProfile` independently enables search radar, fire-control, active missile radar, optical missile warning and visual observation. No-warning profiles cannot react to hidden actions. `assign(..., profile)` allows scenario overrides; the default array assigns fits by aircraft type.
+BEFORE THE DAWN now uses only Smart Level 1 / Rookie pilots (configurable via `mission1.smartLevel`, default 1). Levels 1–5 remain supported for other scenarios and tests. Each pilot has a separate fictional warning-equipment fit. The fit is a game profile, not a claim about real aircraft. `PilotAI.WarningProfile` independently enables search radar, fire-control, active missile radar, optical missile warning and visual observation. No-warning profiles cannot react to hidden actions. `assign(..., profile)` allows scenario overrides; the default array assigns fits by aircraft type.
 
 TWS tracking produces no warning, even if an old configuration still includes `ai.trackingCue=true`. Suitable search emissions can produce SEARCH and raise awareness to ALERTED after a delay, without forcing a maneuver. Compatible fire-control receivers can receive LOCK. Nearby transmitting active seekers can produce ACTIVE_SEEKER when range/LOS permits. Launches alone do not universally signal radar warnings; optical/visual fits require an observable launch or missile within their fictional range. Passive IR acquisition produces no warning.
 
@@ -55,7 +55,7 @@ Recognition remains probabilistic and delayed; at most six cues can be pending p
 
 IR seeker visibility can be adjusted through `setConditions(thermalContrast, visibility)`. The default factors are 1.0; reduced contrast smoothly reduces sensing and zero visibility blocks it. Watchpost has no IRST. An optional sensor-model `observeIrst` API produces same-contact bearing/elevation with unknown range; there is no standalone IRST search UI in this build.
 
-Rookies tend to continue; higher levels increasingly consider evasive turns, a tangential notch attempt, abort or retreat. A notch only intermittently breaks radar guidance after the aircraft actually turns roughly perpendicular to the radar bearing. Missiles retain motion and can reacquire; no maneuver guarantees survival. The supplied launch branch is implemented as a Smart-weighted decision, including missed/late warnings and occasional continuation, as required by the written guide.
+Rookies tend to continue; higher levels increasingly consider evasive turns, a tangential notch attempt, abort or retreat. NOTCH decisions and notch effects require Smart Level 3 or above. A notch only intermittently breaks radar guidance after the aircraft actually turns roughly perpendicular to the radar bearing. Missiles retain motion and can reacquire; no maneuver guarantees survival. The supplied launch branch is implemented as a Smart-weighted decision, including missed/late warnings and occasional continuation, as required by the written guide.
 
 ## Bounded learning
 
