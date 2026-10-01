@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Radar Watch Development
+Signer #1 certificate SHA-256 digest: 874917652661ca6ebb3edc445a53d9046150ddfc9ead5d389047793a596007e2
+Signer #1 certificate SHA-1 digest: 36edf0a9e30a3874a3daf52ed84b4e169af54830
+Signer #1 certificate MD5 digest: 88ca8af27a20584f7ef14a7b5d25659b
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 2048
+Signer #1 public key SHA-256 digest: 24071eeb8abd73f65401bdcd1eedbb2df2577d9338b263db906b78ce44feeaa7
+Signer #1 public key SHA-1 digest: e502f6cfd30573ec988cf82d9a46c60dd57a5bd3
+Signer #1 public key MD5 digest: 7bb000b86d4f3294bf08740644795ecd

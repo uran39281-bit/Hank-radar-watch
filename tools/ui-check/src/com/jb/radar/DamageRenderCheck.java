@@ -1,0 +1,6 @@
+package com.jb.radar;
+public class DamageRenderCheck {
+ public static void main(String[] args)throws Exception{
+  MainActivity a=new MainActivity();a.onCreate(null);MainActivity.Radar v=a.view;TechTreeRenderCheck.ok(!v.profileFallback,"both configuration assets loaded");v.act("start");v.game.battery.parts[Battery.RADAR].hp=58;v.game.battery.parts[Battery.L1].hp=0;v.game.battery.parts[Battery.L2].hp=45;v.game.launchers[1].ammo=0;v.game.launchers[1].reload=90;v.game.reserve=6;v.game.reserved=3;v.game.battery.parts[Battery.POWER].hp=52;v.game.battery.outageUntil=5;v.game.battery.parts[Battery.COMMAND].hp=68;v.game.syncBattery();v.act("status");TechTreeRenderCheck.ok(v.paused&&v.statusOpen,"battery opens and pauses");TechTreeRenderCheck.draw(v,"battery-v010");v.act("start");TechTreeRenderCheck.ok(!v.paused&&!v.statusOpen,"resume works");TechTreeRenderCheck.draw(v,"gameplay-v010");v.act("help");TechTreeRenderCheck.draw(v,"guide-v010");v.act("start");v.game.finish(false);TechTreeRenderCheck.draw(v,"debrief-v010");v.act("menu");TechTreeRenderCheck.ok(!v.statusOpen&&!v.started,"return to menu");a.onDestroy();System.out.println("PASS: component status, pause/resume/menu and damage/debrief layouts");
+ }
+}

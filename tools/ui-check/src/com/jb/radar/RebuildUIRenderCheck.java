@@ -1,5 +1,6 @@
 package com.jb.radar;
 import android.graphics.*;import android.view.MotionEvent;import java.util.*;import java.io.File;import javax.imageio.ImageIO;
+/** Historical v0.17 shared-layout predecessor; use ReferenceUIRenderCheck for v0.19. */
 public class RebuildUIRenderCheck {
  static void ok(boolean b,String m){if(!b)throw new AssertionError(m);}
  static class Recording extends Canvas {ArrayList<String> labels=new ArrayList<>();int lines;public void drawText(String s,float x,float y,Paint p){labels.add(s);super.drawText(s,x,y,p);}public void drawLine(float x,float y,float xx,float yy,Paint p){lines++;super.drawLine(x,y,xx,yy,p);}}

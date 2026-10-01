@@ -1,0 +1,55 @@
+----------
+1. WARNING in /workspace/scratch/5f5ba1bbd966/radar/tests/IntroTest.java (at line 4)
+	public static void main(String[] args){IntroSequence s=new IntroSequence();ok(s.SECTIONS.length==12,"12 exact sections");ok(Math.abs(s.ends[11]-75.64)<1e-8,"ZIP runtime 75.64 seconds");s.start();ok(s.section()==0&&s.visible()==0,"blank preroll");s.advance(.299);ok(s.visible()==0,"300ms pre-section pause");s.advance(.1);ok(s.visible()>0,"typing begins");double t=s.elapsed;s.paused=true;s.advance(300);s.sync(40);ok(s.elapsed==t,"pause holds clock");s.paused=false;s.advance(2);ok(s.elapsed==t+2,"resume continues");
+	                                                                                ^^^^^^^^
+The static field IntroSequence.SECTIONS should be accessed in a static way
+----------
+2. WARNING in /workspace/scratch/5f5ba1bbd966/radar/tests/IntroTest.java (at line 5)
+	for(int n=0;n<12;n++){s.elapsed=s.reveal[n][s.reveal[n].length-1]+.001;ok(s.section()==n&&s.visible()==s.SECTIONS[n].length(),"full story revealed "+n);double hold=s.ends[n]-s.reveal[n][s.reveal[n].length-1]-IntroSequence.delay(s.SECTIONS[n].charAt(s.SECTIONS[n].length()-1));ok(Math.abs(hold-(n==0?1.8:n==11?2.8:2.1))<1e-8,"complete hold "+n);}
+	                                                                                                         ^^^^^^^^
+The static field IntroSequence.SECTIONS should be accessed in a static way
+----------
+3. WARNING in /workspace/scratch/5f5ba1bbd966/radar/tests/IntroTest.java (at line 5)
+	for(int n=0;n<12;n++){s.elapsed=s.reveal[n][s.reveal[n].length-1]+.001;ok(s.section()==n&&s.visible()==s.SECTIONS[n].length(),"full story revealed "+n);double hold=s.ends[n]-s.reveal[n][s.reveal[n].length-1]-IntroSequence.delay(s.SECTIONS[n].charAt(s.SECTIONS[n].length()-1));ok(Math.abs(hold-(n==0?1.8:n==11?2.8:2.1))<1e-8,"complete hold "+n);}
+	                                                                                                                                                                                                                                      ^^^^^^^^
+The static field IntroSequence.SECTIONS should be accessed in a static way
+----------
+4. WARNING in /workspace/scratch/5f5ba1bbd966/radar/tests/IntroTest.java (at line 5)
+	for(int n=0;n<12;n++){s.elapsed=s.reveal[n][s.reveal[n].length-1]+.001;ok(s.section()==n&&s.visible()==s.SECTIONS[n].length(),"full story revealed "+n);double hold=s.ends[n]-s.reveal[n][s.reveal[n].length-1]-IntroSequence.delay(s.SECTIONS[n].charAt(s.SECTIONS[n].length()-1));ok(Math.abs(hold-(n==0?1.8:n==11?2.8:2.1))<1e-8,"complete hold "+n);}
+	                                                                                                                                                                                                                                                           ^^^^^^^^
+The static field IntroSequence.SECTIONS should be accessed in a static way
+----------
+----------
+5. WARNING in /workspace/scratch/5f5ba1bbd966/radar/tests/RebuildTest.java (at line 6)
+	static class Certain extends Random {public double nextDouble(){return 0;}public double nextGaussian(){return 0;}}
+	             ^^^^^^^
+The serializable class Certain does not declare a static final serialVersionUID field of type long
+----------
+5 problems (5 warnings)
+PASS: inventory, shared channels, reload restrictions and timing, range/ceiling, coasting, terrain, acceleration, guidance loss, geometric interception, uncertainty, mission ending, restart
+PASS: IR acquisition, passive lock, aspect, terrain, ceiling, independent flight, flare distraction, reload, pause, timeout and reset
+PASS: five missile intercepts, channels, cycling, ID transitions and command defeat
+PASS: track/lock, cycling, range damage, launch timing, guidance loss and component defeat
+PASS: combat/victory rewards, defeat/withdrawal, persistence/recovery, duplicate protection, failed-write retry, radar+IR payouts and overflow
+PASS: profile loading/validation, radar envelopes/capacity/channels/scan speed, IR compatibility, mass/thrust/speed/G/AOA/energy, all guidance modes and friendly/enemy/IR timeouts
+PASS: exact USA stats, free starters, partial research, purchases, loadout, real interceptions, migration, retries and duplicate/insufficient-funds protection
+PASS: explosive kg, falloff, protection, component isolation, power outages, reload degradation, config validation
+PASS: silent/delayed cues, Smart levels, overhead release, flight/scatter, retreat/retry, bounded optional shared memory and reset
+PASS: shared per-missile channels, confirmed oldest overflow, SARH displacement, activation release, early fallback, acquisition timing and separate warning events
+PASS: automatic 3/6 capacity, detection-only displays, measurement prediction, missile/manual priority, protected engagements, destruction/expiry refill, stale freeze/reacquisition, scan-only updates and display zoom independence
+PASS: acquiring/stable/coasting/lost estimates, priority, shared missile channels, explicit release, support recovery, seeker FOV/acquisition/loss, hidden-truth isolation and absolute limits
+PASS: receiver profiles, delayed awareness, silent TWS/IR, physical launch cues, IR radar-cue acquisition and post-launch search, shared launchers, seeker cone/recovery, cached guidance and passive unknown range
+PASS: all twelve Mission 1 pilots are configurable rookies, lower/delayed warning recognition, no advanced novice notching, future skill preserved and moving starter-missile interception
+PASS: sensor controls/reset, detection-only isolation, track retention, timed locks, confirmed overflow, early seeker, SARH retarget, independent identification, view scale, damage curves and radar-off enemy fairness
+PASS: independent IRST switching, sampling, acquisition/capacity, unknown range, coasting/reset, visibility/terrain, LOAL dwell, first heat source, independent flight, reacquisition and radar cueing
+PASS: intro timing, all sections, pause/resume, skip/replay (ZIP duration 75.640s)
+seed=0 hits=4 shots=13 site=3
+seed=1 hits=4 shots=13 site=4
+seed=2 hits=9 shots=18 site=3
+seed=3 hits=3 shots=8 site=2
+seed=4 hits=1 shots=5 site=0
+seed=5 hits=9 shots=18 site=29
+seed=6 hits=5 shots=18 site=0
+seed=7 hits=4 shots=8 site=1
+seed=8 hits=4 shots=11 site=0
+seed=9 hits=2 shots=10 site=3

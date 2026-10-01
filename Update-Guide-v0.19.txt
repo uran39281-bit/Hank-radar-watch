@@ -1,0 +1,17 @@
+AIR DEFENSE v0.19 — RADAR CONSOLE UPDATE
+
+Source: supplied Google Doc 170pFAgDHbSvsvS7WbFxBIpvjbH0DjT8GjzXJBw4zvy4, retained as UPDATE-REFERENCE-v019.txt, and ICONS FOR RADAR.zip.
+
+Scope: implement general radar/IRST, tracking, guidance, damage and console UI rules. As requested, skip the beta-only Horizon Shield/MIM-225A equipment and replacement aircraft roster. Preserve current story, missions, USA progression, soundtrack and easier Rookie Mission 1.
+
+The new native console follows UI_guide.png: enlarged central scope, TWS list/selected missile/inventory to the left, sensor controls/selected contact/weapons to the right, and four launchers plus battle log below. Supplied canonical icons distinguish affiliation and recognition; track and hard-lock overlays remain separate. Unknown/untracked contacts show no speed, altitude or heading.
+
+Radar switching, AUTO TRACK and RESET have distinct effects. Turning AUTO TRACK off lets old tracks coast while the search radar can still detect plots. RESET clears radar measurements/tracks/locks without deleting aircraft, missiles, ammunition or passive IRST state. Lock acquisition takes time; selecting a contact never locks or identifies it.
+
+DATALINKS is a shared per-missile support pool. SARH requires maintained illumination; active radar needs a usable track for midcourse and releases its channel when its seeker activates. SEARCHING does not mean SEEKER LOCK. When full, the UI warns before an additional launch transfers the oldest supported missile's channel. That missile remains in flight: active enters early search, SARH enters its support-loss window.
+
+IRST has independent switching, update/acquisition/expiry/capacity and passive bearing-only observations when fitted. Current Watchpost still has no IRST. Its radar can cue Ember's own thermal sensor without granting an instant IR lock. IR missiles require no external channel after firing and use bounded onboard acquisition/search.
+
+Missile stats show maneuverability 1.00–10.00 with configurable conversion, warhead type and explosive content. Configurable blast/fragmentation damage supports partial damage; kinetic profiles need direct impact. Closest-approach checks preserve the fix for premature explosions before an approaching missile reaches its target.
+
+Provisional defaults and limits are documented in EQUIPMENT.md. No supplied fictional value is presented as real weapon data. Mission balance and actual phone performance still require human playtesting.

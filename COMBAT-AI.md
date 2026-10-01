@@ -1,10 +1,10 @@
-# Battery damage and pilot behavior — v0.18
+# Battery damage and pilot behavior — v0.19
 
 Implements the supplied `Update-Guide-v0.10.txt` and `AI-Decision-Flow.mmd`. These are simplified fictional game rules. Existing player equipment, research, Dollars/BP, terminal-green interface, launcher artwork and menu music remain.
 
 ## Component damage
 
-Each of six components starts with 100 HP: radar, L1, L2, L3, power and command. For each component in the blast footprint:
+Each of seven components starts with 100 HP: radar, L1, L2, L3, L4, power and command. For each component in the blast footprint:
 
 `damage = explosiveKg * damage.multiplier * max(0, 1 - distance / radius) * protection`
 
@@ -27,13 +27,13 @@ The current twelve-aircraft mission uses the first five categories. Mega-large a
 | Component | Protection | Effect |
 | --- | ---: | --- |
 | Radar | 0.65 | Health scales detection, track and lock range; lower signal quality; zero HP disables tracking/locking |
-| L1 / L2 / L3 | 0.75 | Reload work slows with damage, up to nearly 3x healthy time; destroyed launcher cannot fire or reload |
+| L1 / L2 / L3 / L4 | 0.75 | Reload work slows with damage, up to nearly 3x healthy time; destroyed launcher cannot fire or reload |
 | Power | 0.80 | A damaging hit interrupts power for 0.7–6 seconds; zero HP disables connected equipment |
 | Command | 0.55 | Damage increases minimum observation spacing from 0.25 to 4.25 seconds; zero HP defeats the battery |
 
 Lost launcher rounds are removed from inventory. A destroyed reloading launcher releases its reserve allocation; unused reserve is retained for surviving launchers. Damage is repaired free at the next mission. Opening BATTERY pauses the simulation and shows all components, reload effects, power interruptions and warnings.
 
-Hostile missiles use `missile.<id>.explosiveKg` and `.blastRadiusKm` from `equipment.properties`. Total `.massKg` still affects acceleration only. Site and nearby terrain impacts use the same component explosion calculation as bombs. Current hostile warheads are fictional balance values: Kh-25 24.5kg/0.20km, Kh-29 87.1kg/0.32km, Kh-23 and Kh-27 44.4kg/0.20km, Kh-58 87.1kg/0.32km. Existing air-target hit geometry remains an arcade collision model; the new component formula is for battery damage.
+Hostile missiles use `missile.<id>.explosiveKg` and `.blastRadiusKm` from `equipment.properties`. Total `.massKg` affects flight acceleration and the optional kinetic-impact model. Site and nearby terrain impacts use the same component explosion calculation as bombs. Current hostile warheads are fictional balance values: Kh-25 24.5kg/0.20km, Kh-29 87.1kg/0.32km, Kh-23 and Kh-27 44.4kg/0.20km, Kh-58 87.1kg/0.32km. Air-target warhead damage is separate from this battery formula. v0.19 uses explosive content, warhead type, distance falloff and target vulnerability for partial damage; kinetic profiles require direct impact. See EQUIPMENT.md for provisional coefficients.
 
 Victory still awards $500/250 BP. The condition bonus awards $100/50 BP per 25% tier, rounded up (1–4 for a surviving battery). The old saved `remainingHits` field now holds this tier count for compatibility. No currency/research migration or reset is required.
 
@@ -53,7 +53,7 @@ TWS tracking produces no warning, even if an old configuration still includes `a
 
 Recognition remains probabilistic and delayed; at most six cues can be pending per pilot. Base delays by Smart Level are 5.0, 3.8, 2.5, 1.4 and 0.7 seconds, with ±15% variation. SEARCH uses a 1.2 delay multiplier; LAUNCH/ACTIVE_SEEKER use 0.8. SEARCH recognition runs from 20% to 94%, LOCK 28% to 97%, LAUNCH 35% to 99%, and ACTIVE_SEEKER 30% to 99% across the five levels. Awareness progresses from UNAWARE through ALERTED to DEFENSIVE when an actual defensive maneuver is chosen. A recognized lock does not guarantee an abort or panic.
 
-IR seeker visibility can be adjusted through `setConditions(thermalContrast, visibility)`. The default factors are 1.0; reduced contrast smoothly reduces sensing and zero visibility blocks it. Watchpost has no IRST. An optional sensor-model `observeIrst` API produces same-contact bearing/elevation with unknown range; there is no standalone IRST search UI in this build.
+IR seeker visibility can be adjusted through `setConditions(thermalContrast, visibility)`. The default factors are 1.0; reduced contrast smoothly reduces sensing and zero visibility blocks it. Watchpost has no IRST. Fitted IRST profiles now support independent switching, search, acquisition, capacity, angular observations, stale expiry and cue controls; IRST-only contacts never expose a precise hidden range. These controls remain unavailable on Watchpost.
 
 Rookies tend to continue; higher levels increasingly consider evasive turns, a tangential notch attempt, abort or retreat. NOTCH decisions and notch effects require Smart Level 3 or above. A notch only intermittently breaks radar guidance after the aircraft actually turns roughly perpendicular to the radar bearing. Missiles retain motion and can reacquire; no maneuver guarantees survival. The supplied launch branch is implemented as a Smart-weighted decision, including missed/late warnings and occasional continuation, as required by the written guide.
 

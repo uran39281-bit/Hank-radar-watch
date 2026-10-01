@@ -1,3 +1,21 @@
+# Project status — v0.19
+
+Latest request: implement the supplied radar console guide, ignoring beta-only content. Source retained in UPDATE-REFERENCE-v019.txt; exact supplied canonical radar icons bundled in assets/radar-icons. Existing Watchpost/USA tree, mission roster, Rookie Mission 1, economy, menus, Digital-7 introduction and music preserved. Beta-only Horizon Shield/MIM-225A and replacement test aircraft omitted.
+
+Package com.jb.radar, versionCode 19 / versionName 0.19.0. Artifact artifacts/Air-Defense-v0.19.apk. Existing signer/save keys retained. Work branch radar-rebuild-v0.17 remains the current backup; main retains v0.16.
+
+New native console: larger central radar, TWS/weapon/inventory panels, radar and independent IRST controls, target details, four launchers, shared DATALINKS and expandable battle log. Eight canonical supplied PNGs are unchanged; runtime SCREEN compositing preserves their artwork over the scope. ReferenceUIRenderCheck covers actual touch/drawing, including launcher4, owned missile switching, track masks, timed lock, strict transfer confirmation and passive bearing-only IRST.
+
+Game owns detection-only versus detailed tracking history, capacity priorities, coasting, separate identification/recognition, timed lock acquisition/loss, sensor toggles/radar-only reset, shared per-missile support, confirmed oldest transfer, activation-time active channel release, early search and bounded SARH retargeting. Infrared owns independent passive IRST and physical LOAL heat acquisition/reacquisition. Equipment/CombatRules expose provisional sensor/flight/damage defaults; Battery has seven components including L4. Warhead distance/type/content and target vulnerability drive partial damage; kinetic profiles require impact. Enemy laser/command attacks no longer depend on player radar being switched on. New contact/bomb events require sensor evidence.
+
+Validation: all 17 pure Java assertion suites and ten full seeded mission simulations pass after final model fixes. ReferenceUIRenderCheck, MissionMenuCheck and IntroRenderCheck pass; radar console, channel confirmation, loadout, battery, log and passive sensor views reviewed. Rookie moving one-shot interceptions and the premature-graze regression remain passing. APK v2/v3 signature and original certificate verified; manifest is 19/0.19.0, Android26–35; all 15 bundled asset files verified byte-for-byte against source, including the eight original radar icons.
+
+APK size: 7804537 bytes. SHA256: 57f221a52078e854e1fbc05c0278580bb558113d08cf6c952bd6e5b35bfb406f. No physical Android installation, audio/touch performance or human balance playtest is available. The current Watchpost has no fitted IRST, so independent IRST uses configured compatible test profiles until a future owned battery is added. Source guide beta-only long-range equipment is intentionally not a selectable item. Active missions still do not persist across process death.
+
+Current documentation: README.md, Update-Guide-v0.19.txt, TRACKING.md, EQUIPMENT.md and COMBAT-AI.md. Previous guides/APKs are historical. Never upload private signing keys/passwords.
+
+## Previous version history
+
 # Project status — v0.18
 
 Latest request: Mission 1 is too difficult; lower AI smartness. All BEFORE THE DAWN aircraft now use CombatRules.mission1SmartLevel (mission1.smartLevel=1, valid 1–5), rather than randomized levels 1–5. Rookie warning probabilities/delays and lower evasion weighting apply naturally. NOTCH action weights are zero below Smart Level 3, and notchBreak requires Smart Level 3+. Rookie approaches have a minimum 1,800 m AGL and no low evasive dive. Existing advanced profiles remain testable/configurable for future missions. Fixed premature radar-missile graze detonation: Game.passedClosest gates the near-miss branch, letting an approaching missile reach the 0.12 km direct-hit threshold instead of detonating at 0.25 km for 27–29 damage.

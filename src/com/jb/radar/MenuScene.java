@@ -43,7 +43,7 @@ final class MenuScene {
   menuButton(c,418,"USA TECH TREE",0);menuButton(c,504,"ECONOMY / REWARDS",1);menuButton(c,590,"EQUIPMENT / STATS",2);
   if(saveFailed)txt(c,"SAVE PENDING / OPEN ECONOMY TO RETRY",53,688,12,WHITE,false);
   else if(fallback)txt(c,"CONFIG ERROR / DEFAULT VALUES LOADED",53,688,12,WHITE,false);
-  else txt(c,"AIR DEFENSE  /  v0.18",53,694,10,0xff436343,false);
+  else txt(c,"AIR DEFENSE  /  v0.19",53,694,10,0xff436343,false);
  }
  void wallet(Canvas c,float x,float y,float w,String label,String value,boolean bp){rect(c,x,y,w,55,0xff010901,true,7);rect(c,x,y,w,55,0xff214721,false,7);corners(c,x,y,w,55,0xff346c34);icon(c,x+33,y+29,bp?3:1,.70f,0xff60d260);txt(c,label,x+71,y+18,bp?10:12,DIM,false);txt(c,value,x+71,y+46,28,0xffc2f2c2,true);}
  void play(Canvas c,double time){float pulse=(float)(.5+.5*Math.sin(time*1.5));

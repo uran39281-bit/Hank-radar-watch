@@ -1,48 +1,21 @@
 package com.jb.radar;
 import java.util.*;
-/** Channel ownership and guidance regressions across the rebuilt sensor model. */
+/** Shared missile-channel ownership, explicit overflow and independent seekers. */
 public class TrackingTest {
  static void check(boolean b,String s){if(!b)throw new AssertionError(s);}
- static Game active(int channels){return EquipmentTest.game(EquipmentTest.config("missile.rampart.radarMode","ACTIVE","missile.rampart.seekerKm","3","radar.illuminationChannels","2","radar.midcourseChannels",""+channels));}
- static Game.Contact target(Game g,int n){Game.Contact t=GameTest.target(g,n);t.x=t.px=18+n;return t;}
- static void inSeeker(Game.Missile m){m.x=m.target.px-1;m.y=m.target.py;m.z=m.target.palt/1000;m.vx=1;m.vy=0;m.vz=0;}
+ static Game active(int channels){return EquipmentTest.game(EquipmentTest.config("missile.rampart.radarMode","ACTIVE","missile.rampart.seekerKm","3","radar.channels",""+channels));}
+ static Game.Contact target(Game g,int n){Game.Contact t=GameTest.target(g,n);t.x=t.px=21+n;return t;}
+ static void inSeeker(Game.Missile m){m.x=m.target.px-1;m.y=m.target.py;m.z=m.target.palt/1000;MissileMotion.aim(m,m.target.x-m.x,m.target.y-m.y,m.target.alt/1000-m.z);}
+ static void acquire(Game g,Game.Missile m){for(int i=0;i<20&&!m.autonomous&&m.alive;i++)g.fly(m,.025);}
  public static void main(String[] args){
-  Game g=active(2);Game.Contact t=target(g,0);t.radarTracked=false;
-  check(g.launchBlock(t).equals("TRACK TOO WEAK"),"unallocated detection cannot fire");g.track(t);
-  check(g.tracked(t)&&!g.hardLocked(t)&&g.illuminationUsed()==0&&g.midcourseUsed()==0,"automatic track alone uses no support channel");
-  check(g.lockBlock(t)!=null&&g.launchBlock(t)==null,"active fires within track envelope outside hard-lock range");
-  g.launch(t);Game.Missile first=g.missiles.get(0);check(first.datalink&&g.midcourseUsed()==1&&g.illuminationUsed()==0&&g.guided(first)&&!first.autonomous,"active launch reserves only midcourse support");
-  g.launch(t);Game.Missile second=g.missiles.get(1);check(g.midcourseUsed()==2,"two missiles at one target consume two midcourse channels");
-  Game.Contact other=target(g,1);int shots=g.shots,ammo=g.ready();check(g.launchBlock(other).equals("NO FREE SUPPORT CHANNEL"),"third supported launch blocked");g.launch(other);check(g.shots==shots&&g.ready()==ammo,"denied launch spends no ammo");
-  inSeeker(first);check(g.guided(first)&&first.autonomous&&!first.datalink&&g.midcourseUsed()==1,"actual seeker acquisition frees only that missile channel");
-  g.chosenLauncher=1;check(g.launchBlock(other)==null,"handoff admits another supported shot");g.launch(other);check(g.midcourseUsed()==2,"new launch reserves the released channel");
-  second.alive=false;check(g.midcourseUsed()==1,"destroyed missile releases its reservation");t.radarTracked=false;g.battery.parts[Battery.POWER].hp=0;check(g.guided(first),"acquired seeker survives radar and power loss");
-
-  g=active(1);t=target(g,0);g.launch(t);Game.Missile m=g.missiles.get(0);t.radarTracked=false;
-  check(!g.guided(m)&&g.midcourseUsed()==1,"transient track loss interrupts updates but retains reservation");other=GameTest.target(g,1);g.illuminate(other);
-  check(g.hardLocked(other)&&g.illuminationUsed()==1&&g.midcourseUsed()==1,"illumination has a separate pool from reserved midcourse");t.radarTracked=true;
-  check(g.guided(m)&&g.midcourseUsed()==1,"fresh track recovers existing reservation without competing with hard lock");g.release(other);check(g.illuminationUsed()==0&&g.midcourseUsed()==1,"unlock releases only illumination");m.age=g.weapon.guidanceSeconds+.1;check(!g.guided(m)&&g.midcourseUsed()==0,"guidance expiry releases missile support");
-
-  g=active(1);t=GameTest.target(g,0);g.launch(t);m=g.missiles.get(0);g.illuminate(t);
-  check(g.hardLocked(t)&&g.illuminationUsed()==1&&g.midcourseUsed()==1,"manual hard lock and active missile reserve independent channels");g.release(t);
-  check(g.tracked(t)&&!g.hardLocked(t)&&g.guided(m)&&g.illuminationUsed()==0,"unlock retains automatic track and active updates");g.illuminate(t);inSeeker(m);
-  check(g.guided(m)&&m.autonomous&&g.hardLocked(t)&&g.illuminationUsed()==1&&g.midcourseUsed()==0,"seeker handoff leaves manually established illumination intact");g.release(t);check(g.channels()==0&&g.guided(m),"manual unlock leaves acquired seeker independent");
-
-  g=new Game(3);g.start();g.contacts.clear();t=GameTest.target(g,0);
-  check(g.launchBlock(t).equals("RADAR LOCK REQUIRED"),"semi-active cannot fire with only a track");g.illuminate(t);g.launch(t);m=g.missiles.get(0);g.launch(t);
-  check(g.guided(m)&&g.illuminationUsed()==1&&g.midcourseUsed()==0&&g.supportedMissilesUsed()==2,"SARH missiles share target illumination and count toward missile support cap");g.release(t);
-  check(g.tracked(t)&&!g.hardLocked(t)&&!g.guided(m),"automatic track alone cannot guide semi-active missile");g.illuminate(t);check(g.guided(m),"lock recovery inside the recovery window resumes SARH");
-  t.seen=-100;g.maintainTracks();check(!g.tracked(t)&&!g.hardLocked(t)&&g.illuminationUsed()==0,"expired track clears fire-control state");
-  g=active(0);t=target(g,0);check(g.launchBlock(t).equals("NO FREE SUPPORT CHANNEL"),"zero-channel battery cannot launch supported active missile");
-
-  Properties p=new Properties();p.setProperty("ai.trackingCue","true");g=new Game(1,new Economy(new Economy.MemoryStore()),Equipment.defaults(),new CombatRules(p));g.start();g.contacts.clear();g.random=new AIBehaviorTest.Certain();t=GameTest.target(g,0);t.radarTracked=false;g.ai.assign(t,5,1,2);g.track(t);
-  check(t.pilot.cues.isEmpty(),"internal TWS allocation never invents a tracking warning");g.illuminate(t);
-  check(t.pilot.cues.size()==1&&t.pilot.cues.get(0).kind==PilotAI.Warning.LOCK,"compatible receiver can detect explicit hard lock");g.release(t);check(t.pilot.cues.size()==1&&!g.hardLocked(t),"unlock invents no warning");
-
-  // Integrate actual projectile motion through search, acquisition and geometric intercept.
-  g=active(1);t=GameTest.target(g,0);g.launch(t);m=g.missiles.get(0);boolean handoff=false;
-  for(int i=0;i<2000&&m.alive;i++){g.fly(m,.02);handoff|=m.autonomous;check(g.midcourseUsed()<=1,"flight support cap");}
-  check(handoff&&g.kills==1&&!t.alive&&g.midcourseUsed()==0,"active flight acquires its assigned target, intercepts and frees support");
-  System.out.println("PASS: independent illumination/midcourse pools, per-missile reservations, acquisition release, transient recovery, SARH sharing and separate warning events");
+  Game g=active(2);Game.Contact t=target(g,0);t.radarTracked=false;check(g.launchBlock(t).equals("TRACK TOO WEAK"),"unallocated detection cannot fire");g.track(t);for(int i=0;i<2;i++){g.elapsed+=1;g.observe(t);}check(g.tracked(t)&&!g.hardLocked(t)&&g.channels()==0,"automatic track alone uses no support channel");check(g.lockBlock(t)!=null&&g.launchBlock(t)==null,"active may launch outside hard-lock range within tracking envelope");g.launch(t);Game.Missile first=g.missiles.get(0);g.launch(t);Game.Missile second=g.missiles.get(1);check(g.channels()==2&&first.datalink&&second.datalink,"two missiles at one target consume both channels");Game.Contact other=target(g,1);int shots=g.shots,ammo=g.ready();check(g.launchBlock(other)==null&&g.launchWarning(other)!=null,"overflow offers consequence separately from launch eligibility");g.launch(other,false);check(g.shots==shots&&g.ready()==ammo&&!first.supportReleased,"unconfirmed transfer spends nothing");g.launch(other,true);Game.Missile third=g.missiles.get(2);check(g.shots==shots+1&&g.channels()==2&&first.supportReleased&&first.seekerState==Game.SeekerState.SEARCHING&&!first.datalink&&second.datalink&&third.datalink,"confirmed overflow displaces oldest missile into early search");
+  inSeeker(second);g.guided(second);check(second.seekerState==Game.SeekerState.SEARCHING&&g.channels()==1&&!second.datalink,"seeker activation frees channel before target acquisition");acquire(g,second);check(second.autonomous&&g.guided(second),"seeker acquires only after its own search");t.radarTracked=false;g.battery.parts[Battery.POWER].hp=0;check(g.guided(second),"acquired seeker survives battery power loss");
+  g=active(1);t=target(g,0);g.launch(t);Game.Missile m=g.missiles.get(0);t.radarTracked=false;g.fly(m,.1);check(m.alive&&m.seekerState==Game.SeekerState.SEARCHING&&g.channels()==0&&!m.datalink,"lost external track immediately activates seeker and releases channel");t.radarTracked=true;g.fly(m,.1);check(!m.datalink&&g.channels()==0,"track recovery does not restore battery updates after seeker activation");
+  g=active(1);t=GameTest.target(g,0);g.launch(t);m=g.missiles.get(0);GameTest.lock(g,t);check(g.hardLocked(t)&&g.channels()==1,"manual hard lock adds no missile channel");g.release(t);check(g.tracked(t)&&!g.hardLocked(t)&&g.guided(m),"unlock retains automatic track and active updates");
+  g=new Game(3);g.start();g.contacts.clear();t=GameTest.target(g,0);check(g.launchBlock(t).equals("RADAR LOCK REQUIRED"),"SARH cannot launch with track alone");GameTest.lock(g,t);g.launch(t);m=g.missiles.get(0);g.launch(t);Game.Missile companion=g.missiles.get(1);check(g.channels()==2&&g.guided(m)&&g.guided(companion),"two SARH missiles to one locked target occupy two channels");g.launch(t,true);check(g.channels()==2&&m.supportReleased&&!g.guided(m)&&g.guided(companion)&&g.hardLocked(t),"SARH displacement affects oldest missile without silently unlocking companion");for(int i=0;i<45&&m.alive;i++)g.fly(m,.1);check(!m.alive&&t.alive,"displaced SARH fails after finite guidance-loss grace");
+  g=active(0);t=target(g,0);check(g.launchBlock(t)!=null,"zero-capacity radar cannot provide launch support");
+  Properties p=new Properties();p.setProperty("ai.trackingCue","true");g=new Game(1,new Economy(new Economy.MemoryStore()),Equipment.defaults(),new CombatRules(p));g.start();g.contacts.clear();g.random=new AIBehaviorTest.Certain();t=GameTest.target(g,0);t.radarTracked=false;g.ai.assign(t,5,1,2);g.track(t);check(t.pilot.cues.isEmpty(),"TWS allocation creates no automatic hard-lock warning");for(int i=0;i<2;i++){g.elapsed+=1;g.observe(t);}t.pilot.cues.clear();GameTest.lock(g,t);check(t.pilot.cues.size()==1&&t.pilot.cues.get(0).kind==PilotAI.Warning.LOCK,"dedicated fire control creates separate warning");
+  g=active(1);t=GameTest.target(g,0);g.launch(t);m=g.missiles.get(0);boolean handoff=false;for(int i=0;i<2000&&m.alive;i++){g.fly(m,.02);handoff|=m.autonomous;check(g.channels()<=1,"flight channel cap");}check(handoff&&g.kills==1&&!t.alive&&g.channels()==0,"actual active flight searches, acquires, intercepts and frees capacity");
+  System.out.println("PASS: shared per-missile channels, confirmed oldest overflow, SARH displacement, activation release, early fallback, acquisition timing and separate warning events");
  }
 }

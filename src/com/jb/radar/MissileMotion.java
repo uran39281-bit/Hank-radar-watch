@@ -14,7 +14,7 @@ public final class MissileMotion {
   double dx=tx-m.x,dy=ty-m.y,dz=tz-m.z,d=Math.sqrt(dx*dx+dy*dy+dz*dz);
   if(guided&&d>1e-9){
    dx/=d;dy/=d;dz/=d;double dot=Game.clamp(dx*m.vx+dy*m.vy+dz*m.vz,-1,1),angle=Math.acos(dot);
-   double rate=Math.min(w.maxG*9.81/(m.speed*1000),Math.toRadians(w.maxAoADeg)*2);
+   double rate=Math.min(w.maneuverG*9.81/(m.speed*1000),Math.toRadians(w.maxAoADeg)*2);
    double turn=Math.min(angle,rate*dt);
    if(turn>1e-9){double px=dx-dot*m.vx,py=dy-dot*m.vy,pz=dz-dot*m.vz,pn=Math.sqrt(px*px+py*py+pz*pz);
     if(pn<1e-9){if(Math.abs(m.vz)<.9){px=-m.vy;py=m.vx;pz=0;}else{px=1;py=0;pz=-m.vx/m.vz;}pn=Math.sqrt(px*px+py*py+pz*pz);}

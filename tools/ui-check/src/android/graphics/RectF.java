@@ -1,1 +1,1 @@
-package android.graphics;public class RectF {public float l,t,r,b;public RectF(float a,float y,float c,float d){l=a;t=y;r=c;b=d;}public boolean contains(float x,float y){return x>=l&&x<=r&&y>=t&&y<=b;}}
+package android.graphics;public class RectF {public float l,t,r,b;public RectF(){}public void set(float a,float y,float c,float d){l=a;t=y;r=c;b=d;}public RectF(float a,float y,float c,float d){l=a;t=y;r=c;b=d;}public boolean contains(float x,float y){return x>=l&&x<=r&&y>=t&&y<=b;}}

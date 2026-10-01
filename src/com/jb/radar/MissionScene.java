@@ -33,7 +33,7 @@ final class MissionScene {
   control(c,"STORE",36,594,280,true);control(c,"LOADOUT >",964,594,280,true);center(c,"BEFORE THE DAWN",335,643,610,29,WHITE,true);center(c,"06 OCT 1973 / 0445",335,671,610,16,GREEN,false);center(c,"MISSION 01 SELECTED",335,611,610,13,GREEN,false);
  }
  void loadout(Canvas c,double time,Economy.State wallet,Equipment equipment,String notice){background(c,time,"MISSION LOADOUT");text(c,"BEFORE THE DAWN",64,112,30,WHITE,true);text(c,"06 OCT 1973 / 0445",64,141,16,GREEN,false);
-  frame(c,64,184,1152,111,true);text(c,"BATTERY",87,218,14,GREEN,false);text(c,equipment.radar.name,87,260,31,WHITE,true);text(c,"L1 / L2 / L3",968,222,16,GREEN,false);text(c,"9 READY + 9 RESERVE",916,260,19,WHITE,false);
+  frame(c,64,184,1152,111,true);text(c,"BATTERY",87,218,14,GREEN,false);text(c,equipment.radar.name,87,260,31,WHITE,true);text(c,"L1 / L2 / L3 / L4",968,222,16,GREEN,false);text(c,"12 READY + 12 RESERVE",916,260,19,WHITE,false);
   Equipment.Weapon[] choices={equipment.primary,equipment.stonebolt,equipment.active,equipment.infrared};for(int i=0;i<choices.length;i++){Equipment.Weapon w=choices[i];float x=64+i%2*592,y=314+i/2*112;boolean owned=wallet.owned.contains(w.id),selected=wallet.equippedMissile.equals(w.id);frame(c,x,y,560,98,owned);text(c,w.name,x+22,y+31,25,WHITE,true);text(c,w.guidanceLabel(),x+22,y+59,14,GREEN,false);text(c,selected?"EQUIPPED":owned?"TAP TO EQUIP":"LOCKED / RESEARCH IN STORE",x+22,y+83,13,owned?GREEN:DIM,false);}
   text(c,notice,65,556,16,GREEN,false);control(c,"< MISSIONS",36,594,280,true);control(c,"START MISSION >",876,594,368,!notice.startsWith("SAVE FAILED"));
  }
