@@ -1,0 +1,1217 @@
+AIR DEFENSE 101 — AIRCRAFT, RWR AND AI UPDATE
+
+Apply this update to the previous beta guide.
+
+Previous guide:
+
+Keep the existing radar, missile-guidance, channel, UI, and equipment rules. This update replaces the aircraft roster and expands aircraft stats, RWR behavior, and AI decisions. Do not rebuild unrelated systems or change the MIM-225 equipment values.
+
+Use only Su-27, MiG-29, MiG-25, and Tu-160 as enemy aircraft. Remove Su-25 and Tu-95 from the default spawn roster.
+
+The proposed values below are editable beta defaults. RWR “generations” are game tiers, not a universal classification of real equipment.
+
+AIRCRAFT STATS AND LOGIC
+
+One playable profile per aircraft
+
+Show a single aircraft name such as Su-27 or MiG-29. Do not create separate player-facing variants such as F-16A, F-16C, and F-16V.
+
+A reference variant may be recorded internally to explain the source of flight data. It does not create another playable aircraft. Different weapon presets may use the same aircraft profile.
+
+Display the aircraft’s original design role separately from its assigned mission. An air-superiority fighter can have a bomb-strike mission; its role label does not change.
+
+Aircraft stat template
+
+Aircraft name: generic player-facing name.
+
+Original role: fighter, interceptor, attack aircraft, or strategic bomber.
+
+Mission task: assigned objective for this sortie.
+
+Maximum speed: an altitude-dependent speed cap in km/h, not a speed achieved instantly.
+
+Reference altitude: altitude associated with the quoted maximum speed, in meters.
+
+Maximum altitude: flight ceiling in meters.
+
+Maximum G limit: the selected game structural threshold. Keep it separate from maximum commanded G and actual maneuverability.
+
+Maximum commanded G: the AI’s safe maneuver limit under the current flight conditions.
+
+Maneuverability: a configurable 1.00–10.00 handling rating that modifies response and energy loss; it cannot override structural limits.
+
+Stealth level: 0.00 means no stealth reduction. Reserve 1.00–7.00 for later reduced-signature aircraft; all four aircraft in this update use 0.00.
+
+Weapon access: allowed WP identifiers, not a manual loadout editor.
+
+RWR generation and profile ID: select a capability profile rather than granting abilities from the label alone.
+
+Countermeasures: one combined inventory count for the simplified chaff/flare system.
+
+Health: current damage state. Use 100% as undamaged; damaged aircraft lose relevant performance.
+
+AI profile: reaction delay, skill, aggression, and abort thresholds.
+
+Speed, G and stealth rules
+
+Use the War Thunder Wiki and Statshark as reference tools, recording which source variant and flight mode supplied a value. Do not silently mix arcade, realistic, stock, and upgraded figures.
+
+Do not confuse IAS structural speed limits with maximum true airspeed at altitude. The proposed radar-game speeds below are rounded gameplay caps inspired by the wiki’s upgraded realistic figures.
+
+For this beta, interpolate between a configurable low-altitude speed cap and the reference-altitude cap. Clamp above that altitude; account for load, damage, and finite acceleration.
+
+G limit is not maneuverability. High-speed aircraft still have large turning circles, and a fighter cannot sustain its maximum G at every speed.
+
+All aircraft can be detected at stealth level 0.00; this does not force identical radar signatures. Use a separate baseline signature modifier if size differences are needed.
+
+Statshark could not be read during this update. Do not claim its data verified the proposed values.
+
+Tu-160 has no verified War Thunder flight-stat record in the sources used here. Its numerical beta profile is provisional rather than a sourced real-aircraft specification.
+
+Weapon presets
+
+Use fixed presets assigned at spawn. Each preset stores weapon category, ammunition count, release conditions, cooldown, and the relevant weapon-definition ID.
+
+WP-0: no usable ground-attack weapons; assigned to high-speed intrusion or diversion, not a bombing task.
+
+WP-1: unguided bomb strike. Proposed quantities: Su-27 four bombs, MiG-29 two bombs, Tu-160 eight bombs. Weapon damage and bomb class remain configurable.
+
+WP-2: unguided rocket attack, reserved for a later update.
+
+WP-3: air-to-ground missile attack, reserved for a later update.
+
+Enable only WP-0 and WP-1 in this update. Do not add hostile missile spawns merely because a future preset is listed.
+
+For bombs, require a valid release solution based on position, altitude, speed, and heading; do not damage the battery immediately on release.
+
+MiG-25 has no ground ordnance in the selected War Thunder reference profile. Use WP-0 rather than inventing a bomb load.
+
+Tu-160’s original role is a strategic missile carrier. Its WP-1 bomb-strike behavior here is an explicit gameplay abstraction, not a claim about the reference aircraft’s operational loadout.
+
+An armed aircraft exits after expending its ground-attack weapons. An aircraft intentionally assigned WP-0 completes its intrusion/diversion route instead of aborting immediately for having no bombs.
+
+Recommended Su-27 beta profile
+
+Aircraft name: Su-27.
+
+Original role: air-superiority fighter.
+
+Mission task: bomb strike.
+
+Maximum speed: 2,400 km/h at 12,000 m; low-altitude cap 1,400 km/h.
+
+Maximum altitude: 16,000 m.
+
+Maximum G limit: +11 G, inspired by the War Thunder structural threshold; AI commanded limit +9 G.
+
+Maneuverability: 8.00 / 10.00.
+
+Stealth level: 0.00.
+
+Weapon access: WP-1, four configurable bombs.
+
+RWR: GEN-2 / RWR-S27.
+
+Countermeasures: 96 combined game units.
+
+AI character: moderately committed attacker; may continue after a search warning, but responds to confirmed fire-control or missile threats.
+
+Recommended MiG-29 beta profile
+
+Aircraft name: MiG-29.
+
+Original role: frontline fighter.
+
+Mission task: bomb strike.
+
+Maximum speed: 2,350 km/h at 14,000 m; low-altitude cap 1,450 km/h.
+
+Maximum altitude: 16,000 m.
+
+Maximum G limit: +13 G, inspired by the War Thunder structural threshold; AI commanded limit +9 G.
+
+Maneuverability: 8.50 / 10.00.
+
+Stealth level: 0.00.
+
+Weapon access: WP-1, two configurable bombs.
+
+RWR: GEN-2 / RWR-M29.
+
+Countermeasures: 60 combined game units.
+
+AI character: agile but limited in countermeasure endurance; favors shorter defensive attempts and preserves some inventory.
+
+Recommended MiG-25 beta profile
+
+Aircraft name: MiG-25.
+
+Original role: high-altitude interceptor.
+
+Mission task: high-speed intrusion/diversion.
+
+Maximum speed: 2,940 km/h at 18,000 m; low-altitude cap 1,200 km/h.
+
+Maximum altitude: 25,000 m.
+
+Maximum G limit: +7 G, inspired by the War Thunder structural threshold; AI commanded limit +5 G.
+
+Maneuverability: 3.00 / 10.00.
+
+Stealth level: 0.00.
+
+Weapon access: WP-0.
+
+RWR: GEN-1 / RWR-M25.
+
+Countermeasures: 64 combined game units.
+
+AI character: preserves speed and uses broad turns; cannot evade like a lightweight fighter.
+
+Recommended Tu-160 beta profile — provisional
+
+Aircraft name: Tu-160.
+
+Original role: strategic bomber / missile carrier.
+
+Mission task: simplified bomb strike.
+
+Maximum speed: proposed 2,200 km/h at 12,000 m; low-altitude cap 1,000 km/h.
+
+Maximum altitude: proposed 16,000 m.
+
+Maximum G limit: proposed +3 G; AI commanded limit +2 G.
+
+Maneuverability: 1.50 / 10.00.
+
+Stealth level: 0.00.
+
+Weapon access: WP-1, eight configurable bombs.
+
+RWR: GEN-2 / RWR-T160.
+
+Countermeasures: proposed 128 combined game units.
+
+AI character: broad defensive turns and earlier disengagement; never performs fighter-style high-G turns.
+
+Its speed, G limits, RWR tier, and countermeasure quantity are balancing proposals, not verified real Tu-160 specifications.
+
+Countermeasure simplification
+
+Use one countermeasure button and one inventory for both chaff and flares. This is a deliberate game simplification.
+
+A deployment creates a temporary countermeasure effect. Radar-guided seekers evaluate its radar-decoy component; IR seekers evaluate its heat-decoy component.
+
+A deployment does not instantly destroy a missile or guarantee lock loss. Guidance quality, seeker resistance, geometry, and timing determine whether a decoy is acquired.
+
+Do not spend inventory against search radar alone. Deploy in limited bursts after a credible threat is perceived, with a cooldown and an optional reserve.
+
+Suggested beta defaults: three units per burst, 1.5 seconds between bursts, three-second effect lifetime, and 10% reserve unless an immediate missile threat justifies using it.
+
+Countermeasure quantities above are adopted game inventories, not a claim that a combined “unit” equals one real dispenser cartridge.
+
+RWR — STATS AND WARNING LOGIC
+
+Receiver, not radar
+
+An RWR is a passive receiver of radar emissions. It does not scan the sky or see the player’s target-selection state.
+
+It may estimate emitter bearing, classify an emission, and warn of fire-control activity when its hardware and recognition library support that signal.
+
+It does not automatically know exact emitter distance, target range, missile count, or missile impact time.
+
+A radar detection, a stored TWS track, and the emissions arriving at an aircraft are different things. Do not send the player’s internal DETECTED, TRACKED, LOCKED, or FIRED state directly into the AI.
+
+RWR profile stats
+
+Profile ID and generation: a reusable capability definition.
+
+Supported bands: which configured radar-frequency bands can be received.
+
+Supported waveforms: search, pulse-Doppler, fire-control/illumination, and active-seeker signals supported by the profile.
+
+Sensitivity: signal-strength threshold for reception; separate from the player radar’s detection range.
+
+Horizontal and vertical coverage: antenna sectors and blind areas.
+
+Bearing precision: angular error or coarse sector size.
+
+Warning delay: time required to detect/classify a received signal.
+
+Search-warning capability: can display a received search emission.
+
+Fire-control recognition: can distinguish a known lock/illumination pattern from search.
+
+Illumination-warning recognition: can classify an associated missile-guidance pattern as a suspected missile threat.
+
+Active-seeker recognition: can distinguish a known active missile seeker from an unidentified radar.
+
+Emitter library: known signal families; recognizing a family is not proof of an exact battery model.
+
+Threat capacity: number of received emitter contacts maintained simultaneously.
+
+Warning memory: how long a warning persists after the signal is no longer received.
+
+Missed/ambiguous classification settings: configurable receiver imperfections.
+
+Proposed GEN-0 profile
+
+No RWR. Receives no RF warnings. The AI can still react to visual evidence, a separately equipped missile-warning sensor, damage, and mission reports.
+
+Proposed GEN-1 profile — basic
+
+Suggested bands: H, I, J.
+
+Suggested bearing display: four coarse sectors.
+
+Receives configured search and fire-control signals, but reports limited identity information.
+
+Recognizes supported hard-lock patterns. Does not separately identify a missile-launch pattern or active seeker.
+
+An active seeker may still appear as an unidentified radar signal if reception succeeds; “cannot classify” does not mean “cannot receive.”
+
+Suggested warning delay 1.2 seconds, memory six seconds, four emitter contacts.
+
+Use for RWR-M25. This is a simplified game profile inspired by basic sector-based receivers, not an exact SPO-10 simulation.
+
+Proposed GEN-2 profile — improved
+
+Suggested bands: G, H, I.
+
+Suggested bearing error: ±15 degrees.
+
+Recognizes configured search, fire-control, known illumination, and active-seeker patterns when supported and present in its library.
+
+Classifies broad emitter families such as SEARCH RADAR, FIRE CONTROL, or MISSILE SEEKER; it does not reveal the player’s exact missile model or ammunition.
+
+Suggested warning delay 0.7 seconds, memory eight seconds, eight emitter contacts.
+
+Use for RWR-S27, RWR-M29, and RWR-T160. Aircraft profiles may override specific flags without changing the tier label.
+
+Proposed GEN-3 profile — advanced, reserved
+
+Suggested bands: C through J; suggested bearing error ±5 degrees.
+
+Improved receiver sensitivity, library coverage, signal separation, and threat prioritization.
+
+Suggested warning delay 0.3 seconds, memory ten seconds, sixteen emitter contacts.
+
+Still cannot detect passive IR sensing, read the player’s UI, or determine exact range from a simple RWR bearing.
+
+No current aircraft receives GEN-3 by default. Retain it for later aircraft.
+
+Emission-to-warning rules
+
+Give the fictional battery and missile seekers configurable band, waveform, emission pattern, and strength fields. Suggested compatibility default: I-band for the beta battery and active seeker, allowing all nonzero beta profiles to receive them when geometry and sensitivity permit. This is not a real MIM-225 specification.
+
+For each actual emission, check band and waveform compatibility, antenna coverage, line of sight/terrain, and received strength.
+
+Only then attempt classification using the receiver’s library and uncertainty settings.
+
+Schedule the warning after the profile delay. Pass only the estimated bearing, inferred signal class, confidence, and timestamp to the AI.
+
+Use anonymous perceived-emitter IDs. Do not let the AI retrieve a hidden world object’s exact position or weapon state from them.
+
+Refresh existing warnings when the signal returns; do not generate a new panic decision on every search sweep.
+
+An RWR can hear a radar emission even when the radar has not detected that aircraft; model these reception paths independently.
+
+Warnings and player actions
+
+RADAR ON: after the radar’s switching delay, actual search emissions may create SEARCH warnings. The button press itself creates none.
+
+AUTO TRACK / TWS: maintaining a track creates no special warning if the emitted pattern remains ordinary search. Only an externally distinguishable, supported pattern may change the warning.
+
+LOCK: a valid detectable fire-control pattern may create a FIRE CONTROL warning after receiver delay. Failed lock attempts are not successful locks, although any emitted attempt signal may still be received.
+
+SEMI-ACTIVE FIRE: associated illumination may produce ILLUMINATION / SUSPECTED MISSILE guidance warnings if recognized. This is evidence of a dangerous mode, not proof of an exact launch or missile count.
+
+ACTIVE FIRE / MIDCOURSE: no automatic LAUNCH alert. The aircraft may receive other radar signals, visual evidence, or an optional missile-warning alert.
+
+ACTIVE SEEKER ON: compatible radiation reaching the aircraft may produce a SEEKER / MISSILE warning when recognized; otherwise it is an unidentified emitter warning.
+
+IR FIRE / IRST ON: no RWR alert from passive sensing or the IR seeker. Visual detection or a separate missile-warning sensor may reveal the missile.
+
+UNLOCK: the old fire-control warning decays after loss of that signal; search warnings may remain.
+
+RADAR OFF: RF warnings decay according to receiver memory. An already active missile seeker can continue warning independently.
+
+RESET / CHANNEL OVERFLOW: the AI sees only resulting emission changes. It must not know that the player cleared a list or displaced a guidance channel.
+
+SELECT TARGET / NEXT TARGET / SELECT MISSILE / SELECT LAUNCHER / DISPLAY RANGE: no direct AI warning.
+
+PAUSE / TIME SPEED: stop or scale all receiver and AI timers consistently with the simulation.
+
+Optional visual and missile-warning sensors
+
+Keep visual detection and missile approach warning (MAWS) separate from RWR.
+
+Suggested visual beta model: limited viewing sector, clear line of sight, finite acquisition time, and weather/night penalties. Any visual distance estimate is uncertain.
+
+Set MAWS to FALSE for these proposed profiles until separately specified. RWR generation does not automatically grant MAWS.
+
+If enabled later, MAWS may report an approaching missile without necessarily identifying its guidance type.
+
+An aircraft with no useful RWR warning can still be surprised by a missile. Do not compensate by giving it invisible global missile awareness.
+
+AI LOGIC AND REACTIONS TO PLAYER ACTIONS
+
+Core rule
+
+AI decisions use perceived warnings, mission information, remembered evidence, and the aircraft’s own condition. They do not use the player’s selected target, actual radar track status, missile inventory, guidance-channel count, or undetected missiles.
+
+The assigned mission may supply an objective location and route. This is legitimate mission knowledge; it does not reveal the player’s current lock, firing intent, or missile positions.
+
+AI stats — proposed starting values
+
+Skill: 0.00–1.00; default 0.40. Controls decision quality, estimate errors, and maneuver execution.
+
+Reaction delay: sample 2.0–4.0 seconds once for a new credible warning. Add receiver delay separately; do not reroll every frame.
+
+Emergency reaction delay: proposed 1.0–2.0 seconds after a credible incoming-missile cue; this is separate from ordinary search/fire-control caution.
+
+Observed missile memory: proposed twelve seconds after the last supporting observation, refreshed only by new evidence. Expiry means uncertainty, not proof that the missile is destroyed.
+
+Aggression: 0.00–1.00; default 0.55. Controls willingness to continue a mission under uncertainty, not immunity to threats.
+
+Abort health threshold: 35%.
+
+Minimum state hold: two seconds, except a newly perceived more urgent threat may interrupt.
+
+Safe-clear time: six seconds after relevant warnings and remembered missile threats expire.
+
+Failed approach limit: two disrupted attack runs before disengaging.
+
+Countermeasure reserve and burst parameters: use the aircraft’s countermeasure configuration.
+
+Decision interval: 0.25 seconds. Movement and collision processing remain at the simulation’s normal update rate.
+
+These are gameplay balance defaults. Changing AI skill does not improve an aircraft’s RWR bands, ammunition, maximum G, or stealth.
+
+AI states
+
+MISSION APPROACH: follow the assigned route and prepare the configured attack.
+
+CAUTIOUS: keep the mission but monitor a detected emitter and assess risk.
+
+DEFENSIVE: delay or interrupt the attack and execute a physically achievable defensive maneuver.
+
+MISSILE EVASION: respond to a perceived incoming missile or a credible associated guidance threat.
+
+REASSESS: recover control and decide whether to retry, continue, or leave.
+
+ATTACK RUN: follow a valid release solution and expend only the configured weapons.
+
+DISENGAGE: abort the attack and follow an exit route.
+
+EXITED or DESTROYED: terminal state; stop further attack decisions.
+
+Threat priorities
+
+First avoid imminent terrain collision and handle loss of flight control.
+
+Next handle a perceived missile threat; then sustained fire-control/illumination warnings; then search/unknown emissions; then the mission.
+
+Evaluate every perceived threat before choosing a primary one. Do not ignore a second known missile merely because one is already selected.
+
+A search warning alone is lower urgency than an associated guidance warning. Unknown emissions remain uncertain; do not automatically label all of them missiles.
+
+Only compute missile direction, closing trend, or time-to-impact from observations that support those estimates. If unavailable, use conservative threat categories rather than true world distance.
+
+If two threats are similarly urgent, choose a maneuver with tolerable risk against both and accept that it may not defeat either.
+
+Decision cycle
+
+Refresh received warnings, visual observations, remembered threats, health, performance, and remaining weapons.
+
+Check whether the aircraft is destroyed, leaving the play area, about to hit terrain, or unable to maintain flight.
+
+Build a perceived threat list and select its highest-priority threat.
+
+Apply the relevant reaction delay once. A new higher-priority observed threat can trigger its own shorter configured emergency delay; repeated warnings do not extend the timer forever.
+
+When the delay expires, evaluate mission commitment, current energy, achievable maneuvers, available countermeasures, and terrain.
+
+Choose or retain a state. Use minimum state hold and safe-clear time to prevent rapid switching.
+
+Execute the maneuver, release weapons only when eligible, and reevaluate as new evidence arrives.
+
+End the sortie after exit, destruction, mission completion, or an abort decision.
+
+If only a search emission is detected
+
+Enter CAUTIOUS after the reaction delay.
+
+Continue toward the mission unless warning persistence, accumulated risk, or earlier failed attempts justify a route adjustment.
+
+Do not deploy countermeasures or instantly abandon the attack.
+
+A cautious route change is a small configurable course adjustment, not a perfect response to the player’s radar beam.
+
+If the emission disappears, retain memory until timeout, then return to MISSION APPROACH if safe.
+
+If the player is internally tracking the aircraft in TWS
+
+If no distinguishable warning exists, continue the current state unchanged.
+
+If the receiver identifies a genuine changed emission pattern, react to that perceived signal class.
+
+Never let “player has a TWS track” directly cause notching or countermeasure use.
+
+If a hard fire-control warning is received
+
+After reaction delay, assess warning persistence and mission commitment.
+
+An aggressive, undamaged attacker close to its release point may continue briefly while adjusting course. A cautious or damaged aircraft may interrupt the run.
+
+Choose a turn, course change, or altitude change that fits the aircraft’s current speed, G limit, and safe altitude.
+
+A beam/notch-style attempt is an abstract game maneuver: apply a configured sensor-quality effect only if that radar model supports the relevant rejection behavior. It must not automatically break every radar lock.
+
+Avoid continuous maximum-G turns that ignore speed loss. MiG-25 and Tu-160 must use broader turns than Su-27 and MiG-29.
+
+Do not know whether the player’s lock actually broke. Assess whether the received warning stopped and whether any other perceived threat remains.
+
+If illumination or an active missile seeker is recognized
+
+Treat it as a high-priority guidance threat, then enter MISSILE EVASION after reaction delay.
+
+Use estimated emitter bearing and any visual/MAWS observations; do not aim an evasive maneuver using the missile’s hidden coordinates.
+
+Deploy a limited combined countermeasure burst when inventory and cooldown allow.
+
+Choose a feasible defensive turn, separation maneuver, or safe altitude adjustment. Repeated bursts and maneuver changes require new assessment.
+
+If no countermeasures remain, continue maneuvering or disengage; do not invent additional rounds.
+
+For an unidentified active-seeker emission, react according to confidence and the receiver’s classification limits rather than granting a perfect “missile locked on me” label.
+
+A maneuver or decoy can fail. Let missile guidance and the flight simulation determine the result.
+
+If an IR missile is launched
+
+There is no direct RWR state change.
+
+If visual or MAWS evidence later reveals an incoming missile, enter MISSILE EVASION after the corresponding delay.
+
+If no sensor reveals it, continue the current mission/state and allow surprise hits.
+
+Only reduce modeled heat output as a deliberate response to a perceived IR threat or a generic defensive policy, with the corresponding thrust/energy tradeoff.
+
+If the player unlocks, switches radar off, or resets
+
+Lose or downgrade the relevant RF warning only after its timeout. Do not instantly return to a straight attack path.
+
+Continue responding to any independently received active seeker and remembered observed missile.
+
+The aircraft does not know that an unobserved semi-active missile self-destructed or that an IR missile is still flying.
+
+Return to REASSESS only after the safe-clear rule is met; if warnings resume, interrupt reassessment.
+
+Attack, abort and reattack
+
+During ATTACK RUN, check weapon availability, release geometry, and mission eligibility. An aircraft assigned WP-0 never tries to release bombs.
+
+A confirmed missile threat can interrupt a run, but aggression may affect whether a briefly available valid release is completed before defensive action.
+
+Continue to model released bombs after the aircraft turns away or is destroyed.
+
+After a defensive attempt, check health, control authority, remaining attack weapons, mission route, threat memory, and failed-run count.
+
+If health is below 35%, control is critically degraded, attack weapons are exhausted, or two attack runs have been disrupted, enter DISENGAGE.
+
+Otherwise, if warnings have cleared for six seconds, recover energy and attempt another valid approach.
+
+DISENGAGE forbids a new attack, but still allows self-preservation against subsequently perceived threats.
+
+Exit-route coordinates must come from mission configuration. Do not allow AI to teleport away or leave and reappear with refilled weapons.
+
+State stability and uncertainty
+
+Roll sensing/classification uncertainty at a configured sensor update, not every rendered frame.
+
+Select an initial maneuver with a seeded random choice, then hold it long enough to have an effect. Do not alternate left/right every 0.25 seconds.
+
+Missed warnings and delayed decisions must be possible. RWR quality and pilot skill are separate contributors.
+
+Keep short in-match memory of perceived emitter sectors, dangerous approaches, and failed runs. Do not add persistent self-training or an AI that learns hidden player actions between matches.
+
+For an accessible beta, start with moderate skill and visible reaction delays. Increase difficulty through better decisions and evidence use rather than cheating with hidden information.
+
+Debugging and acceptance checks
+
+Provide a development-only trace showing received evidence, selected threat, state transition, delay, maneuver, and remaining countermeasures.
+
+Keep this trace separate from the player’s battle log so it cannot reveal information the player’s own sensors lack.
+
+Verify these cases:
+
+A radar sweep detects an aircraft but its RWR cannot receive that emission: no RF-driven reaction.
+
+An RWR hears search emissions before the radar detects the aircraft: search caution is possible.
+
+TWS tracking changes no emission pattern: no special reaction.
+
+A supported hard lock is received: delayed fire-control response.
+
+An active missile launches without a new detectable signal: no instant launch warning.
+
+Its seeker activates: a warning occurs only after reception and supported classification.
+
+A passive IR launch is unseen: no reaction; later visual detection produces a delayed response.
+
+Radar OFF does not silence an already active missile seeker.
+
+An old warning expiring does not clear a separately remembered observed missile.
+
+A MiG-25 or Tu-160 cannot exceed its flight limits to match fighter evasions.
+
+Countermeasure exhaustion and disrupted attacks can lead to disengagement.
+
+WP-0 performs its mission without an immediate “out of bombs” abort.
+
+Pause and time speed affect sensor, reaction, memory, and countermeasure timers together.
+
+AI DECISION FLOWCHARTS
+
+Give each aircraft an assigned objective, awareness, confidence, and a survival instinct expressed through risk tolerance. Decisions depend on perceived evidence, progress toward a valid attack, and the aircraft’s ability to survive. These are proposed AIR DEFENSE 101 game rules.
+
+After immediate terrain-collision and flight-control emergencies, evaluate critical damage → perceived incoming missile → received fire-control/lock warning → attack plan. Critical escape still includes defense against newly perceived missiles.
+
+The flows extend the existing AI rules. They do not enable WP-2/WP-3, new weapons, or MAWS. Reaction delay applies once per new warning episode; a newly perceived urgent threat may interrupt lower-priority actions.
+
+1A. Awareness: immediate threats
+
+Update only information available to this aircraft. Continue to 1B when no immediate missile or lock warning is received.
+
+1B. Awareness: radar and route
+
+A radar warning can reveal an emitter’s presence without revealing that the player has selected, detected, or automatically tracked this aircraft.
+
+Detection and tracking alone do not interrupt the mission. Sensors or authorized shared intelligence must provide evidence of danger. Battery position and threat direction remain estimates unless mission intelligence legitimately supplies them.
+
+2A. Lock warning: release or interrupt
+
+A received lock warning means a supported fire-control pattern, not access to the player’s internal LOCK state. Apply the existing receiver and reaction delays.
+
+2B. Lock defense: escape and retry
+
+Choose terrain cover, descent, or a defensive turn only when physically reachable and safe. An unknown direction permits a cautious broad maneuver, not a perfect turn away from hidden coordinates.
+
+Warning stopped means the relevant RWR warning has expired through its hold/memory rules. Then wait through the existing six-second safe-clear cooldown, including remembered missile threats. A renewed warning interrupts cooldown and resumes the appropriate defense. Breaking a lock creates an escape or repositioning opportunity; it does not automatically end the engagement.
+
+3A. Missile defense: choose the response
+
+Estimate missile direction and time to impact only when observations support them; otherwise use an uncertain urgency category. Reevaluate every credible threat, while choosing the shortest credible estimated time to impact as the primary threat.
+
+3B. Missile defense: guidance and persistence
+
+Guidance type is a perceived classification. Unknown missiles receive an imperfect general defense. All bursts draw from the existing combined countermeasure inventory and respect its cooldown and reserve.
+
+Missile-guidance rules
+
+Semi-active: brief supporting-lock loss may disrupt guidance; it does not guarantee a miss.
+
+Active: after its seeker activates, breaking the battery’s lock does not remove the threat.
+
+IR: require visual, installed sensors, or another legitimate warning source. Default MAWS remains off.
+
+Unknown: defend imperfectly from available evidence. Energy-limited maneuvers remain after countermeasures run out.
+
+Chaff, flares, notching, and terrain have conditional effects. Notching needs a susceptible radar mode; use installed effects and simulate the result.
+
+4A. Mission: objective and approach
+
+Reassess damage, configured weapons, objective, risk, and retries. WP-0 keeps its intrusion/diversion mission; only bombing presets use this branch.
+
+4B. Mission: release, correction, and retry
+
+Bomb release requires the configured weapon, a valid envelope, stable aim and flight path, and enough room to correct the approach. New credible warnings return control to the threat decisions.
+
+Assess attack results only through legitimate observations or mission reports. Choose an alternate objective only when the mission assigned one. Exiting and disengaging follow the configured route, preserve self-defense, and never refill weapons. Use the existing two-disrupted-approach retry limit and abort thresholds.
+
+Aircraft behavior variables
+
+These variables change decision behavior; they do not grant better sensors or exceed aircraft performance. Confidence and survival instinct feed the existing aggression and risk assessment rather than replacing critical-damage or missile priorities.
+
+Variable
+
+Decisions it changes
+
+Awareness
+
+Whether warnings are noticed and threats identified correctly.
+
+Reaction delay
+
+How long the aircraft waits before responding to new evidence.
+
+Skill
+
+Maneuver timing, route choice, and countermeasure use.
+
+Confidence
+
+Whether it finishes a dangerous bombing approach when perceived risk is acceptable.
+
+Aircraft energy
+
+Whether it can sustain turns, climb, or escape.
+
+Damage
+
+Whether it continues attacking or retreats.
+
+Countermeasures remaining
+
+Whether it deploys another burst or conserves supplies.
+
+Retry limit
+
+How many failed approaches it attempts before leaving.
+
+Threat memory
+
+Whether it avoids a previously dangerous route.
+
+Mission 1 behavior
+
+Use slower reactions, occasional missed warnings, poor maneuver timing, and limited countermeasure use. Keep the existing proposed reaction ranges, cooldowns, inventories, and flight limits configurable. More confident attackers may keep pushing toward an imminent valid bombing point when perceived risk is acceptable, giving the player a fair chance to intercept them.
+
+Essential rule: never react to hidden player actions such as selecting a target, opening target analysis, or preparing to fire. The AI reacts when evidence reaches the aircraft.
+
+RUSSIAN AIRCRAFT WEAPON STATS
+
+Use these War Thunder game values as weapon reference data. Adding this catalogue does not enable WP-3 or new hostile missile spawns; the existing beta preset scope remains in effect.
+
+Field definitions and missing values
+
+Maximum firing range below is the Wiki’s Launch range. A separate maximum travel range is not supplied. Launch range is not a guaranteed effective hit range.
+
+Maximum aircraft release / launch speed is not listed in the checked panels for any weapon. Preserve it as unknown; do not substitute the missile’s maximum speed, zero, or unlimited.
+
+Maximum speed is retained in Mach because conversion to km/h requires atmospheric conditions. Guidance time is the listed missile guidance lifetime, not motor burn time.
+
+Bombs are unguided: flight speed and horizontal travel vary with release conditions. Missile firing range and guidance time are N/A. Their maximum release speed remains not listed.
+
+Air-to-ground and cruise missiles
+
+Kh-31PD, Kh-58UShK, and Kh-58U are anti-radiation missiles. Kh-59MK is an anti-ship cruise missile; the other entries in this table are air-to-ground missiles.
+
+Weapon
+
+Guidance
+
+Max speed
+
+(Mach)
+
+Launch range
+
+(km)
+
+Guidance
+
+(s)
+
+Kh-38MT
+
+IR + inertial + GNSS
+
+2.2
+
+70
+
+200
+
+Kh-38ML
+
+Laser + inertial + GNSS
+
+2.2
+
+70
+
+200
+
+Kh-31PD
+
+Passive radar + inertial
+
+4
+
+250
+
+250
+
+Kh-29TD
+
+TV
+
+1.8
+
+35
+
+70
+
+Kh-58UShK
+
+Passive radar + inertial
+
+4
+
+245
+
+500
+
+Kh-25ML
+
+Laser
+
+2
+
+10
+
+45
+
+Kh-29T
+
+TV
+
+1.8
+
+13
+
+40
+
+Kh-29L
+
+Laser
+
+1.8
+
+10
+
+40
+
+Kh-58U (A′/B/C)
+
+Passive radar
+
+3.5
+
+120
+
+240
+
+Kh-59MK
+
+Active radar + inertial
+
+0.9
+
+120
+
+1,000
+
+Air-to-air missiles
+
+All entries in this table are air-to-air missiles. R-27 is a family name; R, T, and ET alternatives are listed separately alongside ER.
+
+Weapon
+
+Guidance
+
+Max speed
+
+(Mach)
+
+Launch range
+
+(km)
+
+Guidance
+
+(s)
+
+Max G
+
+R-77-1
+
+ARH+IOG+DL
+
+4
+
+120
+
+120
+
+50
+
+R-77
+
+ARH+IOG+DL
+
+4
+
+80
+
+90
+
+50
+
+R-27ER
+
+SARH+IOG+DL
+
+5.8
+
+100
+
+60
+
+35
+
+R-27R
+
+SARH+IOG+DL
+
+3.5
+
+55
+
+60
+
+35
+
+R-27T
+
+IR
+
+3.5
+
+50
+
+60
+
+35
+
+R-27ET
+
+IR
+
+5.8
+
+100
+
+60
+
+35
+
+Additional missile stats
+
+Lock range is the seeker value, separate from carrier radar range and practical missile reach. Not listed means unavailable in the checked panel.
+
+Weapon
+
+Mass
+
+(kg)
+
+Filler
+
+(kg)
+
+TNT equivalent
+
+(kg)
+
+Seeker lock
+
+(km)
+
+Kh-38MT
+
+520
+
+95
+
+152
+
+Not listed
+
+Kh-38ML
+
+520
+
+95
+
+152
+
+Not listed
+
+Kh-31PD
+
+715
+
+85
+
+144.5
+
+100
+
+Kh-29TD
+
+686
+
+116.4
+
+186.2
+
+Not listed
+
+Kh-58UShK
+
+650
+
+110
+
+176
+
+100
+
+Kh-25ML
+
+297
+
+93
+
+119
+
+Not listed
+
+Kh-29T
+
+670
+
+116.4
+
+186.2
+
+Not listed
+
+Kh-29L
+
+657
+
+116.4
+
+186.2
+
+Not listed
+
+Kh-58U (A′/B/C)
+
+640
+
+110
+
+176
+
+100
+
+Kh-59MK
+
+930
+
+119
+
+190.4
+
+15
+
+R-77-1
+
+190
+
+9.7
+
+15.6
+
+16
+
+R-77
+
+175
+
+9.7
+
+15.6
+
+16
+
+R-27ER
+
+350
+
+15
+
+24
+
+25
+
+R-27R
+
+253
+
+15
+
+24
+
+25
+
+R-27T
+
+245.5
+
+15
+
+24
+
+18 rear / 4.8 all-aspect
+
+R-27ET
+
+343
+
+15
+
+24
+
+18 rear / 4.8 all-aspect
+
+Unguided bombs
+
+OFAB-100 is a fragmentation / high-explosive bomb; the FAB entries are high-explosive bombs. Explosive filler mass and TNT equivalent are distinct fields.
+
+Bomb
+
+Mass
+
+(kg)
+
+Filler
+
+(kg)
+
+TNT equivalent
+
+(kg)
+
+OFAB-100
+
+114
+
+38
+
+38
+
+FAB-500M-46
+
+428
+
+325
+
+325
+
+FAB-500M-54
+
+478
+
+201
+
+201
+
+FAB-500M-62
+
+508.3
+
+213
+
+340.8
+
+FAB-1500M-54
+
+1,550
+
+675
+
+675
+
+FAB-3000M-46
+
+2,983
+
+1,400
+
+1,400
+
+FAB-3000M-54
+
+3,067
+
+1,387
+
+2,219.2
+
+Variant and guidance notes
+
+KH-58SHK is assumed to mean Kh-58UShK. Keep that assumption visible until the intended suffix is confirmed. FAB-500M and FAB-3000M require a variant suffix; do not silently combine their different values.
+
+The current Kh-29TD panel says TV; the archived Wiki used TV+IR. This catalogue keeps the current displayed guidance label.
+
+The Wiki panels label ARM guidance SARH or SARH+IOG. War Thunder’s developer explanation describes passive homing on the enemy radar emitter. Implement these as passive anti-radiation weapons, not conventional SARH missiles requiring the launching aircraft to illuminate the target.
+
+Kh-58U A′, B, and C have the same listed flight values but different displayed seeker bands: I, F, and D respectively. Kh-31PD and Kh-58UShK panels display band D. Radar-guided AAMs and Kh-59MK display band I. Preserve these as Wiki game labels.
+
+IOG = inertial guidance; DL = datalink; GNSS = satellite navigation; ARH = active radar; SARH = semi-active radar. Do not infer instantaneous guidance or a guaranteed hit from a label.
+
+Kh-59MK uses active radar + inertial guidance in the current panel; do not replace it with Kh-59M’s TV guidance. The FAB-3000M entries are unguided bombs, not the separate UMPK glide weapon.
+
+Weapon sources
+
+War Thunder Su-30SM2 weapon panels — primary source for Kh-38, Kh-31PD, Kh-58UShK, Kh-59MK, R-77-1, and other listed weapons.
+
+War Thunder Su-39 weapon panels — Kh-25ML and Kh-58U A′/B/C.
+
+War Thunder MiG-27K weapon panels — Kh-29T.
+
+War Thunder Su-27SM weapon panels — R-77 and R-27 family.
+
+War Thunder MiG-29 (9-12) weapon panels — FAB-500M-54.
+
+War Thunder Tu-4 weapon panels — FAB-500M-46 and FAB-3000M-46.
+
+War Thunder Su-34 weapon panels — FAB-3000M-54.
+
+War Thunder anti-radiation missile explanation — passive homing behavior.
+
+REFERENCE NOTES
+
+War Thunder Su-27 flight limits — source for the rounded fighter speed and structural threshold.
+
+War Thunder MiG-29 flight limits — source variant 9-13, used internally only.
+
+War Thunder MiG-25 flight limits — source variant PD, used internally only.
+
+War Thunder RWR mechanics — reference for band compatibility, profile-dependent classification, and associated guidance warnings; this official explanation is not a guarantee of unchanged current game values.
+
+War Thunder Su-27 countermeasures — inspiration for the adopted Su-27 game inventory.
+
+War Thunder MiG-29 countermeasures — inspiration for the adopted MiG-29 game inventory.
+
+War Thunder MiG-25 sensors and countermeasures — inspiration for the MiG-25 sector receiver and inventory.
+
+Statshark — requested supplementary reference; unreadable during this research, so not used as verification.
+
+All low-altitude speed caps, maneuverability ratings, AI timing values, numerical RWR tier settings, and the Tu-160 numeric profile are proposals for this game. Keep them editable.

@@ -1,3 +1,21 @@
+# Project status — v0.20
+
+Completed the two updated Google Doc guides (2026-10-05): four-aircraft roster, aircraft speed/G/energy/preset profiles, actual-emission RWR reception, separate visual sensing, perception-only AI reactions/memory/retries and finite combined countermeasures. Existing Watchpost/player weapons, radar rules, economy, menus/intro/music remain. No default hostile missiles; WP-2/WP-3 and weapon catalogue are reference-only. See Update-Guide-v0.20.txt for implemented scope and provisional values.
+
+IMPORTANT INSTALLATION CHANGE: original com.jb.radar signing key was lost when temporary workspace was cleared and was not present in recovered backups. v0.20 installs alongside old app as com.jb.radar.next (label AIR DEFENSE 0.20), fully qualified activity com.jb.radar.MainActivity. It does not overwrite or automatically import old saved progress. Never tell the user to uninstall the old app to install this APK. New key backup exists privately as Air-Defense-Next-Signing-Backup.zip; recover it for future updates, never commit key/password. New signer SHA256: f531de809216fb186541cf0a095da96658c9bb73ce653bf1948da1489e232da2.
+
+Source owners: AircraftProfiles.java defines editable stats/presets/routes/AI/CM; RwrReceiver.java is the receiver boundary; GameSensors.java maps physical world emissions and visual sightings to anonymous delayed evidence; PilotAI.java consumes only that evidence and self/mission knowledge. Game.java applies physical flight, default spawns, ballistic release and sensor/guidance integration; Infrared.java manages independent IRST/seeker plus combined decoys. Model/UI configuration is loaded from assets/aircraft.properties and assets/rwr.properties alongside existing equipment/combat assets.
+
+Validation: 23 pure-Java suites and 10 complete mission seeds pass. Actual default Su-27 Smart1 spawn profiles produced 19/20 one-shot starter-missile kills across 7/9/11/12km sampled engagements (not a guaranteed hit rate; one survivor had about2% health). Existing radar/guidance/IR/economy/intro regressions pass. Actual desktop Canvas ReferenceUIRenderCheck, MissionMenuCheck, IntroRenderCheck and new AircraftProfileRenderCheck pass at 800x450 and1600x900. Full Android source compiles; APK v2/v3signature, manifest Android26–35/20/0.20.0 and all17 assetfiles byteidentity verified. No emulator or real Android phone was available.
+
+APK: artifacts/Air-Defense-v0.20.apk
+APK bytes: 7837444
+APK SHA256: beded2c71dca8d76a8e14397079d54fcec1515e63c53d1d8aa41593b4f0b849d
+Work branch: radar-rebuild-v0.17. main still retains prior history.
+Validation files: docs/validation-v020/. Historical APKs/docs below remain unchanged references.
+
+## Previous version history
+
 # Project status — v0.19
 
 Latest request: implement the supplied radar console guide, ignoring beta-only content. Source retained in UPDATE-REFERENCE-v019.txt; exact supplied canonical radar icons bundled in assets/radar-icons. Existing Watchpost/USA tree, mission roster, Rookie Mission 1, economy, menus, Digital-7 introduction and music preserved. Beta-only Horizon Shield/MIM-225A and replacement test aircraft omitted.

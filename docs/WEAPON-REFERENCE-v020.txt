@@ -1,0 +1,45 @@
+AIR DEFENSE v0.20 weapon reference catalogue
+
+Source: the user-supplied Aircraft, RWR and AI Update guide, retrieved 5 October 2026:
+https://docs.google.com/document/d/1aUPYVPOLXG5LDyRoFjqV96M9hksr2b8GoINwVMx-Iwo/edit
+
+WEAPON-REFERENCE-v020.csv transcribes the guide's reference tables. The catalogue
+does not activate any weapon, change a player's loadout, enable WP-2/WP-3, or
+create hostile missile spawns. Only aircraft.properties configures active fixed
+WP-0/WP-1 aircraft presets. OFAB-100 is the provisional beginner bomb choice.
+
+NOT_LISTED is unknown, never zero or unlimited. No checked weapon panel supplied
+maximum aircraft release/launch speed. The aircraft preset release limits are
+separately documented gameplay defaults, not reference weapon speed limits.
+
+Missile maximum speed remains in Mach. Atmospheric conditions would be required
+for a conversion to km/h. Launch range is the listed panel value, not guaranteed
+effective range or maximum travel distance. Guidance lifetime is not motor burn
+time. Bomb speed/travel follow release conditions; guidance/range are N/A.
+
+Variant assumptions and guidance interpretation:
+- KH-58SHK is assumed to mean Kh-58UShK pending confirmation of the suffix.
+- Kh-58U A-prime/B/C share the listed flight values, with bands I/F/D respectively.
+- Kh-31PD and Kh-58UShK list band D; radar AAMs and Kh-59MK list I. These are
+  source-game labels, not universal real equipment frequency specifications.
+- ARM panels use SARH labels, but the guide's developer reference describes
+  passive radar-emitter homing. Catalogue guidance is passive anti-radiation.
+- Kh-29TD uses the current guide's TV label, not its cited archived TV+IR label.
+- Kh-59MK is active radar + inertial anti-ship; it is not the TV-guided Kh-59M.
+- R-27R/T/ER/ET are distinct weapons, not one merged R-27 entry.
+- FAB-500M/FAB-3000M need suffixes. FAB-3000M here is unguided, not UMPK.
+- Explosive filler and TNT-equivalent mass are separate values; do not substitute
+  the entire weapon mass for its explosive charge.
+
+Source attribution supplied by the guide (not independently reverified here):
+- War Thunder Su-30SM2 weapon panels: Kh-38, Kh-31PD, Kh-58UShK, Kh-59MK, R-77-1.
+- War Thunder Su-39 weapon panels: Kh-25ML and Kh-58U A-prime/B/C.
+- War Thunder MiG-27K weapon panels: Kh-29T.
+- War Thunder Su-27SM weapon panels: R-77 and the R-27 family.
+- War Thunder MiG-29 (9-12) weapon panels: FAB-500M-54.
+- War Thunder Tu-4 weapon panels: FAB-500M-46 and FAB-3000M-46.
+- War Thunder Su-34 weapon panels: FAB-3000M-54.
+- War Thunder developer anti-radiation explanation: passive homing behavior.
+
+Statshark was unavailable during the guide's research and is not verification.
+Tu-160 flight, RWR and countermeasure numbers remain provisional game balance.

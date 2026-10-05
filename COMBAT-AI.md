@@ -1,3 +1,5 @@
+> Current aircraft/RWR/AI rules are in [Update-Guide-v0.20.txt](Update-Guide-v0.20.txt). Sections below retain prior system details where not superseded.
+
 # Battery damage and pilot behavior — v0.19
 
 Implements the supplied `Update-Guide-v0.10.txt` and `AI-Decision-Flow.mmd`. These are simplified fictional game rules. Existing player equipment, research, Dollars/BP, terminal-green interface, launcher artwork and menu music remain.

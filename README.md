@@ -1,22 +1,22 @@
-# AIR DEFENSE 0.19 — radar console update
+# AIR DEFENSE 0.20 — aircraft, receiver and AI update
 
-Offline Android radar-defense game in terminal green. Native landscape Canvas UI, Android 8+, package `com.jb.radar`, versionCode 19. No network/account permissions. The existing development certificate permits in-place upgrades.
+Offline Android radar-defense game in terminal green. Native landscape Canvas UI, Android 8+, versionCode 20. No network/account permissions.
 
-## Download
+## Download and installation
 
-[Air-Defense-v0.19.apk](artifacts/Air-Defense-v0.19.apk)
+[Air-Defense-v0.20.apk](artifacts/Air-Defense-v0.20.apk)
 
-Install over the previous version to retain Dollars, BP, research, ownership and best score. Uninstalling or clearing app data removes local progress. Active battles do not persist after process termination.
+**This build installs separately as `com.jb.radar.next`, labeled AIR DEFENSE 0.20.** The original `com.jb.radar` signing key was not recoverable after temporary workspace cleanup. The new APK therefore cannot update v0.19 in place. It leaves the old installation and its Dollars/BP/research untouched; progress starts fresh in the new app and does not transfer automatically. Do not uninstall the old app to install this one. A private backup of the new signing key is saved separately from this repository for future updates.
 
 ## This update
 
-The supplied radar guide and icon pack drive a larger native console: central radar, left TWS list/missile stats/inventory, right sensor/contact/fire controls, four launchers and a visible battle log. Detection, tracking, hard lock, recognition and allegiance remain separate. AUTO TRACK, radar switching and radar-only RESET have explicit consequences for guidance.
+The two supplied guides now explicitly specify Su-27, MiG-29, MiG-25 and Tu-160. These four profiles replace the previous campaign roster. Their speed caps depend on altitude, load and damage; acceleration is finite, turns obey individual G limits and consume energy. WP-1 bomb strikes carry four/two/eight bombs respectively; MiG-25 uses the unarmed WP-0 intrusion route. Bomb release requires stable aim, heading, altitude, speed and a ballistic impact solution; released bombs continue after the aircraft is destroyed. WP-2/WP-3 and the supplied weapon catalogue are inactive references, with no default hostile missile spawns.
 
-Radar missiles share a per-missile DATALINKS pool. Overflow requires a warning/confirmation before the oldest missile loses support. Active seekers release support at activation, while SEARCHING and SEEKER LOCK remain distinct. Semi-active guidance can recover or retarget within its bounded support window. IR needs its own thermal acquisition and no channel after firing. Independent bearing-only IRST is implemented for fitted profiles; the existing Watchpost remains without IRST.
+RF warnings now come from actual emitted signals tested against receiver bands, waveforms, beam/antenna coverage, terrain and sensitivity. A receiver may hear search before player detection. TWS and menu actions create no warning. Fire control, suspected illumination and active seeker emissions have separate delayed, imperfect recognition; IR remains RF-silent. Independent visual detection needs line of sight, a finite viewing sector and acquisition time, with pre-dawn/weather penalties. MAWS is absent from all default profiles.
 
-Missile maneuverability uses a configurable 1.00–10.00 rating. Configurable warhead/fuze/damage settings support partial blast damage and direct-impact kinetic profiles. Supplied icons preserve identification colors, with separate tracking/lock overlays and no heading leak on untracked plots.
+Pilots react to anonymous perceived bearings and confidence rather than hidden missile positions, launch counts or player selections. They have reaction delays, threat memory, cautious/defensive/reassessment states, finite combined countermeasures, limited retries and exit routes. Rookie Mission 1 remains slower and imperfect. Countermeasures affect radar and heat sensors through geometry, age and configurable resistance; they never delete a missile automatically.
 
-As requested, the beta-only Horizon Shield/MIM-225A equipment and replacement test aircraft roster are omitted. The original campaign, USA progression, animated menus, Digital-7 introduction, soundtrack and Smart Level 1 Mission 1 remain. The original guide is retained as [UPDATE-REFERENCE-v019.txt](UPDATE-REFERENCE-v019.txt); implemented rules/defaults are in [Update-Guide-v0.19.txt](Update-Guide-v0.19.txt), [TRACKING.md](TRACKING.md) and [EQUIPMENT.md](EQUIPMENT.md).
+The Watchpost, player missiles, economy, USA tree, radar console, supplied icons, animated menus, Digital-7 introduction and music remain. The beta-only Horizon Shield equipment swap remains excluded. A recognized aircraft's INFO header opens a paused profile panel; mission task remains unconfirmed until observed, and the full roster is never shown before gameplay. Tu-160 figures and its bomb role are explicitly provisional game abstractions.
 
 ## Play
 
@@ -38,7 +38,7 @@ Work is backed up on `radar-rebuild-v0.17`; `main` preserves v0.16. Earlier guid
 
 ## Development
 
-See [PROJECT_STATUS.md](PROJECT_STATUS.md), [EQUIPMENT.md](EQUIPMENT.md), [TRACKING.md](TRACKING.md), [COMBAT-AI.md](COMBAT-AI.md) and [INTRO.md](INTRO.md). Balance settings live in `assets/equipment.properties` and `assets/combat.properties`; prices are in `TechTree.java`. All values are fictional game balance.
+See [Update-Guide-v0.20.txt](Update-Guide-v0.20.txt), [PROJECT_STATUS.md](PROJECT_STATUS.md), [EQUIPMENT.md](EQUIPMENT.md), [TRACKING.md](TRACKING.md), [COMBAT-AI.md](COMBAT-AI.md) and [INTRO.md](INTRO.md). Balance settings live in `assets/equipment.properties`, `assets/combat.properties`, `assets/aircraft.properties` and `assets/rwr.properties`; prices are in `TechTree.java`. All values are fictional game balance.
 
 Build with Java 17, Android platform 35, build-tools 35.0.0 and zip. Set `RADAR_ANDROID_JAR`, `RADAR_BUILD_TOOLS`, `RADAR_KEYSTORE`, `RADAR_KEY_PASSWORD`, then run `./build.sh`. Optional `RADAR_ECJ` selects ECJ when javac is unavailable. Never publish private signing keys/passwords.
 

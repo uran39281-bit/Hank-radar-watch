@@ -1,3 +1,5 @@
+> Current aircraft/RWR/AI rules are in [Update-Guide-v0.20.txt](Update-Guide-v0.20.txt). Sections below retain prior system details where not superseded.
+
 # Equipment and provisional balance — v0.19
 
 These are fictional game values. The update keeps Watchpost, the existing USA tree and campaign aircraft. The supplied guide's beta-only Horizon Shield battery, MIM-225A missile and replacement aircraft roster are intentionally excluded. `UPDATE-REFERENCE-v019.txt` retains the source guide.

@@ -1,0 +1,28 @@
+AIR DEFENSE v0.20 / 2026-10-05
+
+SCOPE
+Both updated source guides are retained in UPDATE-REFERENCE-v020-radar.txt and UPDATE-REFERENCE-v020-aircraft.txt. The new four-aircraft roster is central requested content. Watchpost/player equipment remain unchanged; MIM-225 beta equipment remains excluded. Future weapon tables are inactive reference data in docs/WEAPON-REFERENCE-v020.csv and .txt.
+
+INSTALLATION
+Original signer was absent from all recovered backups. APK uses new stable package com.jb.radar.next and a new privately backed-up certificate; activity remains com.jb.radar.MainActivity. It coexists with old com.jb.radar. Original app saves remain in that app; no automatic transfer. No uninstall is necessary. Never put either signing private key or password in GitHub.
+
+AIRCRAFT / FLIGHT
+AircraftProfiles.java + aircraft.properties define Su-27, MiG-29, MiG-25 and Tu-160, roles distinct from assigned tasks, rounded gameplay speed caps, reference heights, ceilings, structural/commanded G, handling, signature separate from stealth, editable route/AI/CM/presets. All stealth=0 and MAWS=false. Flight interpolates low/reference speed limits and handles load, health, finite acceleration, induced turn energy loss and terrain clearance. Tu-160 numerical values are provisional, not a verified War Thunder or Statshark specification.
+
+WP-0 flies its configured intrusion route without immediately aborting for no bombs. WP-1 checks ballistic lead, stable heading/aim, AGL, speed and cooldown, releasing one bomb per cooldown. Counts Su-27=4, MiG-29=2, Tu-160=8. Default light OFAB-100 is configurable (114 kg total/38 kg explosive), preserving accessibility. Bomb fall uses gravity and initial horizontal speed with small scatter; it is independent of the parent afterward. WP-2/WP-3 do not activate attacks. Legacy hostile missile machinery remains available for nondefault tests/future work.
+
+RECEIVER BOUNDARY
+GameSensors emits actual search/steered fire-control/illumination/active-seeker signals. RwrReceiver checks band/waveform, beam/antenna coverage, line of sight, inverse-square signal strength and profile uncertainty. Detection by player radar is not required. The AI sees anonymous emitter ID, inferred class, estimated bearing, confidence and evidence times only. GEN-1 supports coarse search/fire-control and treats unrecognized seekers as unknown; GEN-2 recognizes compatible illumination/seekers after delay. GEN-0 and future GEN-3 are configuration options. Visual evidence is independent, finite-FOV/dwell, with night/weather penalties; no default MAWS.
+
+TWS/selection/ammo/channel/UI information never triggers warnings. ARH launch/midcourse and IR launch are silent by themselves. Hard-lock emissions and SARH-associated illumination are evidence, not exact launch counts. Seeker radiation continues with battery radar off. Each signal class retains its own memory; ordinary search cannot indefinitely extend an expired hard-lock warning. All receiver/AI/decoy/physics times use simulation time and freeze on pause/background.
+
+AI / COUNTERMEASURES
+Skill=.4, aggression=.55, ordinary delay2-4s, urgent delay1-2s, observed-threat memory12s, minimum state hold2s, safe-clear6s, decision interval.25s, health abort below35%, maximum2 disrupted passes. RookieSmart1 remains configured, with slower/missed/mistimed responses. Pilots combine equally urgent perceived bearings, never hidden missile coordinates. DISENGAGE stops attacks but can still defend. Mission memory is bounded and developer traces are disabled by default and absent from player logs. Bomb-result learning requires observed impact evidence.
+
+A single combined inventory (96/60/64/128 by profile) consumes up to3 units per burst, cooldown1.5s, effect3s, reserve10% except urgent threat. Same cloud provides radar and heat effects governed by geometry/age/resistance; no instant destruction or guaranteed lock break. Search alone never deploys countermeasures. Heat reduction is deliberate with a flight-energy cost. Notching is a physical geometry-dependent radar-quality modifier only on configured susceptible models.
+
+UI / CONTINUITY
+Recognized-contact INFO opens a paused generic profile; role and observed/unknown mission task are distinct. Full actual task is available in postmission debrief. Pre-mission menus, loadout and intro reveal no enemy names, counts, wave timing or roster. Radar tracking/datalink/lock/ID behavior from v0.19 remains. Economy keys/schema and progression logic remain unchanged, but the separate package has its own Android data sandbox.
+
+VALIDATION
+Model tests cover aircraft/RWR/AI/CM/physics, existing tracking/guidance/IR/economy/intro, and ten seeded missions. Desktop actual-Canvas checks cover menu/loadout/intro/navigation and 800x450/1600x900 aircraft panels. APK signature, manifest and packaged assets are verified. No Android emulator/physical phone was available; device installation, audio performance and human balance still need real-device use.

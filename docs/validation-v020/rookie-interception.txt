@@ -1,0 +1,24 @@
+range=7 seed=0 kill=1 hp=0.0 CM=0 bombs=0 state=DESTROYED
+range=7 seed=1 kill=1 hp=0.0 CM=0 bombs=0 state=DESTROYED
+range=7 seed=2 kill=1 hp=0.0 CM=3 bombs=4 state=DESTROYED
+range=7 seed=3 kill=1 hp=0.0 CM=9 bombs=4 state=DESTROYED
+range=7 seed=4 kill=1 hp=0.0 CM=0 bombs=0 state=DESTROYED
+SUMMARY range=7 kills=5/5 damaged=5/5 releases=3/5 CMtotal=12
+range=9 seed=0 kill=1 hp=0.0 CM=0 bombs=3 state=DESTROYED
+range=9 seed=1 kill=1 hp=0.0 CM=0 bombs=3 state=DESTROYED
+range=9 seed=2 kill=1 hp=0.0 CM=9 bombs=4 state=DESTROYED
+range=9 seed=3 kill=1 hp=0.0 CM=15 bombs=4 state=DESTROYED
+range=9 seed=4 kill=0 hp=2.1429845934762852 CM=0 bombs=3 state=DISENGAGE
+SUMMARY range=9 kills=4/5 damaged=5/5 releases=3/5 CMtotal=24
+range=11 seed=0 kill=1 hp=0.0 CM=0 bombs=4 state=DESTROYED
+range=11 seed=1 kill=1 hp=0.0 CM=0 bombs=4 state=DESTROYED
+range=11 seed=2 kill=1 hp=0.0 CM=18 bombs=4 state=DESTROYED
+range=11 seed=3 kill=1 hp=0.0 CM=12 bombs=4 state=DESTROYED
+range=11 seed=4 kill=1 hp=0.0 CM=0 bombs=4 state=DESTROYED
+SUMMARY range=11 kills=5/5 damaged=5/5 releases=0/5 CMtotal=30
+range=12 seed=0 kill=1 hp=0.0 CM=0 bombs=4 state=DESTROYED
+range=12 seed=1 kill=1 hp=0.0 CM=0 bombs=4 state=DESTROYED
+range=12 seed=2 kill=1 hp=0.0 CM=18 bombs=4 state=DESTROYED
+range=12 seed=3 kill=1 hp=0.0 CM=12 bombs=4 state=DESTROYED
+range=12 seed=4 kill=1 hp=0.0 CM=0 bombs=4 state=DESTROYED
+SUMMARY range=12 kills=5/5 damaged=5/5 releases=0/5 CMtotal=30

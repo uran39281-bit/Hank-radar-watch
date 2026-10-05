@@ -1,0 +1,6 @@
+PASS full Android source compile (deprecated platform API warnings only).
+PASS ReferenceUIRenderCheck
+PASS MissionMenuCheck
+PASS IntroRenderCheck
+PASS AircraftProfileRenderCheck: 800x450 and1600x900; textbounds/touch/back/pause/profileidentity; premission rosterhidden/no spawns.
+Screenshots visually inspected. No real Android installation/audio/performance test available.

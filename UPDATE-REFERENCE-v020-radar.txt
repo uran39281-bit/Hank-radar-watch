@@ -1,0 +1,417 @@
+AIR DEFENSE 101 — BETA TEST CODING GUIDE
+
+RADAR AND MISSILE LOGIC
+
+Build the playable beta described below. Use the existing project’s engine and framework if a project is supplied. Treat this guide as the gameplay specification. Preserve the listed equipment values and use ICONS FOR RADAR.zip for the supplied visual assets.
+
+The player operates an air-defense battery: detect contacts, automatically track eligible targets, select a launcher and missile, lock when required, and fire. Keep detection, tracking, locking, identification, and missile guidance as separate states. Selecting a target does not automatically identify, track, or lock it.
+
+Some mechanics below are deliberate game simplifications. Do not present them as universal rules for real weapons. Keep balancing values configurable. Where a required value is missing, use a clearly documented provisional beta default; do not silently invent a final equipment specification.
+
+Detection
+
+When a radar sweep detects a contact, record its last measured position, bearing, range, and detection time. Bearing is needed to place the contact on the radar.
+
+For an untracked contact, show only its last detected position and range. Do not show current altitude, speed, or heading. Move its displayed position only when a new detection updates it.
+
+Detection alone does not reveal the contact’s aircraft model or allegiance.
+
+Tracking — TWS
+
+With AUTO TRACK enabled, automatically build tracks for detected contacts when track quality, range, and tracking capacity allow.
+
+A tracked contact shows estimated range, altitude, speed, and heading. Use its latest measured position and velocity to predict movement between sweeps.
+
+Prediction is an estimate, not a new measurement. A successful radar revisit updates and corrects the track. Prediction error and uncertainty increase when measurements are missed.
+
+A usable radar track allows the player to launch an active-homing missile without a separate hard lock.
+
+Tracking capacity limits tracked contacts, not the number of visible detections. Example: with capacity for two tracks and six detected contacts, predict movement for the two tracked targets; the other four remain at their last detected positions until another sweep detects them.
+
+Suggested beta allocation rule: retain usable existing tracks, then fill free slots with the nearest eligible contacts. Keep this rule configurable and avoid switching targets every sweep.
+
+Keep short measurement history for estimating velocity. Do not read hidden simulation values directly into the player’s sensor display.
+
+Track loss
+
+When radar measurements stop, a track may coast using its last estimate for a configurable time. Mark it STALE and reduce quality.
+
+After the track timeout, remove it from the TWS list and retain only a fading last-known contact until the contact timeout expires.
+
+A stale track below the launch-quality threshold cannot support a new launch or lock. Existing missiles respond according to their guidance type.
+
+Locking
+
+A radar lock requires an existing usable radar track and sufficient lock quality.
+
+Locking provides a higher-quality fire-control solution and, for semi-active missiles, the target illumination needed for guidance. It is more than selecting a target.
+
+For this beta, keep ordinary TWS scanning active while a target is locked. A locked target continues to occupy one tracking slot.
+
+Use configurable acquisition time and lock-loss tolerance. If the track becomes unusable, the target leaves the possible lock envelope, or the radar switches off, the lock is lost.
+
+LOCK is primarily required for semi-active missiles. UNLOCK releases the selected target’s radar lock.
+
+Target warnings and reactions
+
+Aircraft warning equipment determines what the AI can notice. An aircraft without a relevant sensor must not react using hidden knowledge that the player is tracking or firing at it.
+
+Search-radar emissions may produce a general radar warning and approximate emitter direction if the aircraft’s radar warning receiver (RWR) can detect them.
+
+TWS tracking does not automatically guarantee a separate tracking warning. Make that warning dependent on the aircraft’s RWR and the radar’s modeled emissions.
+
+A detectable fire-control lock can produce a stronger warning and increase the AI’s urgency. Launch warnings depend on the aircraft’s equipment and detectable signals; do not grant every aircraft an immediate warning for every missile.
+
+Passive IR sensing does not itself create a radar warning. An aircraft with missile-warning equipment or visual awareness may still detect an incoming IR missile.
+
+Give AI a reaction delay and configurable response strength rather than an instant, guaranteed escape.
+
+Missile guidance types
+
+Support exactly three gameplay guidance types:
+
+Semi-active radar homing.
+
+Active radar homing.
+
+Infrared (IR) homing.
+
+Semi-active and active homing are radar-guided categories. IR homing is infrared-guided.
+
+Semi-active radar homing
+
+Launch requires a tracked target, a usable radar lock, and continuous target illumination after launch.
+
+If illumination is interrupted, the missile temporarily continues using its last guidance estimate. Start a configurable guidance-loss timer; do not make it maneuver randomly.
+
+If valid illumination returns before the timer expires, resume guidance. Otherwise, the missile self-destructs.
+
+Preserve the requested retargeting mechanic as a simplified game feature: quickly unlocking the original target and locking a new target may redirect missiles assigned to that illumination channel. The new target must be within the missile’s seeker field of view and achievable flight envelope, and illumination must return before timeout.
+
+Do not make every airborne semi-active missile change targets merely because the player selects a different contact.
+
+Active radar homing
+
+Launch requires a usable radar track, not a hard radar lock.
+
+Before autonomous seeker activation, the missile follows its predicted intercept course and receives target updates through a guidance channel.
+
+At its configurable seeker-activation condition, turn on its onboard radar and search near the predicted target position. Search does not mean a target has already been acquired.
+
+Use separate MIDCOURSE, SEARCHING, and SEEKER LOCK states.
+
+Once the missile acquires a valid target, it guides autonomously. The seeker has limited range, field of view, and acquisition time.
+
+Preserve the requested beta fallback: if external target updates or the guidance channel are lost before normal seeker activation, activate the seeker early and search using the last received target estimate. This is a gameplay rule, not a guarantee that the missile can find a distant target.
+
+If nothing valid is acquired, continue toward the last predicted intercept until the seeker-search timeout or flight lifetime expires, then self-destruct.
+
+After acquisition, a target leaving the seeker envelope can cause lock loss. Allow a configurable reacquisition period before self-destruction.
+
+Release the battery guidance channel when the onboard seeker activates; both normal activation and early fallback end external guidance in this beta.
+
+Infrared homing and IRST
+
+Infrared search and track (IRST) is a passive battery sensor; the missile’s IR seeker is a separate sensor.
+
+IRST can detect and track eligible heat sources while the radar is off. It can cue the missile toward a target without requiring a radar lock.
+
+Radar tracks can cue IRST toward an area, and IRST can cue radar toward a bearing. A cue does not guarantee that the receiving sensor can detect the target, and it cannot overcome terrain obstruction.
+
+Do not treat an IRST bearing alone as a precise range measurement. Radar-assisted range may be displayed when available; any independent IRST range estimate must be marked as an estimate.
+
+For the requested simplified beta behavior, use lock-on after launch: fire toward a valid IRST cue, activate the missile seeker, and search in that direction.
+
+The seeker attempts to acquire the first valid heat source encountered within its field of view and sensitivity limits. Preserve this simple acquisition rule without making every hot object a guaranteed lock.
+
+After launch, the IR missile receives no further radar or IRST updates and uses no battery guidance channel.
+
+IRST performance depends on heat contrast, target aspect, range, weather, clouds, and obscuration. A hot day does not automatically make IRST fail.
+
+Give IRST its own range, update interval, capacity, and acquisition settings. Do not reuse radar lock range as IRST range.
+
+Range behavior
+
+Treat listed radar detection, tracking, and locking ranges as effective ranges rather than absolute cutoffs.
+
+Within each effective range, outcomes still depend on target and sensor conditions. Beyond it, gradually reduce detection probability and track or lock quality, up to a configurable outer cutoff.
+
+Example: a 30 km effective tracking range may permit an unreliable track at 35–40 km if the configured envelope allows it.
+
+Configure detection, tracking, and locking separately. Do not automatically grant a lock merely because a contact can be detected or tracked.
+
+Radar display-range presets change the view scale only; they do not increase sensor performance.
+
+Missile maximum range is a nominal engagement limit. Weather, target motion, and missile flight performance can reduce the usable envelope. A target inside the listed range is not a guaranteed hit.
+
+Guidance channels and tracking capacity
+
+Maximum simultaneous tracks is the number of contacts the radar can maintain as usable tracks.
+
+The displayed DATALINKS value represents the beta’s shared external-guidance capacity: active missiles receiving midcourse updates and semi-active missiles relying on illumination each occupy one channel.
+
+This shared pool is a game simplification; real datalink and illumination capacities are different concepts.
+
+IR missiles occupy no channels. Active missiles release their channel when their onboard seeker activates. Destroyed, expired, or self-destructed missiles also release their channels.
+
+Preserve the requested overflow behavior: if all channels are occupied and the player launches another radar-guided missile, transfer the oldest supported missile’s channel to the new missile.
+
+The displaced active missile enters early seeker search. The displaced semi-active missile loses guidance and starts its guidance-loss timer.
+
+Show the consequence before firing and log the channel transfer. Do not silently remove an existing missile.
+
+Example: with two occupied channels, a third radar-guided launch displaces the oldest externally guided missile, even when all three missiles target the same aircraft.
+
+Identification
+
+Keep allegiance and type recognition separate from tracking status.
+
+Allegiance: UNKNOWN, HOSTILE, or FRIENDLY.
+
+Type recognition: UNRECOGNIZED or RECOGNIZED, with an estimated aircraft or missile type when supported.
+
+NCTR means non-cooperative target recognition: matching sensor information against a recognition database. Recognizing an aircraft type does not by itself prove allegiance.
+
+IFF and scenario identification evidence determine allegiance. Missing an IFF reply is not automatically proof that a target is hostile.
+
+“NCTR recognized” means a valid type match has been obtained. “NCTR unrecognized” means the system lacks a confident match; it does not necessarily mean recognition proved anything negative.
+
+The simulation knows each beta aircraft’s true type and enemy allegiance. The player sees only what the sensor and identification rules have established.
+
+RADAR STATS
+
+Radar system name: display name of the battery or radar system.
+
+Detection range (km): effective range for detecting contacts.
+
+Radar scan speed: rating from 1.00 to 6.00, allowing two decimal places. 1.00 is the slowest scan rate; 6.00 is the fastest. Map the rating to a configurable interval between radar sweeps. Faster sweeps refresh detections and tracking measurements more often, but do not increase detection, tracking, or lock range. Predicted movement between sweeps remains separate from new sensor measurements.
+
+Track range (km): effective range for maintaining radar tracks.
+
+Lock range (km): effective range for obtaining a fire-control lock.
+
+Maximum simultaneous tracks: number of radar targets tracked at once.
+
+Datalinks / guidance channels: number of missiles externally supported at once under the beta’s shared-channel rule.
+
+Role: the battery’s intended defensive role.
+
+NCTR memory: target types available in the recognition database; membership permits a match but does not instantly identify every contact.
+
+Keep additional implementation parameters configurable: the mapping from scan-speed rating to sweep interval in seconds, acquisition and lock times, track-quality thresholds, prediction uncertainty, stale-track and contact timeouts, range falloff, outer cutoffs, radar switching delay, and IRST sensor settings.
+
+Suggested beta interpretation: AUTO TRACK controls acquisition of radar TWS tracks; IRST ON controls the independent IRST tracking process.
+
+MISSILE DAMAGE AND STATS
+
+Each missile’s performance must come from its configured stats.
+
+Missile name: display name.
+
+Maximum range (km): nominal maximum engagement range, adjusted by modeled conditions.
+
+Guidance: SEMI_ACTIVE_RADAR, ACTIVE_RADAR, or IR.
+
+Role: point defense, short range, medium range, long range, or strategic defense.
+
+Maneuverability: rating from 1.00 to 10.00 that maps to configurable turning performance. It is not automatically a maximum-G value.
+
+Warhead explosive mass (kg): explosive content for explosive warheads. Preserve the supplied beta value below.
+
+Warhead type: blast-fragmentation, fragmentation, or kinetic. Kinetic damage requires impact parameters rather than treating mass as explosive content.
+
+Missiles must have visible flight time and limited turning ability. Do not implement firing as an immediate hit or a fixed random kill chance.
+
+Explosive damage should depend on detonation distance, explosive mass, warhead type, and target vulnerability. A proximity detonation can cause partial damage or a kill; it does not guarantee destruction.
+
+Use direct-impact behavior for kinetic weapons. Keep target health, damage curves, fuze distance, and any damage thresholds configurable.
+
+The source does not provide missile speed, acceleration, flight lifetime, seeker range, field of view, search timeout, or guidance-loss tolerance. Use documented provisional beta defaults for these required settings rather than presenting invented values as supplied stats.
+
+Treat the 1.00–10.00 maneuverability conversion and damage model as configurable beta balancing rules.
+
+UI AND VISUALS
+
+Use UI_guide.png as the reference for panel placement, proportions, and overall terminal appearance. Build an interactive interface; do not use the reference image as a flat screen with invisible controls.
+
+The example equipment names, ranges, dates, aircraft, and inventory counts in the image are illustrative. Use the beta values in this guide instead.
+
+Use a black background, terminal-green interface elements, and readable white secondary text. Preserve the supplied contact-icon colors.
+
+Panel layout
+
+Keep the large radar display in the center.
+
+Place the TWS track list, selected-missile information, and missile inventory on the left.
+
+Place sensor controls, selected-target information, target selection, lock controls, AUTO TRACK, and FIRE on the right.
+
+Place Launcher 1–4 and the battle log along the bottom.
+
+Place battery status and the reference’s time/pause controls in the top bar. Display-range presets sit above the radar.
+
+Contact indicators
+
+A tracked target has a dotted circle around its icon.
+
+A radar-locked target has a solid circle, replacing the dotted tracking circle.
+
+An untracked contact has no tracking or lock circle.
+
+Use a separate selection highlight so selection cannot be mistaken for tracking or locking. IR seeker acquisition must not appear as a battery radar lock.
+
+Missile guidance lines
+
+Semi-active: draw a solid line from the battery/radar to the missile while external guidance is valid. This represents guidance status, not a literal radar beam aimed at the missile. Remove or visibly mark it when guidance is lost.
+
+Active homing: draw a dotted line from the radar to the missile during supported midcourse flight. Remove it when the onboard radar activates, including early fallback activation.
+
+While the active seeker is searching, show SEARCHING with no missile-to-target lock line.
+
+Once it acquires a target, draw a line from the missile to its acquired target. Remove that line if seeker lock is lost.
+
+IR: draw no battery-to-missile or IRST-to-missile guidance line. Use a status label for seeker acquisition; keep its flight independent after launch.
+
+Buttons and screen boxes
+
+TWS track list: show currently maintained radar tracks, track capacity used/available, sensor estimates, identification, and track status. Mark stale data visibly.
+
+Selected missile: switch between available missile types and display their guidance, range, maneuverability, and warhead information. For this beta, only MIM-225A is supplied; do not invent additional selectable equipment.
+
+Missile inventory: show loaded rounds, reserve rounds, and total rounds. A launch consumes one round from the selected launcher, not directly from reserve.
+
+Launcher 1, 2, 3, 4: select the firing launcher and display its state and loaded ammunition. If loading/reloading is needed, use documented provisional capacity and timing settings.
+
+Battle log: record detections, tracks, identification changes, locks, launches, seeker activation, guidance loss, channel transfers, damage, kills, and self-destruction.
+
+FIRE: launch the selected missile from the selected ready launcher when its guidance requirements and flight envelope permit. Show a clear reason when unavailable.
+
+AUTO TRACK: toggle automatic radar tracking. Suggested beta rule: OFF stops acquisition and automatic refresh; existing tracks coast and expire using normal timers. Display the guidance consequence of switching it off.
+
+LOCK: attempt a radar fire-control lock on the selected tracked target.
+
+UNLOCK: release the selected target’s radar lock and show the consequence for dependent semi-active missiles.
+
+NEXT TARGET: cycle through currently visible contacts, including untracked contacts; keep selection stable when new contacts appear.
+
+Selected target: show contact ID, identification confidence, sensor source, tracking/lock state, data age, and only the information the sensors currently provide. Use UNKNOWN or an em dash for unavailable values.
+
+RADAR ON/OFF: switch the radar with a configurable delay. While off, stop radar measurements and illumination; let stale tracks and dependent missile guidance behave according to their timers.
+
+IRST ON/OFF: switch IRST with a shorter configurable delay than the radar.
+
+RESET: clear radar contacts, radar tracks, and radar locks. Do not delete aircraft, missiles, inventory, or IRST tracks. Apply guidance-loss behavior to missiles affected by the cleared radar data. New detections may repopulate the radar on later sweeps. Reserve future jamming-related behavior for a later update.
+
+Radar display-range presets: use values appropriate to this battery’s hundreds-of-kilometers envelope; do not copy the reference image’s 20–60 km limits as this battery’s maximum view range.
+
+Pause/time controls: affect the entire simulation consistently, including scans, movement, guidance timers, reloads, and log timestamps.
+
+Radar icon mapping
+
+Use exact filenames and capitalization from ICONS FOR RADAR.zip.
+
+Player-launched missile: player_missile.png.
+
+Recognized hostile aircraft: hostile_jet.png.
+
+Recognized friendly aircraft: friendly_jet.png.
+
+Recognized hostile missile: hostile_missile.png.
+
+Hostile contact with unrecognized type: hostile_no_ID.png.
+
+Friendly contact with unrecognized type: friendlty_no_ID.png.
+
+Unknown tracked contact: unknown_track.png.
+
+Unknown untracked contact: Unknown_untracked_target.png.
+
+The ZIP contains “friendlty_no_ID.png,” not “friendly_no_ID.png.” Either reference the actual filename or rename it consistently in the project; do not leave a broken path.
+
+Use unknown_track.png as the canonical unknown tracked icon. The separate “unknow tracked.png” is an alternate asset, not an additional gameplay state.
+
+The ZIP also contains “low threat.png” and two generically named PNGs. Their gameplay roles are not specified here; do not invent new target categories for them.
+
+Use affiliation to choose hostile/friendly/unknown styling, recognition to choose a type-specific or generic icon, and tracking state to choose the tracking overlay. Player missiles are always marked as player-owned.
+
+For an unknown-allegiance contact, use the unknown icon and show any available recognized type in its information panel. Do not automatically turn a recognized type into a red hostile icon.
+
+Keep friendly-display support even though the beta spawns only enemies.
+
+Preserve transparency and aspect ratio. Scale icons consistently and orient aircraft/missiles using known heading; do not reveal heading for an untracked contact that lacks that measurement.
+
+PLAYER EQUIPMENT FOR THE BETA TEST
+
+Radar / battery
+
+Radar system name: MIM-225 Horizon Shield.
+
+Detection range: 455 km.
+
+Radar scan speed: TBD (1.00–6.00).
+
+Track range: 315 km.
+
+Lock range: 310 km.
+
+Maximum simultaneous radar tracks: 24.
+
+Datalinks / guidance channels: 8.
+
+Role: strategic defense.
+
+NCTR memory: ALL beta target types. “ALL” means database coverage; identification still requires valid sensor evidence.
+
+Missile
+
+Missile name: MIM-225A.
+
+Maximum range: 305 km.
+
+Guidance: active radar homing.
+
+Role: long-range / strategic defense.
+
+Maneuverability: 4.00 / 10.00.
+
+Warhead explosive mass: 140 kg.
+
+Warhead type: blast-fragmentation.
+
+These are fictional gameplay values. Preserve them without substituting real equipment specs or the UI reference’s MIM-301 values.
+
+Implement the three guidance behaviors so the system can support them, but expose only the supplied MIM-225A in the default beta loadout.
+
+Missing beta values—such as the radar scan-speed rating and baseline sweep interval, ammunition per launcher, reserve count, reload time, IRST range, missile flight speed, and seeker settings—must be collected in a clearly labeled provisional configuration for review.
+
+BETA TEST AIRCRAFT ONLY
+
+Spawn only these aircraft in the beta:
+
+Su-27 — ENEMY.
+
+MiG-29 — ENEMY.
+
+MiG-25 — ENEMY.
+
+Tu-160 — ENEMY.
+
+Aircraft, RWR and AI update:
+
+Follow the linked update for the four-aircraft roster, weapon presets, receiver profiles, and AI reactions. Its aircraft/RWR/AI rules supersede the earlier defaults; other beta equipment and guidance rules remain in effect.
+
+These are scenario truth values, not instant player-visible identification. Contacts begin with whatever sensor evidence is available and gain recognition/allegiance information through the game’s identification rules.
+
+Do not spawn hostile missiles, friendly aircraft, or extra aircraft types in this beta. Keep the corresponding UI icons and guidance support available for later use.
+
+Implementation and verification
+
+Separate the simulation’s true positions and identities from the sensor estimates shown to the player.
+
+Keep equipment stats and provisional balancing settings in configuration rather than scattered hard-coded values.
+
+First implement the radar/contact states and supplied active missile; then connect the UI and verify the other guidance behaviors with controlled test configurations.
+
+Verify: six detections with only two tracking slots; prediction corrected by later sweeps; lock requiring a usable track; active launch without hard lock; seeker search distinguished from seeker lock; oldest-channel displacement; radar OFF and RESET guidance consequences; passive IR flight without channels; and correct icon paths.
+
+Deliver a playable beta and a brief explanation of implemented behavior, provisional defaults, and any remaining limitations. Do not claim a feature is complete until it works in the game.
